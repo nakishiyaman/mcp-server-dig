@@ -1,0 +1,43 @@
+{
+  "name": "mcp-server-dig",
+  "version": "0.1.0",
+  "description": "MCP server for AI-powered code archaeology — git blame, file history, contributor patterns, and related change analysis",
+  "type": "module",
+  "bin": {
+    "mcp-server-dig": "./build/index.js"
+  },
+  "main": "./build/index.js",
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "watch": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "git",
+    "blame",
+    "history",
+    "archaeology",
+    "context",
+    "ai",
+    "claude"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^2.1.0"
+  }
+}
