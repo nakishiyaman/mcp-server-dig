@@ -1,0 +1,27 @@
+{
+  "tab_size": 2,
+  "formatter": "auto",
+  "format_on_save": "on",
+  "soft_wrap": "editor_width",
+  "git": {
+    "inline_blame": {
+      "enabled": true
+    },
+    "git_gutter": "tracked_files"
+  },
+  "file_scan_exclusions": [".git", ".DS_Store", "node_modules", "build", "dist"],
+  "languages": {
+    "TypeScript": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "npx",
+          "arguments": ["prettier", "--stdin-filepath", "{buffer_path}"]
+        }
+      }
+    }
+  },
+  "terminal": {
+    "working_directory": "current_project_directory"
+  }
+}

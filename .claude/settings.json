@@ -1,0 +1,65 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm test:*)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Read",
+      "Write(src/**)",
+      "Write(test/**)",
+      "Write(AGENTS.md)"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Bash(rm -rf:*)",
+      "Bash(sudo *)",
+      "Bash(npm publish:*)",
+      "Write(package-lock.json)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys; d=json.load(sys.stdin); p=d.get('tool_input',{}).get('file_path',''); protected=['.env','package-lock.json','tsconfig.json']; [print('BLOCKED: '+p+' は保護対象です。設定ではなくコードを修正してください。',file=sys.stderr) or sys.exit(2) for x in protected if x in p]\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read f; [ -z \"$f\" ] && exit 0; case \"$f\" in *.ts|*.tsx) npx prettier --write \"$f\" 2>/dev/null; LINT=$(npx eslint \"$f\" 2>&1 | head -20); [ -n \"$LINT\" ] && echo \"$LINT\";; esac; exit 0; }"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'STOP_FLAG=/tmp/mcp_server_dig_stop_hook; if [ -f \"$STOP_FLAG\" ]; then rm -f \"$STOP_FLAG\"; echo \"(再チェックをスキップ)\"; else touch \"$STOP_FLAG\"; cd /home/kishiyama-n/projects/mcp-server-dig; BUILD=$(npm run build 2>&1); if [ $? -ne 0 ]; then echo \"⚠ ビルドが失敗しています。修正してから完了してください。\"; echo \"$BUILD\" | tail -10; exit 1; fi; if [ -f node_modules/.bin/vitest ]; then TEST=$(npx vitest run --reporter=dot 2>&1 | tail -5); if echo \"$TEST\" | grep -q \"FAIL\"; then echo \"⚠ テストが失敗しています。修正してから完了してください。\"; echo \"$TEST\"; exit 1; fi; fi; rm -f \"$STOP_FLAG\"; fi; if [ -n \"$(git status --porcelain 2>/dev/null)\" ]; then echo \"⚠ 未コミット変更があります。コミットしてからセッションを終了してください。\"; git status --short; else echo \"全変更コミット済み。\"; fi'"
+          }
+        ]
+      }
+    ]
+  }
+}
