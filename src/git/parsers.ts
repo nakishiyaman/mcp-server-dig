@@ -1,9 +1,19 @@
-import type { BlameBlock, CommitInfo, ContributorStats } from "./types.js";
+import type {
+  BlameBlock,
+  CommitInfo,
+  ContributorStats,
+  DiffFileStat,
+  DiffStat,
+  FileHotspot,
+} from "./types.js";
 
 const LOG_SEPARATOR = "|";
 
 export function parseLogOutput(raw: string): CommitInfo[] {
-  const lines = raw.trim().split("\n").filter((l) => l.length > 0);
+  const lines = raw
+    .trim()
+    .split("\n")
+    .filter((l) => l.length > 0);
   const commits: CommitInfo[] = [];
 
   for (const line of lines) {
@@ -29,9 +39,7 @@ export function parseBlameOutput(raw: string): BlameBlock[] {
   for (const line of lines) {
     if (line.length === 0) continue;
 
-    const headerMatch = line.match(
-      /^([0-9a-f]{40}) (\d+) (\d+)(?: (\d+))?$/,
-    );
+    const headerMatch = line.match(/^([0-9a-f]{40}) (\d+) (\d+)(?: (\d+))?$/);
     if (headerMatch) {
       current.commitHash = headerMatch[1];
       current.lineNum = parseInt(headerMatch[3], 10);
@@ -84,7 +92,10 @@ export function parseShortlogOutput(
   raw: string,
   totalCommits: number,
 ): ContributorStats[] {
-  const lines = raw.trim().split("\n").filter((l) => l.length > 0);
+  const lines = raw
+    .trim()
+    .split("\n")
+    .filter((l) => l.length > 0);
   const stats: ContributorStats[] = [];
 
   for (const line of lines) {
@@ -96,7 +107,8 @@ export function parseShortlogOutput(
       name: match[2],
       email: match[3],
       commitCount: count,
-      percentage: totalCommits > 0 ? Math.round((count / totalCommits) * 100) : 0,
+      percentage:
+        totalCommits > 0 ? Math.round((count / totalCommits) * 100) : 0,
       lastActive: "",
     });
   }
@@ -121,4 +133,83 @@ export function parseNameOnlyLog(raw: string): Map<string, string[]> {
   }
 
   return commitFiles;
+}
+
+export function parseDiffStatOutput(raw: string): DiffStat {
+  const lines = raw
+    .trim()
+    .split("\n")
+    .filter((l) => l.length > 0);
+  const files: DiffFileStat[] = [];
+  let totalInsertions = 0;
+  let totalDeletions = 0;
+
+  for (const line of lines) {
+    // Match file stat lines like: " src/index.ts | 5 +++--"
+    const fileMatch = line.match(/^\s*(.+?)\s+\|\s+(\d+)\s*([+-]*)\s*$/);
+    if (fileMatch) {
+      const path = fileMatch[1].trim();
+      const plusCount = (fileMatch[3].match(/\+/g) ?? []).length;
+      const minusCount = (fileMatch[3].match(/-/g) ?? []).length;
+      const total = parseInt(fileMatch[2], 10);
+
+      let ins: number;
+      let del: number;
+      if (plusCount + minusCount > 0) {
+        const ratio = total / (plusCount + minusCount);
+        ins = Math.round(plusCount * ratio);
+        del = Math.round(minusCount * ratio);
+      } else {
+        ins = total;
+        del = 0;
+      }
+
+      files.push({ path, insertions: ins, deletions: del });
+      continue;
+    }
+
+    // Match summary line: " 3 files changed, 10 insertions(+), 5 deletions(-)"
+    const summaryMatch = line.match(
+      /(\d+) files? changed(?:,\s*(\d+) insertions?\(\+\))?(?:,\s*(\d+) deletions?\(-\))?/,
+    );
+    if (summaryMatch) {
+      totalInsertions = parseInt(summaryMatch[2] ?? "0", 10);
+      totalDeletions = parseInt(summaryMatch[3] ?? "0", 10);
+    }
+  }
+
+  return {
+    filesChanged: files.length,
+    insertions: totalInsertions,
+    deletions: totalDeletions,
+    files,
+  };
+}
+
+export function parseFileFrequency(
+  raw: string,
+  topN: number = 20,
+): FileHotspot[] {
+  const lines = raw
+    .trim()
+    .split("\n")
+    .filter((l) => l.length > 0);
+  const counts = new Map<string, number>();
+
+  for (const line of lines) {
+    const path = line.trim();
+    if (path.length === 0) continue;
+    counts.set(path, (counts.get(path) ?? 0) + 1);
+  }
+
+  const total = [...counts.values()].reduce((a, b) => a + b, 0);
+  const sorted = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, topN);
+
+  return sorted.map(([filePath, changeCount]) => ({
+    filePath,
+    changeCount,
+    percentage: total > 0 ? Math.round((changeCount / total) * 100) : 0,
+  }));
 }

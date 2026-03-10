@@ -97,8 +97,7 @@ export function registerGitRelatedChanges(server: McpServer): void {
       }
 
       const lines = results.map(
-        (r) =>
-          `  ${r.coChangeCount}x (${r.percentage}%) ${r.filePath}`,
+        (r) => `  ${r.coChangeCount}x (${r.percentage}%) ${r.filePath}`,
       );
 
       const text = [
