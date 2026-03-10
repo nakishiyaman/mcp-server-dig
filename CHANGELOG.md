@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.4.0...v0.5.0) (2026-03-10)
+
+
+### Features
+
+* add MCP Registry support and bump to v0.4.1 ([bfa1455](https://github.com/nakishiyaman/mcp-server-dig/commit/bfa1455a9964c8802af8abbc0d0318ceeeb624d1))
+* add MCP Registry support and bump to v0.4.1 ([c5653aa](https://github.com/nakishiyaman/mcp-server-dig/commit/c5653aa7ad115d0fe9175afcc0f7d826fad2bb26))
+* add smithery.yaml for registry listing ([edc5d4b](https://github.com/nakishiyaman/mcp-server-dig/commit/edc5d4b8ef15a7b7c5c64a63606db4a92dc57311))
+* add smithery.yaml for Smithery registry listing ([070cf48](https://github.com/nakishiyaman/mcp-server-dig/commit/070cf486412639f9ba64dc2d8fbc5d0a68cab3d9))
+
+
+### Bug Fixes
+
+* add NPM_TOKEN for npm publish authentication ([a0ef14e](https://github.com/nakishiyaman/mcp-server-dig/commit/a0ef14e8c03fa82ca9145af79ae612808ec37f82))
+* add NPM_TOKEN for npm publish authentication ([4681e6c](https://github.com/nakishiyaman/mcp-server-dig/commit/4681e6ca29abec98289426bb847a3829a2a17f4a))
+
 ## [0.4.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.3.0...v0.4.0) (2026-03-10)
 
 
