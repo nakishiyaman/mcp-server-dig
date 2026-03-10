@@ -3,6 +3,12 @@ name: Release Please
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to npm (skip release-please)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -11,30 +17,37 @@ permissions:
 
 jobs:
   release-please:
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: node
 
+  publish:
+    needs: [release-please]
+    if: >-
+      always() &&
+      (
+        (github.event_name == 'push' && needs.release-please.outputs.release_created == 'true') ||
+        (github.event_name == 'workflow_dispatch' && inputs.publish)
+      )
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.release_created }}
 
       - uses: actions/setup-node@v4
-        if: ${{ steps.release.outputs.release_created }}
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
       - run: npm install -g npm@latest
-        if: ${{ steps.release.outputs.release_created }}
 
       - run: npm ci
-        if: ${{ steps.release.outputs.release_created }}
 
       - run: npm run build
-        if: ${{ steps.release.outputs.release_created }}
 
       - run: npm publish --access public
-        if: ${{ steps.release.outputs.release_created }}
