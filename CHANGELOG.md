@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.2.0...v0.3.0) (2026-03-10)
+
+
+### Features
+
+* add 4 new code archaeology tools ([0ccfd36](https://github.com/nakishiyaman/mcp-server-dig/commit/0ccfd36d629312be443aa718b53340c6d3c0776c))
+* add 4 new code archaeology tools (git_search_commits, git_commit_show, git_diff_context, git_hotspots) ([685b076](https://github.com/nakishiyaman/mcp-server-dig/commit/685b076c57b245af752d1b50610e2ba466ac5a3d))
+
 ## [0.2.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.1.0...v0.2.0) (2026-03-10)
 
 
