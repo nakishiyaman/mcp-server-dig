@@ -3,26 +3,29 @@
 日時: 2026-03-10
 
 ### 完了したタスク
-- プロジェクトスキャフォールディング（TypeScript + ESM + MCP SDK）
-- 4つのMCPツール実装（git_file_history, git_blame_context, git_related_changes, git_contributor_patterns）
-- git executor + パーサー実装
-- Tesseraワークフロー分析 → 全32項目の適合性評価
-- 採用プラクティス16件をAGENTS.md・フック・コマンド・エディタ設定に組み込み
-- 見送りプラクティスの導入タイミングと具体的アクションを記録
-- セッション管理基盤構築（/handoff, /progress, ROADMAP.md, HANDOFF.md）
-- パーサー単体テスト（16テスト: parseLogOutput, parseBlameOutput, parseShortlogOutput, parseNameOnlyLog）
-- ツール統合テスト（12テスト: executor検証 + 一時gitリポジトリでのend-to-end検証）
-- vitest.config.ts（build/除外）
-- README.md作成
-- v0.1.0全項目完了 → mainマージ
+- release-please導入（v4、Conventional Commitsベース自動バージョニング）
+- release-please設定調整（bump-minor-pre-major、last-release-sha、v0.1.0タグ作成）
+- リリースPR #11（v0.2.0）が自動生成済み
+- npmパッケージからテストファイル除外（!build/**/*.test.*）
+- package.jsonメタデータ追加（author, repository, homepage, bugs）
+- NPM_TOKENシークレット設定
+- GitHub Actions PR作成権限の有効化
+- リポジトリをprivate → publicに切り替え
+- MCP Inspector + MCPクライアントスクリプトで全4ツール動作確認済み
 
 ### 現在の状態
-- ブランチ: `master`（chore/workflow-setupをマージ済み）
-- lint + typecheck + test: 全パス（28テスト）
-- v0.1.0: 完了
+- ブランチ: `main`
+- リリースPR #11（chore(main): release 0.2.0）がオープン中
+- CI: 全マトリクスパス（Node 18/20/22）
+- テスト: 28テスト全パス
+- v0.2.0: 8/9項目完了（npm公開のみ残り）
 
 ### 次にやるべきこと
-- v0.2.0: GitHub公開、CI/CD、npm公開、release-please導入
+- リリースPR #11 をマージ → npm公開が自動実行される
+- npm公開後、`npx mcp-server-dig` で動作確認
+- `claude mcp add dig npx mcp-server-dig` で実環境E2Eテスト
 
 ### ブロッカー/注意点
-- なし
+- リリースPR #11 マージでnpm publish + GitHubリリースが自動実行される
+- NPM_TOKENのGranular Access Tokenに有効期限あり（要確認・更新）
+- release-please-config.jsonにlast-release-sha（13b8d0e）が残っている。初回リリース後は削除しても良い

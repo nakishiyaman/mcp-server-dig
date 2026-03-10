@@ -21,13 +21,17 @@
 - [x] README.md
 - [x] vitest.config.ts（build/除外）
 
-## v0.2.0 — 品質・公開準備（予定）
+## v0.2.0 — 品質・公開準備
 
-- [ ] GitHub公開
-- [ ] CI/CDパイプライン（GitHub Actions）
-- [ ] main保護ルール
-- [ ] npm公開
-- [ ] release-please導入
+- [x] GitHub公開（private → public）
+- [x] CI/CDパイプライン（GitHub Actions — Node 18/20/22マトリクス）
+- [x] main保護ルール（CI必須, force push禁止, 管理者適用）
+- [x] release-please導入（自動バージョニング・changelog生成）
+- [x] package.jsonメタデータ整備（author, repository, homepage, bugs）
+- [x] npmパッケージからテストファイル除外
+- [x] NPM_TOKENシークレット設定
+- [x] MCP Inspector / MCPクライアント統合テストによる動作確認
+- [ ] npm公開（リリースPR #11 マージで自動実行）
 
 ## 将来検討
 
