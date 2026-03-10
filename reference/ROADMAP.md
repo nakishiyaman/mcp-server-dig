@@ -74,8 +74,16 @@
 - [x] npm公開（mcp-server-dig@0.4.1）
 - [ ] Zed拡張パッケージング（API安定後、Rustラッパー必要）
 
+## v0.5.0 — OIDC完全移行・リリース自動化
+
+- [x] Trusted Publishing (OIDC) 完全移行（npm CLI >= 11.5.1 + npmjs.com Trusted Publisher設定）
+- [x] release-please ワークフローをリリース/publish 2ジョブ構成に分離
+- [x] workflow_dispatch による手動publish対応
+- [x] NODE_AUTH_TOKEN / --provenance 削除（OIDC で不要）
+- [x] npm公開（mcp-server-dig@0.5.0）
+- [x] GitHub Release v0.5.0
+
 ## 既知の技術的課題
 
-- [ ] Trusted Publishing (OIDC) 完全移行（npm CLI >= 11.5.1 + npmjs.com設定が必要）
 - [ ] Smithery登録（有料プラン or URL方式でのHTTPトランスポート対応が必要）
-- release-please re-runでは `release_created` が false になる（publish手動対応が必要な場合あり）
+- release-please re-runでは `release_created` が false になる（workflow_dispatch で手動publish可能）
