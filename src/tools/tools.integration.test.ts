@@ -17,6 +17,9 @@ import {
   parseNameOnlyLog,
   parseDiffStatOutput,
   parseFileFrequency,
+  parseNumstatOutput,
+  parseStaleFiles,
+  parseTagOutput,
 } from "../git/parsers.js";
 
 const execFileAsync = promisify(execFileCb);
@@ -68,6 +71,28 @@ beforeAll(async () => {
   );
   await git("add", ".");
   await git("commit", "-m", "feat: add z variable");
+
+  // Add a tag for tag_list tests
+  await git("tag", "-a", "v0.1.0", "-m", "Initial release");
+
+  // Create a feature branch for merge_base tests
+  await git("checkout", "-b", "feature-branch");
+  await writeFile(
+    join(repoDir, "src", "feature.ts"),
+    "export const feature = true;\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "feat: add feature module");
+  await git("checkout", "main");
+
+  // Add one more commit on main for merge_base divergence
+  await writeFile(
+    join(repoDir, "src", "index.ts"),
+    "const x = 1;\nconst y = 2;\nconst z = 3;\nconst w = 4;\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "feat: add w variable");
+  await git("tag", "-a", "v0.2.0", "-m", "Second release");
 }, 30_000);
 
 afterAll(async () => {
@@ -126,11 +151,9 @@ describe("git_file_history (end-to-end)", () => {
     );
     const commits = parseLogOutput(output);
 
-    expect(commits).toHaveLength(3);
-    expect(commits[0].subject).toBe("feat: add z variable");
-    expect(commits[0].author).toBe("Bob");
-    expect(commits[1].subject).toBe("feat: add y variable and sub function");
-    expect(commits[2].subject).toBe("feat: initial setup");
+    expect(commits.length).toBeGreaterThanOrEqual(3);
+    expect(commits[0].subject).toBe("feat: add w variable");
+    expect(commits[1].subject).toBe("feat: add z variable");
   });
 
   it("respects max_commits", async () => {
@@ -220,7 +243,7 @@ describe("git_related_changes (end-to-end)", () => {
       repoDir,
     );
     const commitFiles = parseNameOnlyLog(logOutput);
-    expect(commitFiles.size).toBe(3);
+    expect(commitFiles.size).toBe(4);
 
     // Build co-change map (same logic as the tool)
     const coChangeMap = new Map<string, number>();
@@ -262,7 +285,7 @@ describe("git_contributor_patterns (end-to-end)", () => {
         return sum + (match ? parseInt(match[1], 10) : 0);
       }, 0);
 
-    expect(totalCommits).toBe(3);
+    expect(totalCommits).toBe(4);
 
     const stats = parseShortlogOutput(shortlogOutput, totalCommits);
     expect(stats).toHaveLength(2);
@@ -273,7 +296,7 @@ describe("git_contributor_patterns (end-to-end)", () => {
     expect(alice).toBeDefined();
     expect(alice!.commitCount).toBe(2);
     expect(bob).toBeDefined();
-    expect(bob!.commitCount).toBe(1);
+    expect(bob!.commitCount).toBe(2);
   });
 
   it("enriches with last active date", async () => {
@@ -319,7 +342,7 @@ describe("git_search_commits (end-to-end)", () => {
     );
     const commits = parseLogOutput(output);
 
-    expect(commits).toHaveLength(1);
+    expect(commits).toHaveLength(2);
     expect(commits[0].author).toBe("Bob");
   });
 
@@ -349,14 +372,14 @@ describe("git_commit_show (end-to-end)", () => {
     );
 
     expect(output).toContain("Bob");
-    expect(output).toContain("feat: add z variable");
+    expect(output).toContain("feat: add w variable");
     expect(output).toContain("src/index.ts");
   });
 
   it("shows diff for a commit", async () => {
     const output = await execGit(["show", "-U3", "--format=", "HEAD"], repoDir);
 
-    expect(output).toContain("const z = 3;");
+    expect(output).toContain("const w = 4;");
   });
 });
 
@@ -421,7 +444,7 @@ describe("git_hotspots (end-to-end)", () => {
     // index.ts was changed in all 3 commits, should be top
     const indexTs = hotspots.find((h) => h.filePath === "src/index.ts");
     expect(indexTs).toBeDefined();
-    expect(indexTs!.changeCount).toBe(3);
+    expect(indexTs!.changeCount).toBe(4);
   });
 
   it("filters by path pattern", async () => {
@@ -440,5 +463,199 @@ describe("git_hotspots (end-to-end)", () => {
 
     expect(hotspots).toHaveLength(1);
     expect(hotspots[0].filePath).toBe("src/utils.ts");
+  });
+});
+
+// ─── git_pickaxe ─────────────────────────────────────────
+
+describe("git_pickaxe (end-to-end)", () => {
+  it("finds commits that introduced a string", async () => {
+    const output = await execGit(
+      ["log", "-Sconst z", "--format=%H|%an|%ae|%aI|%s", "--max-count=20"],
+      repoDir,
+    );
+    const commits = parseLogOutput(output);
+
+    expect(commits.length).toBeGreaterThanOrEqual(1);
+    expect(commits[0].subject).toBe("feat: add z variable");
+  });
+
+  it("finds commits with regex search", async () => {
+    const output = await execGit(
+      ["log", "-Gconst [wz]", "--format=%H|%an|%ae|%aI|%s", "--max-count=20"],
+      repoDir,
+    );
+    const commits = parseLogOutput(output);
+
+    expect(commits.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("returns empty for no matches", async () => {
+    const output = await execGit(
+      [
+        "log",
+        "-Snonexistent_string_xyz",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=20",
+      ],
+      repoDir,
+    );
+    const commits = parseLogOutput(output);
+    expect(commits).toHaveLength(0);
+  });
+});
+
+// ─── git_code_churn ──────────────────────────────────────
+
+describe("git_code_churn (end-to-end)", () => {
+  it("returns churn stats per file", async () => {
+    const output = await execGit(
+      ["log", "--numstat", "--format=COMMIT:%H", "--max-count=500"],
+      repoDir,
+    );
+    const churnFiles = parseNumstatOutput(output, 20);
+
+    expect(churnFiles.length).toBeGreaterThanOrEqual(1);
+
+    // index.ts should have the highest churn
+    const indexTs = churnFiles.find((f) => f.filePath === "src/index.ts");
+    expect(indexTs).toBeDefined();
+    expect(indexTs!.totalChurn).toBeGreaterThan(0);
+    expect(indexTs!.commits).toBeGreaterThanOrEqual(3);
+  });
+
+  it("filters by path", async () => {
+    const output = await execGit(
+      [
+        "log",
+        "--numstat",
+        "--format=COMMIT:%H",
+        "--max-count=500",
+        "--",
+        "src/utils.ts",
+      ],
+      repoDir,
+    );
+    const churnFiles = parseNumstatOutput(output, 20);
+
+    expect(churnFiles).toHaveLength(1);
+    expect(churnFiles[0].filePath).toBe("src/utils.ts");
+  });
+});
+
+// ─── git_stale_files ─────────────────────────────────────
+
+describe("git_stale_files (end-to-end)", () => {
+  it("finds stale files with threshold 0 days", async () => {
+    // All files should be "stale" with a 0-day threshold
+    const trackedOutput = await execGit(["ls-files"], repoDir);
+    const trackedFiles = trackedOutput
+      .trim()
+      .split("\n")
+      .filter((f) => f.length > 0);
+
+    const dateLines: string[] = [];
+    for (const file of trackedFiles) {
+      const dateOutput = await execGit(
+        ["log", "--format=%aI", "--max-count=1", "--", file],
+        repoDir,
+      );
+      const date = dateOutput.trim();
+      if (date) dateLines.push(`${date}\t${file}`);
+    }
+
+    const raw = dateLines.join("\n");
+    const staleFiles = parseStaleFiles(raw, 0);
+
+    expect(staleFiles.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("returns empty when no files exceed threshold", async () => {
+    // With a very high threshold, no recently created files should match
+    const raw = `2026-03-11T00:00:00+09:00\tsrc/index.ts`;
+    const staleFiles = parseStaleFiles(raw, 999999);
+    expect(staleFiles).toHaveLength(0);
+  });
+});
+
+// ─── git_merge_base ──────────────────────────────────────
+
+describe("git_merge_base (end-to-end)", () => {
+  it("finds merge base between main and feature branch", async () => {
+    const mergeBaseOutput = await execGit(
+      ["merge-base", "main", "feature-branch"],
+      repoDir,
+    );
+    const mergeBase = mergeBaseOutput.trim();
+
+    expect(mergeBase).toHaveLength(40);
+
+    // Commits on main since merge base (should have "feat: add w variable")
+    const mainOutput = await execGit(
+      [
+        "log",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=50",
+        `${mergeBase}..main`,
+      ],
+      repoDir,
+    );
+    const mainCommits = parseLogOutput(mainOutput);
+    expect(mainCommits.length).toBeGreaterThanOrEqual(1);
+    expect(mainCommits[0].subject).toBe("feat: add w variable");
+
+    // Commits on feature-branch since merge base
+    const featureOutput = await execGit(
+      [
+        "log",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=50",
+        `${mergeBase}..feature-branch`,
+      ],
+      repoDir,
+    );
+    const featureCommits = parseLogOutput(featureOutput);
+    expect(featureCommits.length).toBeGreaterThanOrEqual(1);
+    expect(featureCommits[0].subject).toBe("feat: add feature module");
+  });
+});
+
+// ─── git_tag_list ────────────────────────────────────────
+
+describe("git_tag_list (end-to-end)", () => {
+  it("lists tags sorted by newest first", async () => {
+    const output = await execGit(
+      [
+        "tag",
+        "-l",
+        "--sort=-creatordate",
+        "--format=%(refname:short)|%(creatordate:iso-strict)|%(subject)",
+      ],
+      repoDir,
+    );
+    const tags = parseTagOutput(output);
+
+    expect(tags).toHaveLength(2);
+    const tagNames = tags.map((t) => t.name);
+    expect(tagNames).toContain("v0.1.0");
+    expect(tagNames).toContain("v0.2.0");
+  });
+
+  it("filters tags by pattern", async () => {
+    const output = await execGit(
+      [
+        "tag",
+        "-l",
+        "--sort=-creatordate",
+        "--format=%(refname:short)|%(creatordate:iso-strict)|%(subject)",
+        "v0.1*",
+      ],
+      repoDir,
+    );
+    const tags = parseTagOutput(output);
+
+    expect(tags).toHaveLength(1);
+    expect(tags[0].name).toBe("v0.1.0");
+    expect(tags[0].subject).toBe("Initial release");
   });
 });

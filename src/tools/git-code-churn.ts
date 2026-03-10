@@ -1,0 +1,78 @@
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import { execGit, validateGitRepo } from "../git/executor.js";
+import { parseNumstatOutput } from "../git/parsers.js";
+import { errorResponse, successResponse } from "./response.js";
+
+export function registerGitCodeChurn(server: McpServer): void {
+  server.tool(
+    "git_code_churn",
+    "Analyze code churn (lines added + deleted) per file over a range of commits. High churn files may indicate unstable code, frequent refactoring, or areas needing architectural attention. Complements git_hotspots by measuring change volume, not just frequency.",
+    {
+      repo_path: z.string().describe("Absolute path to the git repository"),
+      path_pattern: z
+        .string()
+        .optional()
+        .describe("Limit analysis to a specific directory, e.g. 'src/'"),
+      since: z
+        .string()
+        .optional()
+        .describe('Date filter, e.g. "2024-01-01" or "6 months ago"'),
+      max_commits: z
+        .number()
+        .int()
+        .min(1)
+        .optional()
+        .default(500)
+        .describe("Number of commits to analyze (default: 500)"),
+      top_n: z
+        .number()
+        .int()
+        .min(1)
+        .optional()
+        .default(20)
+        .describe("Number of top files to return (default: 20)"),
+    },
+    async ({ repo_path, path_pattern, since, max_commits, top_n }) => {
+      try {
+        await validateGitRepo(repo_path);
+
+        const args = [
+          "log",
+          "--numstat",
+          "--format=COMMIT:%H",
+          `--max-count=${max_commits}`,
+        ];
+
+        if (since) args.push(`--since=${since}`);
+        if (path_pattern) args.push("--", path_pattern);
+
+        const output = await execGit(args, repo_path);
+        const churnFiles = parseNumstatOutput(output, top_n);
+
+        if (churnFiles.length === 0) {
+          return successResponse(
+            "No file changes found in the specified range.",
+          );
+        }
+
+        const lines = churnFiles.map(
+          (f) =>
+            `  ${String(f.totalChurn).padStart(6)} churn (+${f.insertions} -${f.deletions}) in ${f.commits} commits  ${f.filePath}`,
+        );
+
+        const scope = path_pattern ? `\nScope: ${path_pattern}` : "";
+        const text = [
+          `Code churn analysis (last ${max_commits} commits)${scope}`,
+          `Top ${churnFiles.length} files by total churn (lines added + deleted)`,
+          "",
+          ...lines,
+        ].join("\n");
+
+        return successResponse(text);
+      } catch (error) {
+        return errorResponse(error);
+      }
+    },
+  );
+}

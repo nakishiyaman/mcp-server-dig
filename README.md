@@ -98,6 +98,65 @@ Identify the most frequently changed files in the repository. Files with high ch
 | max_commits | number | no | Number of commits to analyze (default: 500) |
 | top_n | number | no | Number of top files to return (default: 20) |
 
+### git_pickaxe
+
+Search for commits that introduced or removed a specific string or regex pattern in the codebase (git's pickaxe feature). Essential for finding when a function, variable, or pattern first appeared or was removed.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| search_term | string | yes | String or regex pattern to search for in code changes |
+| is_regex | boolean | no | Treat search_term as regex `-G` instead of literal `-S` (default: false) |
+| max_commits | number | no | Maximum number of commits to return (default: 20) |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| author | string | no | Filter by author name or email |
+| path_pattern | string | no | Limit search to commits touching this path |
+
+### git_code_churn
+
+Analyze code churn (lines added + deleted) per file. High churn files may indicate unstable code, frequent refactoring, or areas needing architectural attention. Complements `git_hotspots` by measuring change volume, not just frequency.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| path_pattern | string | no | Limit analysis to a specific directory, e.g. `"src/"` |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Number of commits to analyze (default: 500) |
+| top_n | number | no | Number of top files to return (default: 20) |
+
+### git_stale_files
+
+Find files that have not been modified for a long time. Stale files may indicate dead code, forgotten configuration, or areas of technical debt that need review or removal.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| threshold_days | number | no | Minimum days since last change to consider stale (default: 180) |
+| path_pattern | string | no | Limit analysis to a specific directory, e.g. `"src/"` |
+| top_n | number | no | Maximum number of stale files to return (default: 30) |
+
+### git_merge_base
+
+Find the common ancestor (merge base) of two branches or refs and show commits on each side since divergence. Useful for understanding branch relationships and reviewing what will be merged.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| ref1 | string | yes | First branch or ref (e.g. `"main"`) |
+| ref2 | string | yes | Second branch or ref (e.g. `"feature-branch"`) |
+| max_commits | number | no | Maximum commits to show per side (default: 50) |
+
+### git_tag_list
+
+List tags sorted by creation date with associated messages. Useful for understanding release history and versioning patterns.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| pattern | string | no | Glob pattern to filter tags, e.g. `"v1.*"` |
+| max_tags | number | no | Maximum number of tags to return (default: 50) |
+| sort | string | no | Sort order: `"newest"` or `"oldest"` (default: `"newest"`) |
+
 ## Setup
 
 ### Prerequisites
