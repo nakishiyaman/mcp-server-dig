@@ -11,7 +11,8 @@
 - [x] 数値バリデーション強化（Zod `.int().min(1)` — max_commits, top_n, start_line, end_line, context_lines, min_coupling）
 - [x] サイレント catch 改善（スキップ数・失敗情報を出力に含める）
 - [x] executor エラーメッセージ改善（git args 全体を記録）
-- [ ] npm公開（mcp-server-dig@0.4.0）
+- [x] npm公開（mcp-server-dig@0.4.0）
+- [x] CI publish修正（NPM_TOKEN追加 — `--provenance` は認証にならない）
 
 ## v0.1.0 — 基盤構築
 
@@ -62,9 +63,15 @@
 - [x] Trusted Publishing (OIDC) に移行（トークンレスCI/CD）
 - [x] README.md 更新（新4ツールのドキュメント追加）
 
-## 将来検討
+## 次のマイルストーン — 国際化・配布拡大
 
-- [ ] Zed拡張としてのパッケージング
-- [x] エラー時のリッチなフィードバック（isError フラグ活用） → v0.4.0 で実装
-- [ ] Smithery / MCP Registry への登録
-- [ ] README 英語化
+- [ ] README英語化（README.md → 英語、README.ja.md → 日本語）
+- [ ] LICENSE ファイル追加（MIT — リポジトリルートに欠落）
+- [ ] Smithery登録（英語README後）
+- [ ] 公式MCP Registry登録（英語README後）
+- [ ] Zed拡張パッケージング（API安定後、Rustラッパー必要）
+
+## 既知の技術的課題
+
+- [ ] Trusted Publishing (OIDC) 完全移行（npm CLI >= 11.5.1 + npmjs.com設定が必要）
+- release-please re-runでは `release_created` が false になる（publish手動対応が必要な場合あり）
