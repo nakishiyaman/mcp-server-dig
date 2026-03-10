@@ -89,7 +89,7 @@
 - [x] `git_tag_list` ツール（タグ/リリース一覧）
   - [x] パーサー: parseTagOutput + 型定義: TagInfo
   - [x] ツール実装 + 統合テスト
-- [ ] README.md 更新（新5ツールのドキュメント追加）
+- [x] README.md 更新（新5ツールのドキュメント追加）
 - [ ] npm公開（mcp-server-dig@0.6.0）
 
 ## 既知の技術的課題
