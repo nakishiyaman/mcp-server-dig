@@ -30,6 +30,15 @@
     "ai",
     "claude"
   ],
+  "author": "nakishiyaman",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nakishiyaman/mcp-server-dig.git"
+  },
+  "homepage": "https://github.com/nakishiyaman/mcp-server-dig#readme",
+  "bugs": {
+    "url": "https://github.com/nakishiyaman/mcp-server-dig/issues"
+  },
   "license": "MIT",
   "engines": {
     "node": ">=18"
