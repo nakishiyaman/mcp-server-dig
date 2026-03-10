@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.3.0...v0.4.0) (2026-03-10)
+
+
+### Features
+
+* improve error handling and input validation (v0.4.0) ([bd010b2](https://github.com/nakishiyaman/mcp-server-dig/commit/bd010b22c5dfabaace9762e4264a45a947090139))
+* improve error handling and input validation across all tools ([60b4428](https://github.com/nakishiyaman/mcp-server-dig/commit/60b44289c32ba4807e619f9ff65bc5754ba5d160))
+
 ## [0.3.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.2.0...v0.3.0) (2026-03-10)
 
 
