@@ -17,7 +17,7 @@
 - v0.1.0全項目完了 → mainマージ
 
 ### 現在の状態
-- ブランチ: `main`（chore/workflow-setupをマージ済み）
+- ブランチ: `master`（chore/workflow-setupをマージ済み）
 - lint + typecheck + test: 全パス（28テスト）
 - v0.1.0: 完了
 
