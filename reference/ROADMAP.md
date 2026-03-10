@@ -2,6 +2,17 @@
 
 最終更新: 2026-03-10
 
+## v0.4.0 — 品質改善
+
+- [x] isError フラグ導入（全8ツールにエラー時 `isError: true` を返す）
+- [x] 共通レスポンスヘルパー（`successResponse` / `errorResponse`）
+- [x] 出力 truncation 統一（全ツールに50,000文字制限）
+- [x] パス検証の完全化（`git_diff_context` に `validateFilePath` 追加）
+- [x] 数値バリデーション強化（Zod `.int().min(1)` — max_commits, top_n, start_line, end_line, context_lines, min_coupling）
+- [x] サイレント catch 改善（スキップ数・失敗情報を出力に含める）
+- [x] executor エラーメッセージ改善（git args 全体を記録）
+- [ ] npm公開（mcp-server-dig@0.4.0）
+
 ## v0.1.0 — 基盤構築
 
 - [x] プロジェクトスキャフォールディング（package.json, tsconfig.json）
@@ -54,6 +65,6 @@
 ## 将来検討
 
 - [ ] Zed拡張としてのパッケージング
-- [ ] エラー時のリッチなフィードバック（isError フラグ活用）
+- [x] エラー時のリッチなフィードバック（isError フラグ活用） → v0.4.0 で実装
 - [ ] Smithery / MCP Registry への登録
 - [ ] README 英語化

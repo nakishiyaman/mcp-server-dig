@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
+import { errorResponse, successResponse } from "./response.js";
 
 export function registerGitSearchCommits(server: McpServer): void {
   server.tool(
@@ -14,6 +15,8 @@ export function registerGitSearchCommits(server: McpServer): void {
         .describe("Search string to match against commit messages"),
       max_commits: z
         .number()
+        .int()
+        .min(1)
         .optional()
         .default(20)
         .describe("Maximum number of commits to return"),
@@ -28,47 +31,44 @@ export function registerGitSearchCommits(server: McpServer): void {
         .describe("Limit search to commits touching this path"),
     },
     async ({ repo_path, query, max_commits, since, author, path_pattern }) => {
-      await validateGitRepo(repo_path);
+      try {
+        await validateGitRepo(repo_path);
 
-      const args = [
-        "log",
-        `--grep=${query}`,
-        "--regexp-ignore-case",
-        "--format=%H|%an|%ae|%aI|%s",
-        `--max-count=${max_commits}`,
-      ];
+        const args = [
+          "log",
+          `--grep=${query}`,
+          "--regexp-ignore-case",
+          "--format=%H|%an|%ae|%aI|%s",
+          `--max-count=${max_commits}`,
+        ];
 
-      if (since) args.push(`--since=${since}`);
-      if (author) args.push(`--author=${author}`);
-      if (path_pattern) args.push("--", path_pattern);
+        if (since) args.push(`--since=${since}`);
+        if (author) args.push(`--author=${author}`);
+        if (path_pattern) args.push("--", path_pattern);
 
-      const output = await execGit(args, repo_path);
-      const commits = parseLogOutput(output);
+        const output = await execGit(args, repo_path);
+        const commits = parseLogOutput(output);
 
-      if (commits.length === 0) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `No commits found matching: "${query}"`,
-            },
-          ],
-        };
+        if (commits.length === 0) {
+          return successResponse(`No commits found matching: "${query}"`);
+        }
+
+        const lines = commits.map(
+          (c) =>
+            `${c.hash.slice(0, 8)} | ${c.date.slice(0, 10)} | ${c.author} | ${c.subject}`,
+        );
+
+        const text = [
+          `Search results for: "${query}"`,
+          `Found ${commits.length} commit(s)`,
+          "",
+          ...lines,
+        ].join("\n");
+
+        return successResponse(text);
+      } catch (error) {
+        return errorResponse(error);
       }
-
-      const lines = commits.map(
-        (c) =>
-          `${c.hash.slice(0, 8)} | ${c.date.slice(0, 10)} | ${c.author} | ${c.subject}`,
-      );
-
-      const text = [
-        `Search results for: "${query}"`,
-        `Found ${commits.length} commit(s)`,
-        "",
-        ...lines,
-      ].join("\n");
-
-      return { content: [{ type: "text" as const, text }] };
     },
   );
 }

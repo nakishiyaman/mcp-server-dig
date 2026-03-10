@@ -1,7 +1,8 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { execGit, validateGitRepo } from "../git/executor.js";
+import { execGit, validateFilePath, validateGitRepo } from "../git/executor.js";
 import { parseDiffStatOutput } from "../git/parsers.js";
+import { errorResponse, successResponse } from "./response.js";
 
 const MAX_DIFF_LENGTH = 50_000;
 
@@ -27,6 +28,8 @@ export function registerGitDiffContext(server: McpServer): void {
         .describe("Show only file change statistics (default: false)"),
       context_lines: z
         .number()
+        .int()
+        .min(0)
         .optional()
         .default(3)
         .describe("Number of context lines in unified diff (default: 3)"),
@@ -39,70 +42,70 @@ export function registerGitDiffContext(server: McpServer): void {
       stat_only,
       context_lines,
     }) => {
-      await validateGitRepo(repo_path);
+      try {
+        await validateGitRepo(repo_path);
+        if (file_path) {
+          await validateFilePath(repo_path, file_path);
+        }
 
-      const base = compare_to ?? `${commit}^`;
+        const base = compare_to ?? `${commit}^`;
 
-      if (stat_only) {
-        const args = ["diff", "--stat", base, commit];
+        if (stat_only) {
+          const args = ["diff", "--stat", base, commit];
+          if (file_path) args.push("--", file_path);
+
+          const output = await execGit(args, repo_path);
+          const stat = parseDiffStatOutput(output);
+
+          const fileLines = stat.files.map(
+            (f) => `  ${f.path} | +${f.insertions} -${f.deletions}`,
+          );
+
+          const text = [
+            `Diff: ${base} → ${commit}`,
+            `${stat.filesChanged} file(s) changed, ${stat.insertions} insertion(s), ${stat.deletions} deletion(s)`,
+            "",
+            ...fileLines,
+          ].join("\n");
+
+          return successResponse(text);
+        }
+
+        // Full diff
+        const args = ["diff", `-U${context_lines}`, base, commit];
         if (file_path) args.push("--", file_path);
 
         const output = await execGit(args, repo_path);
-        const stat = parseDiffStatOutput(output);
 
-        const fileLines = stat.files.map(
-          (f) => `  ${f.path} | +${f.insertions} -${f.deletions}`,
-        );
+        if (output.trim().length === 0) {
+          return successResponse(`No differences between ${base} and ${commit}`);
+        }
 
-        const text = [
-          `Diff: ${base} → ${commit}`,
-          `${stat.filesChanged} file(s) changed, ${stat.insertions} insertion(s), ${stat.deletions} deletion(s)`,
-          "",
-          ...fileLines,
-        ].join("\n");
+        let text: string;
+        if (output.length > MAX_DIFF_LENGTH) {
+          // Fallback to stat + truncated diff
+          const statArgs = ["diff", "--stat", base, commit];
+          if (file_path) statArgs.push("--", file_path);
+          const statOutput = await execGit(statArgs, repo_path);
 
-        return { content: [{ type: "text" as const, text }] };
+          text = [
+            `Diff: ${base} → ${commit}`,
+            `[Output truncated at ${MAX_DIFF_LENGTH} characters. Showing stat + partial diff. Use file_path to view specific files.]`,
+            "",
+            statOutput.trim(),
+            "",
+            "---",
+            "",
+            output.slice(0, MAX_DIFF_LENGTH),
+          ].join("\n");
+        } else {
+          text = [`Diff: ${base} → ${commit}`, "", output].join("\n");
+        }
+
+        return successResponse(text);
+      } catch (error) {
+        return errorResponse(error);
       }
-
-      // Full diff
-      const args = ["diff", `-U${context_lines}`, base, commit];
-      if (file_path) args.push("--", file_path);
-
-      const output = await execGit(args, repo_path);
-
-      if (output.trim().length === 0) {
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: `No differences between ${base} and ${commit}`,
-            },
-          ],
-        };
-      }
-
-      let text: string;
-      if (output.length > MAX_DIFF_LENGTH) {
-        // Fallback to stat + truncated diff
-        const statArgs = ["diff", "--stat", base, commit];
-        if (file_path) statArgs.push("--", file_path);
-        const statOutput = await execGit(statArgs, repo_path);
-
-        text = [
-          `Diff: ${base} → ${commit}`,
-          `[Output truncated at ${MAX_DIFF_LENGTH} characters. Showing stat + partial diff. Use file_path to view specific files.]`,
-          "",
-          statOutput.trim(),
-          "",
-          "---",
-          "",
-          output.slice(0, MAX_DIFF_LENGTH),
-        ].join("\n");
-      } else {
-        text = [`Diff: ${base} → ${commit}`, "", output].join("\n");
-      }
-
-      return { content: [{ type: "text" as const, text }] };
     },
   );
 }

@@ -34,10 +34,12 @@ export async function execGit(
         if (error) {
           const code = (error as NodeJS.ErrnoException & { code?: number })
             .code;
+          const cmd = `git ${args.join(" ")}`;
+          const exitCode = typeof code === "number" ? code : undefined;
           reject(
             new GitExecutorError(
-              `git ${args[0]} failed: ${stderr || error.message}`,
-              typeof code === "number" ? code : undefined,
+              `${cmd} failed: ${stderr || error.message}`,
+              exitCode,
             ),
           );
           return;
