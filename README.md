@@ -1,5 +1,7 @@
 # mcp-server-dig
 
+English | [日本語](./README.ja.md)
+
 MCP server for AI-powered code archaeology — explore git blame, file history, contributor patterns, and co-change analysis through the [Model Context Protocol](https://modelcontextprotocol.io/).
 
 ## Tools
