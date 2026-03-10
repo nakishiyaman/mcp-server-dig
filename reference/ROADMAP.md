@@ -16,9 +16,10 @@
 - [x] Claude Codeフック（PreToolUse, PostToolUse, Stop）
 - [x] AGENTS.md + 推奨プラクティス記録
 - [x] セッション管理コマンド（/handoff, /progress）
-- [ ] パーサー単体テスト（vitest）
-- [ ] ツール統合テスト（一時gitリポジトリ）
-- [ ] README.md
+- [x] パーサー単体テスト（vitest）
+- [x] ツール統合テスト（一時gitリポジトリ）
+- [x] README.md
+- [x] vitest.config.ts（build/除外）
 
 ## v0.2.0 — 品質・公開準備（予定）
 

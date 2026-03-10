@@ -10,18 +10,19 @@
 - 採用プラクティス16件をAGENTS.md・フック・コマンド・エディタ設定に組み込み
 - 見送りプラクティスの導入タイミングと具体的アクションを記録
 - セッション管理基盤構築（/handoff, /progress, ROADMAP.md, HANDOFF.md）
+- パーサー単体テスト（16テスト: parseLogOutput, parseBlameOutput, parseShortlogOutput, parseNameOnlyLog）
+- ツール統合テスト（12テスト: executor検証 + 一時gitリポジトリでのend-to-end検証）
+- vitest.config.ts（build/除外）
+- README.md作成
+- v0.1.0全項目完了 → mainマージ
 
 ### 現在の状態
-- ブランチ: `chore/workflow-setup`
-- 未コミット変更: なし（HANDOFF.md更新分を除く）
-- lint + typecheck + build: 全パス
-- テスト: vitestテストは未作成
+- ブランチ: `main`（chore/workflow-setupをマージ済み）
+- lint + typecheck + test: 全パス（28テスト）
+- v0.1.0: 完了
 
 ### 次にやるべきこと
-- パーサー単体テスト（parseLogOutput, parseBlameOutput, parseShortlogOutput, parseNameOnlyLog）
-- ツール統合テスト（一時gitリポジトリを作成してend-to-end検証）
-- README.md作成
-- `chore/workflow-setup` → masterへマージ
+- v0.2.0: GitHub公開、CI/CD、npm公開、release-please導入
 
 ### ブロッカー/注意点
 - なし
