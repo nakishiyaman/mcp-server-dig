@@ -4,7 +4,10 @@ import type {
   ContributorStats,
   DiffFileStat,
   DiffStat,
+  FileChurn,
   FileHotspot,
+  StaleFile,
+  TagInfo,
 } from "./types.js";
 
 const LOG_SEPARATOR = "|";
@@ -212,4 +215,123 @@ export function parseFileFrequency(
     changeCount,
     percentage: total > 0 ? Math.round((changeCount / total) * 100) : 0,
   }));
+}
+
+/**
+ * Parse `git log --numstat --format=COMMIT:%H` output into per-file churn stats.
+ */
+export function parseNumstatOutput(
+  raw: string,
+  topN: number = 20,
+): FileChurn[] {
+  const lines = raw.trim().split("\n");
+  const fileMap = new Map<
+    string,
+    { insertions: number; deletions: number; commits: Set<string> }
+  >();
+  let currentHash = "";
+
+  for (const line of lines) {
+    if (line.startsWith("COMMIT:")) {
+      currentHash = line.slice(7).trim();
+      continue;
+    }
+    // numstat lines: <ins>\t<del>\t<path>  (binary files show - - path)
+    const match = line.match(/^(\d+|-)\t(\d+|-)\t(.+)$/);
+    if (!match) continue;
+
+    const ins = match[1] === "-" ? 0 : parseInt(match[1], 10);
+    const del = match[2] === "-" ? 0 : parseInt(match[2], 10);
+    const path = match[3];
+
+    const existing = fileMap.get(path) ?? {
+      insertions: 0,
+      deletions: 0,
+      commits: new Set<string>(),
+    };
+    existing.insertions += ins;
+    existing.deletions += del;
+    if (currentHash) existing.commits.add(currentHash);
+    fileMap.set(path, existing);
+  }
+
+  const sorted = [...fileMap.entries()]
+    .map(([filePath, data]) => ({
+      filePath,
+      insertions: data.insertions,
+      deletions: data.deletions,
+      totalChurn: data.insertions + data.deletions,
+      commits: data.commits.size,
+    }))
+    .sort((a, b) => b.totalChurn - a.totalChurn)
+    .slice(0, topN);
+
+  return sorted;
+}
+
+/**
+ * Parse stale file data from `git log` output.
+ * Input format: lines of "ISO_DATE\tFILE_PATH"
+ */
+export function parseStaleFiles(
+  raw: string,
+  thresholdDays: number,
+  now: Date = new Date(),
+): StaleFile[] {
+  const lines = raw
+    .trim()
+    .split("\n")
+    .filter((l) => l.length > 0);
+  const fileMap = new Map<string, string>(); // path -> most recent date
+
+  for (const line of lines) {
+    const tabIdx = line.indexOf("\t");
+    if (tabIdx === -1) continue;
+    const date = line.slice(0, tabIdx).trim();
+    const path = line.slice(tabIdx + 1).trim();
+    if (!path) continue;
+
+    const existing = fileMap.get(path);
+    if (!existing || date > existing) {
+      fileMap.set(path, date);
+    }
+  }
+
+  const results: StaleFile[] = [];
+  const nowMs = now.getTime();
+
+  for (const [filePath, lastModified] of fileMap) {
+    const modMs = new Date(lastModified).getTime();
+    const daysSinceLastChange = Math.floor(
+      (nowMs - modMs) / (1000 * 60 * 60 * 24),
+    );
+    if (daysSinceLastChange >= thresholdDays) {
+      results.push({ filePath, lastModified, daysSinceLastChange });
+    }
+  }
+
+  return results.sort((a, b) => b.daysSinceLastChange - a.daysSinceLastChange);
+}
+
+/**
+ * Parse `git tag -l --sort=-creatordate --format=...` output.
+ */
+export function parseTagOutput(raw: string): TagInfo[] {
+  const lines = raw
+    .trim()
+    .split("\n")
+    .filter((l) => l.length > 0);
+  const tags: TagInfo[] = [];
+
+  for (const line of lines) {
+    const parts = line.split("|");
+    if (parts.length < 2) continue;
+    tags.push({
+      name: parts[0],
+      date: parts[1],
+      subject: parts.slice(2).join("|"),
+    });
+  }
+
+  return tags;
 }

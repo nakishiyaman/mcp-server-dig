@@ -74,8 +74,25 @@
 - [x] npm公開（mcp-server-dig@0.4.1）
 - [ ] Zed拡張パッケージング（API安定後、Rustラッパー必要）
 
+## v0.6.0 — コード考古学ツール拡充 第2弾
+
+- [x] `git_pickaxe` ツール（コード追加/削除コミット検索 — `git log -S/-G`）
+  - [x] ツール実装 + 統合テスト
+- [x] `git_code_churn` ツール（ファイル単位の変更量分析 — `git log --numstat`）
+  - [x] パーサー: parseNumstatOutput + 型定義: FileChurn
+  - [x] ツール実装 + 統合テスト
+- [x] `git_stale_files` ツール（長期間未更新ファイル検出）
+  - [x] パーサー: parseStaleFiles + 型定義: StaleFile
+  - [x] ツール実装 + 統合テスト
+- [x] `git_merge_base` ツール（ブランチ分岐点・差分分析）
+  - [x] ツール実装 + 統合テスト
+- [x] `git_tag_list` ツール（タグ/リリース一覧）
+  - [x] パーサー: parseTagOutput + 型定義: TagInfo
+  - [x] ツール実装 + 統合テスト
+- [ ] README.md 更新（新5ツールのドキュメント追加）
+- [ ] npm公開（mcp-server-dig@0.6.0）
+
 ## 既知の技術的課題
 
-- [ ] Trusted Publishing (OIDC) 完全移行（npm CLI >= 11.5.1 + npmjs.com設定が必要）
 - [ ] Smithery登録（有料プラン or URL方式でのHTTPトランスポート対応が必要）
-- release-please re-runでは `release_created` が false になる（publish手動対応が必要な場合あり）
+- release-please re-runでは `release_created` が false になる（workflow_dispatch で手動publish可能）

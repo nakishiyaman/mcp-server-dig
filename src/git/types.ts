@@ -52,3 +52,23 @@ export interface FileHotspot {
   changeCount: number;
   percentage: number;
 }
+
+export interface FileChurn {
+  filePath: string;
+  insertions: number;
+  deletions: number;
+  totalChurn: number;
+  commits: number;
+}
+
+export interface StaleFile {
+  filePath: string;
+  lastModified: string;
+  daysSinceLastChange: number;
+}
+
+export interface TagInfo {
+  name: string;
+  date: string;
+  subject: string;
+}

@@ -3,13 +3,18 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerGitBlameContext } from "./tools/git-blame-context.js";
+import { registerGitCodeChurn } from "./tools/git-code-churn.js";
 import { registerGitCommitShow } from "./tools/git-commit-show.js";
 import { registerGitContributorPatterns } from "./tools/git-contributor-patterns.js";
 import { registerGitDiffContext } from "./tools/git-diff-context.js";
 import { registerGitFileHistory } from "./tools/git-file-history.js";
 import { registerGitHotspots } from "./tools/git-hotspots.js";
+import { registerGitMergeBase } from "./tools/git-merge-base.js";
+import { registerGitPickaxe } from "./tools/git-pickaxe.js";
 import { registerGitRelatedChanges } from "./tools/git-related-changes.js";
 import { registerGitSearchCommits } from "./tools/git-search-commits.js";
+import { registerGitStaleFiles } from "./tools/git-stale-files.js";
+import { registerGitTagList } from "./tools/git-tag-list.js";
 
 function createServer() {
   const server = new McpServer({
@@ -25,6 +30,11 @@ function createServer() {
   registerGitCommitShow(server);
   registerGitDiffContext(server);
   registerGitHotspots(server);
+  registerGitPickaxe(server);
+  registerGitCodeChurn(server);
+  registerGitStaleFiles(server);
+  registerGitMergeBase(server);
+  registerGitTagList(server);
 
   return server;
 }
