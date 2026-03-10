@@ -29,29 +29,27 @@
 - [x] release-please導入（自動バージョニング・changelog生成）
 - [x] package.jsonメタデータ整備（author, repository, homepage, bugs）
 - [x] npmパッケージからテストファイル除外
-- [x] NPM_TOKENシークレット設定
 - [x] MCP Inspector / MCPクライアント統合テストによる動作確認
 - [x] npm公開（mcp-server-dig@0.2.0）
 
 ## v0.3.0 — コード考古学ツール拡充
 
-- [ ] `git_search_commits` ツール（コミットメッセージ検索）
-  - [ ] パーサー: 既存 parseLogOutput 再利用
-  - [ ] ツール実装 + 統合テスト
-- [ ] `git_commit_show` ツール（コミット詳細表示）
-  - [ ] 型定義: CommitDetail (types.ts)
-  - [ ] パーサー: parseShowOutput + 単体テスト
-  - [ ] ツール実装 + 統合テスト
-- [ ] `git_diff_context` ツール（任意2点間の差分）
-  - [ ] 型定義: DiffStat (types.ts)
-  - [ ] パーサー: parseDiffStatOutput + 単体テスト
-  - [ ] 出力サイズ制御（truncation）
-  - [ ] ツール実装 + 統合テスト
-- [ ] `git_hotspots` ツール（変更頻度ホットスポット分析）
-  - [ ] 型定義: FileHotspot (types.ts)
-  - [ ] パーサー: parseFileFrequency + 単体テスト
-  - [ ] ツール実装 + 統合テスト
-- [ ] README.md 更新（全4ツールのドキュメント）
+- [x] `git_search_commits` ツール（コミットメッセージ検索）
+  - [x] パーサー: 既存 parseLogOutput 再利用
+  - [x] ツール実装 + 統合テスト
+- [x] `git_commit_show` ツール（コミット詳細表示）
+  - [x] 型定義: DiffStat, DiffFileStat, FileHotspot (types.ts)
+  - [x] ツール実装 + 統合テスト
+- [x] `git_diff_context` ツール（任意2点間の差分）
+  - [x] パーサー: parseDiffStatOutput + 単体テスト
+  - [x] 出力サイズ制御（50,000文字truncation）
+  - [x] ツール実装 + 統合テスト
+- [x] `git_hotspots` ツール（変更頻度ホットスポット分析）
+  - [x] パーサー: parseFileFrequency + 単体テスト
+  - [x] ツール実装 + 統合テスト
+- [x] npm公開（mcp-server-dig@0.3.0）
+- [x] Trusted Publishing (OIDC) に移行（トークンレスCI/CD）
+- [x] README.md 更新（新4ツールのドキュメント追加）
 
 ## 将来検討
 
