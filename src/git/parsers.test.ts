@@ -4,6 +4,8 @@ import {
   parseBlameOutput,
   parseShortlogOutput,
   parseNameOnlyLog,
+  parseDiffStatOutput,
+  parseFileFrequency,
 } from "./parsers.js";
 
 describe("parseLogOutput", () => {
@@ -247,5 +249,93 @@ describe("parseNameOnlyLog", () => {
     const result = parseNameOnlyLog(raw);
     expect(result.has("abc1234")).toBe(true);
     expect(result.get("abc1234")).toEqual(["src/index.ts"]);
+  });
+});
+
+describe("parseDiffStatOutput", () => {
+  it("parses diff stat with insertions and deletions", () => {
+    const raw = [
+      " src/index.ts  | 5 +++--",
+      " src/utils.ts  | 10 ++++------",
+      " README.md     | 3 +++",
+      " 3 files changed, 10 insertions(+), 8 deletions(-)",
+    ].join("\n");
+
+    const result = parseDiffStatOutput(raw);
+    expect(result.filesChanged).toBe(3);
+    expect(result.insertions).toBe(10);
+    expect(result.deletions).toBe(8);
+    expect(result.files).toHaveLength(3);
+    expect(result.files[0].path).toBe("src/index.ts");
+    expect(result.files[2].path).toBe("README.md");
+  });
+
+  it("handles insertions only", () => {
+    const raw = [
+      " src/new.ts | 20 ++++++++++++++++++++",
+      " 1 file changed, 20 insertions(+)",
+    ].join("\n");
+
+    const result = parseDiffStatOutput(raw);
+    expect(result.filesChanged).toBe(1);
+    expect(result.insertions).toBe(20);
+    expect(result.deletions).toBe(0);
+  });
+
+  it("handles deletions only", () => {
+    const raw = [
+      " src/old.ts | 5 -----",
+      " 1 file changed, 5 deletions(-)",
+    ].join("\n");
+
+    const result = parseDiffStatOutput(raw);
+    expect(result.insertions).toBe(0);
+    expect(result.deletions).toBe(5);
+  });
+
+  it("returns empty for empty input", () => {
+    const result = parseDiffStatOutput("");
+    expect(result.filesChanged).toBe(0);
+    expect(result.files).toEqual([]);
+  });
+});
+
+describe("parseFileFrequency", () => {
+  it("counts file occurrences and sorts by frequency", () => {
+    const raw = [
+      "src/index.ts",
+      "src/utils.ts",
+      "src/index.ts",
+      "README.md",
+      "src/index.ts",
+      "src/utils.ts",
+    ].join("\n");
+
+    const result = parseFileFrequency(raw);
+    expect(result[0].filePath).toBe("src/index.ts");
+    expect(result[0].changeCount).toBe(3);
+    expect(result[1].filePath).toBe("src/utils.ts");
+    expect(result[1].changeCount).toBe(2);
+    expect(result[2].filePath).toBe("README.md");
+    expect(result[2].changeCount).toBe(1);
+  });
+
+  it("respects topN parameter", () => {
+    const raw = ["a.ts", "b.ts", "c.ts", "a.ts", "b.ts", "a.ts"].join("\n");
+
+    const result = parseFileFrequency(raw, 2);
+    expect(result).toHaveLength(2);
+    expect(result[0].filePath).toBe("a.ts");
+    expect(result[1].filePath).toBe("b.ts");
+  });
+
+  it("calculates percentage correctly", () => {
+    const raw = ["a.ts", "a.ts", "b.ts", "b.ts"].join("\n");
+    const result = parseFileFrequency(raw);
+    expect(result[0].percentage).toBe(50);
+  });
+
+  it("returns empty for empty input", () => {
+    expect(parseFileFrequency("")).toEqual([]);
   });
 });

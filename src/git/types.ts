@@ -33,3 +33,22 @@ export interface ContributorStats {
   percentage: number;
   lastActive: string;
 }
+
+export interface DiffFileStat {
+  path: string;
+  insertions: number;
+  deletions: number;
+}
+
+export interface DiffStat {
+  filesChanged: number;
+  insertions: number;
+  deletions: number;
+  files: DiffFileStat[];
+}
+
+export interface FileHotspot {
+  filePath: string;
+  changeCount: number;
+  percentage: number;
+}

@@ -32,7 +32,8 @@ export async function execGit(
       { cwd: resolvedCwd, timeout: timeoutMs, maxBuffer: 10 * 1024 * 1024 },
       (error, stdout, stderr) => {
         if (error) {
-          const code = (error as NodeJS.ErrnoException & { code?: number }).code;
+          const code = (error as NodeJS.ErrnoException & { code?: number })
+            .code;
           reject(
             new GitExecutorError(
               `git ${args[0]} failed: ${stderr || error.message}`,
@@ -51,9 +52,7 @@ export async function validateGitRepo(cwd: string): Promise<void> {
   try {
     await execGit(["rev-parse", "--git-dir"], cwd);
   } catch {
-    throw new GitExecutorError(
-      `Not a git repository: ${resolve(cwd)}`,
-    );
+    throw new GitExecutorError(`Not a git repository: ${resolve(cwd)}`);
   }
 }
 

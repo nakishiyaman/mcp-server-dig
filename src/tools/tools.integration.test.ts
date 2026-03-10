@@ -10,7 +10,14 @@ import { tmpdir } from "node:os";
 import { execFile as execFileCb } from "node:child_process";
 import { promisify } from "node:util";
 import { execGit, validateGitRepo, validateFilePath } from "../git/executor.js";
-import { parseLogOutput, parseBlameOutput, parseShortlogOutput, parseNameOnlyLog } from "../git/parsers.js";
+import {
+  parseLogOutput,
+  parseBlameOutput,
+  parseShortlogOutput,
+  parseNameOnlyLog,
+  parseDiffStatOutput,
+  parseFileFrequency,
+} from "../git/parsers.js";
 
 const execFileAsync = promisify(execFileCb);
 
@@ -33,20 +40,32 @@ beforeAll(async () => {
   // Commit 1: create two files
   await mkdir(join(repoDir, "src"), { recursive: true });
   await writeFile(join(repoDir, "src", "index.ts"), "const x = 1;\n");
-  await writeFile(join(repoDir, "src", "utils.ts"), "export function add(a: number, b: number) { return a + b; }\n");
+  await writeFile(
+    join(repoDir, "src", "utils.ts"),
+    "export function add(a: number, b: number) { return a + b; }\n",
+  );
   await git("add", ".");
   await git("commit", "-m", "feat: initial setup");
 
   // Commit 2 (Alice): modify index.ts and utils.ts together
-  await writeFile(join(repoDir, "src", "index.ts"), "const x = 1;\nconst y = 2;\n");
-  await writeFile(join(repoDir, "src", "utils.ts"), "export function add(a: number, b: number) { return a + b; }\nexport function sub(a: number, b: number) { return a - b; }\n");
+  await writeFile(
+    join(repoDir, "src", "index.ts"),
+    "const x = 1;\nconst y = 2;\n",
+  );
+  await writeFile(
+    join(repoDir, "src", "utils.ts"),
+    "export function add(a: number, b: number) { return a + b; }\nexport function sub(a: number, b: number) { return a - b; }\n",
+  );
   await git("add", ".");
   await git("commit", "-m", "feat: add y variable and sub function");
 
   // Commit 3 (Bob): modify only index.ts
   await git("config", "user.name", "Bob");
   await git("config", "user.email", "bob@example.com");
-  await writeFile(join(repoDir, "src", "index.ts"), "const x = 1;\nconst y = 2;\nconst z = 3;\n");
+  await writeFile(
+    join(repoDir, "src", "index.ts"),
+    "const x = 1;\nconst y = 2;\nconst z = 3;\n",
+  );
   await git("add", ".");
   await git("commit", "-m", "feat: add z variable");
 }, 30_000);
@@ -67,7 +86,9 @@ describe("executor: validateGitRepo", () => {
   it("rejects a non-git directory", async () => {
     const nonRepo = await mkdtemp(join(tmpdir(), "mcp-dig-nonrepo-"));
     try {
-      await expect(validateGitRepo(nonRepo)).rejects.toThrow("Not a git repository");
+      await expect(validateGitRepo(nonRepo)).rejects.toThrow(
+        "Not a git repository",
+      );
     } finally {
       await rm(nonRepo, { recursive: true, force: true });
     }
@@ -76,13 +97,15 @@ describe("executor: validateGitRepo", () => {
 
 describe("executor: validateFilePath", () => {
   it("allows paths within the repo", async () => {
-    await expect(validateFilePath(repoDir, "src/index.ts")).resolves.toBeUndefined();
+    await expect(
+      validateFilePath(repoDir, "src/index.ts"),
+    ).resolves.toBeUndefined();
   });
 
   it("rejects path traversal", async () => {
-    await expect(validateFilePath(repoDir, "../../../etc/passwd")).rejects.toThrow(
-      "File path escapes repository root",
-    );
+    await expect(
+      validateFilePath(repoDir, "../../../etc/passwd"),
+    ).rejects.toThrow("File path escapes repository root");
   });
 });
 
@@ -91,7 +114,14 @@ describe("executor: validateFilePath", () => {
 describe("git_file_history (end-to-end)", () => {
   it("returns commit history for a file", async () => {
     const output = await execGit(
-      ["log", "--follow", "--format=%H|%an|%ae|%aI|%s", "--max-count=20", "--", "src/index.ts"],
+      [
+        "log",
+        "--follow",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=20",
+        "--",
+        "src/index.ts",
+      ],
       repoDir,
     );
     const commits = parseLogOutput(output);
@@ -105,7 +135,14 @@ describe("git_file_history (end-to-end)", () => {
 
   it("respects max_commits", async () => {
     const output = await execGit(
-      ["log", "--follow", "--format=%H|%an|%ae|%aI|%s", "--max-count=1", "--", "src/index.ts"],
+      [
+        "log",
+        "--follow",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=1",
+        "--",
+        "src/index.ts",
+      ],
       repoDir,
     );
     const commits = parseLogOutput(output);
@@ -114,7 +151,14 @@ describe("git_file_history (end-to-end)", () => {
 
   it("returns diff stats for a commit", async () => {
     const logOutput = await execGit(
-      ["log", "--follow", "--format=%H|%an|%ae|%aI|%s", "--max-count=1", "--", "src/index.ts"],
+      [
+        "log",
+        "--follow",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=1",
+        "--",
+        "src/index.ts",
+      ],
       repoDir,
     );
     const commits = parseLogOutput(logOutput);
@@ -165,7 +209,14 @@ describe("git_related_changes (end-to-end)", () => {
   it("finds co-changed files", async () => {
     // Get commits that touch index.ts
     const logOutput = await execGit(
-      ["log", "--format=COMMIT:%H", "--name-only", "--max-count=100", "--", "src/index.ts"],
+      [
+        "log",
+        "--format=COMMIT:%H",
+        "--name-only",
+        "--max-count=100",
+        "--",
+        "src/index.ts",
+      ],
       repoDir,
     );
     const commitFiles = parseNameOnlyLog(logOutput);
@@ -174,8 +225,14 @@ describe("git_related_changes (end-to-end)", () => {
     // Build co-change map (same logic as the tool)
     const coChangeMap = new Map<string, number>();
     for (const [hash] of commitFiles) {
-      const allFiles = await execGit(["show", "--name-only", "--format=", hash], repoDir);
-      const files = allFiles.trim().split("\n").filter((f) => f.length > 0 && f !== "src/index.ts");
+      const allFiles = await execGit(
+        ["show", "--name-only", "--format=", hash],
+        repoDir,
+      );
+      const files = allFiles
+        .trim()
+        .split("\n")
+        .filter((f) => f.length > 0 && f !== "src/index.ts");
       for (const f of files) {
         coChangeMap.set(f, (coChangeMap.get(f) ?? 0) + 1);
       }
@@ -225,5 +282,163 @@ describe("git_contributor_patterns (end-to-end)", () => {
       repoDir,
     );
     expect(lastDate.trim()).toMatch(/^\d{4}-\d{2}-\d{2}/);
+  });
+});
+
+// ─── git_search_commits ──────────────────────────────────
+
+describe("git_search_commits (end-to-end)", () => {
+  it("finds commits matching a keyword", async () => {
+    const output = await execGit(
+      [
+        "log",
+        "--grep=initial",
+        "--regexp-ignore-case",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=20",
+      ],
+      repoDir,
+    );
+    const commits = parseLogOutput(output);
+
+    expect(commits).toHaveLength(1);
+    expect(commits[0].subject).toBe("feat: initial setup");
+  });
+
+  it("finds commits by author", async () => {
+    const output = await execGit(
+      [
+        "log",
+        "--grep=feat",
+        "--regexp-ignore-case",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=20",
+        "--author=Bob",
+      ],
+      repoDir,
+    );
+    const commits = parseLogOutput(output);
+
+    expect(commits).toHaveLength(1);
+    expect(commits[0].author).toBe("Bob");
+  });
+
+  it("returns empty for no matches", async () => {
+    const output = await execGit(
+      [
+        "log",
+        "--grep=nonexistent-keyword",
+        "--regexp-ignore-case",
+        "--format=%H|%an|%ae|%aI|%s",
+        "--max-count=20",
+      ],
+      repoDir,
+    );
+    const commits = parseLogOutput(output);
+    expect(commits).toHaveLength(0);
+  });
+});
+
+// ─── git_commit_show ─────────────────────────────────────
+
+describe("git_commit_show (end-to-end)", () => {
+  it("shows commit metadata and stat", async () => {
+    const output = await execGit(
+      ["show", "--stat", "--format=%H|%an|%ae|%aI|%P%n%B", "HEAD"],
+      repoDir,
+    );
+
+    expect(output).toContain("Bob");
+    expect(output).toContain("feat: add z variable");
+    expect(output).toContain("src/index.ts");
+  });
+
+  it("shows diff for a commit", async () => {
+    const output = await execGit(["show", "-U3", "--format=", "HEAD"], repoDir);
+
+    expect(output).toContain("const z = 3;");
+  });
+});
+
+// ─── git_diff_context ────────────────────────────────────
+
+describe("git_diff_context (end-to-end)", () => {
+  it("shows diff stat between two commits", async () => {
+    const logOutput = await execGit(
+      ["log", "--format=%H", "--max-count=3"],
+      repoDir,
+    );
+    const hashes = logOutput.trim().split("\n");
+    const newest = hashes[0];
+    const oldest = hashes[hashes.length - 1];
+
+    const statOutput = await execGit(
+      ["diff", "--stat", oldest, newest],
+      repoDir,
+    );
+    const stat = parseDiffStatOutput(statOutput);
+
+    expect(stat.filesChanged).toBeGreaterThanOrEqual(1);
+    expect(stat.insertions).toBeGreaterThan(0);
+  });
+
+  it("shows full diff for a specific file", async () => {
+    const logOutput = await execGit(
+      ["log", "--format=%H", "--max-count=3"],
+      repoDir,
+    );
+    const hashes = logOutput.trim().split("\n");
+
+    const output = await execGit(
+      [
+        "diff",
+        "-U3",
+        hashes[hashes.length - 1],
+        hashes[0],
+        "--",
+        "src/index.ts",
+      ],
+      repoDir,
+    );
+
+    expect(output).toContain("const y = 2;");
+    expect(output).toContain("const z = 3;");
+  });
+});
+
+// ─── git_hotspots ────────────────────────────────────────
+
+describe("git_hotspots (end-to-end)", () => {
+  it("identifies frequently changed files", async () => {
+    const output = await execGit(
+      ["log", "--format=", "--name-only", "--max-count=500"],
+      repoDir,
+    );
+    const hotspots = parseFileFrequency(output, 20);
+
+    expect(hotspots.length).toBeGreaterThanOrEqual(1);
+
+    // index.ts was changed in all 3 commits, should be top
+    const indexTs = hotspots.find((h) => h.filePath === "src/index.ts");
+    expect(indexTs).toBeDefined();
+    expect(indexTs!.changeCount).toBe(3);
+  });
+
+  it("filters by path pattern", async () => {
+    const output = await execGit(
+      [
+        "log",
+        "--format=",
+        "--name-only",
+        "--max-count=500",
+        "--",
+        "src/utils.ts",
+      ],
+      repoDir,
+    );
+    const hotspots = parseFileFrequency(output, 20);
+
+    expect(hotspots).toHaveLength(1);
+    expect(hotspots[0].filePath).toBe("src/utils.ts");
   });
 });
