@@ -63,15 +63,19 @@
 - [x] Trusted Publishing (OIDC) に移行（トークンレスCI/CD）
 - [x] README.md 更新（新4ツールのドキュメント追加）
 
-## 次のマイルストーン — 国際化・配布拡大
+## v0.4.1 — 国際化・配布拡大
 
-- [ ] README英語化（README.md → 英語、README.ja.md → 日本語）
-- [ ] LICENSE ファイル追加（MIT — リポジトリルートに欠落）
-- [ ] Smithery登録（英語README後）
-- [ ] 公式MCP Registry登録（英語README後）
+- [x] README英語化（README.md → 英語、README.ja.md → 日本語）
+- [x] LICENSE ファイル追加（MIT）
+- [x] smithery.yaml 追加（Smithery対応準備）
+- [ ] Smithery登録（有料プラン必要 — hosted deploymentは無料プラン非対応）
+- [x] 公式MCP Registry登録（`io.github.nakishiyaman/dig`）
+- [x] mcpName フィールド追加 + createSandboxServer エクスポート
+- [x] npm公開（mcp-server-dig@0.4.1）
 - [ ] Zed拡張パッケージング（API安定後、Rustラッパー必要）
 
 ## 既知の技術的課題
 
 - [ ] Trusted Publishing (OIDC) 完全移行（npm CLI >= 11.5.1 + npmjs.com設定が必要）
+- [ ] Smithery登録（有料プラン or URL方式でのHTTPトランスポート対応が必要）
 - release-please re-runでは `release_created` が false になる（publish手動対応が必要な場合あり）
