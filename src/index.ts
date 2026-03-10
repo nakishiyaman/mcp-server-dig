@@ -11,19 +11,30 @@ import { registerGitHotspots } from "./tools/git-hotspots.js";
 import { registerGitRelatedChanges } from "./tools/git-related-changes.js";
 import { registerGitSearchCommits } from "./tools/git-search-commits.js";
 
-const server = new McpServer({
-  name: "dig",
-  version: "0.1.0",
-});
+function createServer() {
+  const server = new McpServer({
+    name: "dig",
+    version: "0.1.0",
+  });
 
-registerGitFileHistory(server);
-registerGitBlameContext(server);
-registerGitRelatedChanges(server);
-registerGitContributorPatterns(server);
-registerGitSearchCommits(server);
-registerGitCommitShow(server);
-registerGitDiffContext(server);
-registerGitHotspots(server);
+  registerGitFileHistory(server);
+  registerGitBlameContext(server);
+  registerGitRelatedChanges(server);
+  registerGitContributorPatterns(server);
+  registerGitSearchCommits(server);
+  registerGitCommitShow(server);
+  registerGitDiffContext(server);
+  registerGitHotspots(server);
+
+  return server;
+}
+
+// Exported for Smithery registry scanning
+export function createSandboxServer() {
+  return createServer();
+}
+
+const server = createServer();
 
 async function main() {
   const transport = new StdioServerTransport();
