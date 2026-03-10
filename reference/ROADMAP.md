@@ -49,7 +49,7 @@
   - [x] ツール実装 + 統合テスト
 - [x] npm公開（mcp-server-dig@0.3.0）
 - [x] Trusted Publishing (OIDC) に移行（トークンレスCI/CD）
-- [ ] README.md 更新（新4ツールのドキュメント追加）
+- [x] README.md 更新（新4ツールのドキュメント追加）
 
 ## 将来検討
 
