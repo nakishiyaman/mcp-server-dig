@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.5.0...v0.6.0) (2026-03-10)
+
+
+### Features
+
+* add 5 new archaeology tools (pickaxe, code-churn, stale-files, merge-base, tag-list) ([69575c9](https://github.com/nakishiyaman/mcp-server-dig/commit/69575c9e1570b90005b9c74dab5d589dc85b8a84))
+* add 5 new archaeology tools for v0.6.0 ([97e0d7c](https://github.com/nakishiyaman/mcp-server-dig/commit/97e0d7c97673d9c52f31343deb4db8aea072e5fb))
+
+
+### Bug Fixes
+
+* switch npm publish to OIDC Trusted Publishing ([#27](https://github.com/nakishiyaman/mcp-server-dig/issues/27)) ([b3bfc84](https://github.com/nakishiyaman/mcp-server-dig/commit/b3bfc84f187bb7e1941e8190fcee4ec3578a7c7a))
+* use Fine-Grained PAT for release-please to trigger CI ([76f9a24](https://github.com/nakishiyaman/mcp-server-dig/commit/76f9a24757ca7e7f306b62cd395ed677ff5d5087))
+* use Fine-Grained PAT for release-please to trigger CI on PRs ([dbce236](https://github.com/nakishiyaman/mcp-server-dig/commit/dbce2363cff79d8c55122411e1539328d089a02c))
+
 ## [0.5.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.4.0...v0.5.0) (2026-03-10)
 
 
