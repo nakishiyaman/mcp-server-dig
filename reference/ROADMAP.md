@@ -23,9 +23,9 @@
 
 ## v0.2.0 — 品質・公開準備（予定）
 
-- [ ] GitHub公開
-- [ ] CI/CDパイプライン（GitHub Actions）
-- [ ] main保護ルール
+- [x] GitHubリポジトリ作成（private）
+- [x] CI/CDパイプライン（GitHub Actions — Node 18/20/22マトリクス）
+- [x] main保護ルール（CI必須, force push禁止, 管理者適用）
 - [ ] npm公開
 - [ ] release-please導入
 
