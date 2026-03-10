@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit"
   },
   "files": [
-    "build"
+    "build",
+    "!build/**/*.test.*"
   ],
   "keywords": [
     "mcp",
