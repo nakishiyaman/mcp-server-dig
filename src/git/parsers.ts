@@ -26,8 +26,6 @@ export function parseBlameOutput(raw: string): BlameBlock[] {
   const lines = raw.split("\n");
   const blocks: BlameBlock[] = [];
   let current: Partial<BlameBlock> & { lineNum?: number } = {};
-  let currentContent = "";
-
   for (const line of lines) {
     if (line.length === 0) continue;
 
@@ -50,7 +48,7 @@ export function parseBlameOutput(raw: string): BlameBlock[] {
     } else if (line.startsWith("summary ")) {
       current.summary = line.slice(8);
     } else if (line.startsWith("\t")) {
-      currentContent = line.slice(1);
+      const content = line.slice(1);
       const lineNum = current.lineNum ?? 0;
 
       // Try to merge with the last block if same commit
@@ -61,7 +59,7 @@ export function parseBlameOutput(raw: string): BlameBlock[] {
         lastBlock.endLine === lineNum - 1
       ) {
         lastBlock.endLine = lineNum;
-        lastBlock.lines.push(currentContent);
+        lastBlock.lines.push(content);
       } else {
         blocks.push({
           commitHash: current.commitHash ?? "",
@@ -71,7 +69,7 @@ export function parseBlameOutput(raw: string): BlameBlock[] {
           summary: current.summary ?? "",
           startLine: lineNum,
           endLine: lineNum,
-          lines: [currentContent],
+          lines: [content],
         });
       }
 
