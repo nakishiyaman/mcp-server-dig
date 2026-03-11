@@ -181,6 +181,15 @@ export function registerGitWhy(server: McpServer): void {
           lines.push(`  Co-changed with: ${coChangeParts.join(", ")}`);
         }
 
+        // Next actions
+        lines.push("", "Next actions:");
+        lines.push(
+          `  → git_pickaxe — 関連する文字列の追加/削除履歴を追跡`,
+        );
+        lines.push(
+          `  → git_file_history — ${file_path} の全体的な変遷を確認`,
+        );
+
         return successResponse(lines.join("\n"));
       } catch (error) {
         return errorResponse(error);

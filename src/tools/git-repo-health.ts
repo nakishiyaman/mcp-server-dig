@@ -160,6 +160,30 @@ export function registerGitRepoHealth(server: McpServer): void {
           }
         }
 
+        // Next actions
+        const actions: string[] = [];
+        if (hotspots.length > 0) {
+          actions.push(
+            `git_file_risk_profile — ホットスポット上位ファイルのリスク詳細を確認`,
+          );
+        }
+        if (contributorData.stats.length <= 2) {
+          actions.push(
+            `git_knowledge_map — 知識集中度の詳細を確認`,
+          );
+        }
+        if (staleCount > 0) {
+          actions.push(
+            `git_stale_files — 放置ファイルの一覧と最終更新日を確認`,
+          );
+        }
+        if (actions.length > 0) {
+          sections.push("", "Next actions:");
+          for (const a of actions) {
+            sections.push(`  → ${a}`);
+          }
+        }
+
         return successResponse(sections.join("\n"));
       } catch (error) {
         return errorResponse(error);

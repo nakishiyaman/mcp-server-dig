@@ -173,6 +173,41 @@ List tags sorted by creation date with associated messages. Useful for understan
 | max_tags | number | no | Maximum number of tags to return (default: 50) |
 | sort | string | no | Sort order: `"newest"` or `"oldest"` (default: `"newest"`) |
 
+### git_knowledge_map
+
+Show who owns knowledge of each directory, including bus factor analysis. Helps identify knowledge concentration risks and areas where team cross-training is needed.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| path_pattern | string | no | Limit analysis to a specific directory, e.g. `"src/"` |
+| depth | number | no | Directory depth for aggregation (default: 2) |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"1 year ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 500) |
+
+### git_dependency_map
+
+Visualize implicit dependency networks between directories based on co-change patterns. Directories that frequently change together may have hidden coupling.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| depth | number | no | Directory depth for aggregation (default: 2) |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"1 year ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 500) |
+| min_coupling | number | no | Minimum co-change count to include (default: 3) |
+
+### git_bisect_guide
+
+Pre-bisect analysis for identifying bug-introducing commits. Shows commit count in range, estimated bisect steps, hotspots, and relevant commits. Does NOT run `git bisect` itself.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| good_ref | string | yes | Known good reference where the bug did not exist |
+| bad_ref | string | no | Known bad reference where the bug exists (default: HEAD) |
+| file_path | string | no | Optional file path to focus on |
+
 ### git_review_prep
 
 Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.
@@ -288,12 +323,15 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `review-pr` | PR review workflow — generates a review briefing with risk assessment | `repo_path`, `base_ref`, `head_ref?` |
 | `assess-health` | Repository health assessment — evaluates overall repo quality | `repo_path` |
 | `trace-change` | Change tracing — tracks when and why a specific string was added or removed | `repo_path`, `search_term` |
+| `onboard-codebase` | New contributor onboarding — guided tour of repo structure, key contributors, and active areas | `repo_path` |
+| `find-bug-origin` | Bug origin hunting — uses bisect analysis to identify bug-introducing commits | `repo_path`, `good_ref`, `bad_ref?`, `file_path?`, `symptom?` |
 
 ## Resources
 
 | URI | Description |
 |-----|-------------|
 | `dig://tool-guide` | Tool selection guide — maps common questions to the right tool |
+| `dig://repo-summary/{path}` | Dynamic repository summary — generates overview with branch, file count, contributors, and recent commits |
 
 ## Setup
 

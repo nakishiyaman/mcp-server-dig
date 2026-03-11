@@ -115,4 +115,4 @@ npm run typecheck        # tsc --noEmit
 - ロードマップ: `reference/ROADMAP.md`
 - セッション引き継ぎ: `reference/HANDOFF.md`
 - Tessera導入評価: `docs/recommended-practices.md`
-- 現在のステータス: **v0.9.0 開発中**（17ツール: データ取得13 + 組み合わせ分析2 + ワークフロー統合2）
+- 現在のステータス: **v0.10.0 開発中**（20ツール: データ取得16 + 組み合わせ分析2 + ワークフロー統合2, Prompts 6, Resources 2）
