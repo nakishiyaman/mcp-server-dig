@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { AnalysisCache } from "./analysis/cache.js";
+import { logger } from "./logger.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
@@ -100,10 +101,10 @@ const server = createServer();
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("mcp-server-dig running on stdio");
+  logger.info("mcp-server-dig running on stdio", { version });
 }
 
 main().catch((error) => {
-  console.error("Fatal:", error);
+  logger.error("Fatal error", { error: error instanceof Error ? error.message : String(error) });
   process.exit(1);
 });
