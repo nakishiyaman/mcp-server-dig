@@ -3,6 +3,7 @@ import { buildInvestigateCodePrompt } from "./investigate-code.js";
 import { buildReviewPrPrompt } from "./review-pr.js";
 import { buildAssessHealthPrompt } from "./assess-health.js";
 import { buildTraceChangePrompt } from "./trace-change.js";
+import { buildOnboardCodebasePrompt } from "./onboard-codebase.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -121,5 +122,22 @@ describe("trace-change prompt", () => {
     const text = (result.messages[0].content as { type: string; text: string }).text;
     expect(text).toContain("「handleError」を追加/削除したコミットを検索");
     expect(text).toContain("「handleError」がいつ・誰によって");
+  });
+});
+
+describe("onboard-codebase prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildOnboardCodebasePrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("git_repo_health");
+    expect(text).toContain("git_contributor_patterns");
+    expect(text).toContain("git_hotspots");
+    expect(text).toContain("git_tag_list");
+    expect(text).toContain("git_stale_files");
   });
 });
