@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-11
+最終更新: 2026-03-12
 
 ## v0.4.0 — 品質改善
 
@@ -90,9 +90,20 @@
   - [x] パーサー: parseTagOutput + 型定義: TagInfo
   - [x] ツール実装 + 統合テスト
 - [x] README.md 更新（新5ツールのドキュメント追加）
-- [ ] npm公開（mcp-server-dig@0.6.0）
+- [x] npm公開（mcp-server-dig@0.6.0）
+- [x] release-please PAT修正（GITHUB_TOKEN → Fine-Grained PAT で CI トリガー問題解決）
+- [x] Auto-merge有効化（Release PR の自動マージ）
+- [x] 開発ワークフロー強化:
+  - [x] `.claude/rules/` 導入（general, git-workflow, implementation, testing, validation）
+  - [x] `CLAUDE.md` 作成（プロジェクト概要・規律）
+  - [x] ADR導入（`docs/adr/` — 3件記録）
+  - [x] GitHub Issueテンプレート（bug.yml, feature.yml）
+  - [x] リリースボディテンプレート（`.github/release-body.md`）
+  - [x] 検証チェックリストテンプレート（`reference/templates/release-validation.md`）
 
 ## 既知の技術的課題
 
 - [ ] Smithery登録（有料プラン or URL方式でのHTTPトランスポート対応が必要）
+- [ ] Zed拡張パッケージング（API安定後、Rustラッパー必要）
+- [ ] RELEASE_PLEASE_TOKEN の年次更新（2027-03頃）
 - release-please re-runでは `release_created` が false になる（workflow_dispatch で手動publish可能）
