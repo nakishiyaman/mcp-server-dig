@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.8.0...v0.8.1) (2026-03-11)
+
+
+### Bug Fixes
+
+* 品質強化 — エッジケース修正・テスト追加 ([4251fbb](https://github.com/nakishiyaman/mcp-server-dig/commit/4251fbbc3e481e811919a7fd93c8d54a7954cf79))
+* 品質強化 — エッジケース修正・テスト追加（67→82テスト） ([446b49d](https://github.com/nakishiyaman/mcp-server-dig/commit/446b49d1388be69f4a64e8cc7f19f5ea16316156))
+
 ## [0.8.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.7.0...v0.8.0) (2026-03-11)
 
 
