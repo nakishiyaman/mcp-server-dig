@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.10.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.9.1...v0.10.0) (2026-03-11)
+
+
+### Features
+
+* v0.10.0 Phase 1 — 3ツール + 1Prompt + エラーメッセージ改善 ([6bade38](https://github.com/nakishiyaman/mcp-server-dig/commit/6bade38011b91fcc079da25663c7bf4124d7182d))
+* v0.10.0 Phase 1 — 3ツール + 1Prompt + エラーメッセージ改善 ([f5fffc2](https://github.com/nakishiyaman/mcp-server-dig/commit/f5fffc2d5f023ae6df39c4136094796b743722fc))
+* v0.10.0 Phase 2 — find-bug-origin Prompt + repo-summary Resource ([cbfb937](https://github.com/nakishiyaman/mcp-server-dig/commit/cbfb93718218f86f4a33b93f20bc029c54f77822))
+* v0.10.0 Phase 2 — find-bug-origin Prompt + repo-summary動的Resource ([321d28b](https://github.com/nakishiyaman/mcp-server-dig/commit/321d28b924d8809644de258c877be140007db3ad))
+* v0.10.0 Phase 3 — アクション提案 + README更新 + ROADMAP完了 ([2155fb2](https://github.com/nakishiyaman/mcp-server-dig/commit/2155fb2cb5b68292488ffa0f1aa710683bb7994d))
+* v0.10.0 Phase 3 — アクション提案 + README更新 + ROADMAP完了 ([2db7f49](https://github.com/nakishiyaman/mcp-server-dig/commit/2db7f49ecb2b30c3735f46039089d9f215f4c3ba))
+
 ## [0.9.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.9.0...v0.9.1) (2026-03-11)
 
 
