@@ -1,18 +1,19 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
-import { analyzeHotspots } from "../analysis/hotspots.js";
-import { analyzeChurn } from "../analysis/churn.js";
+import {
+  analyzeHotspotsAndChurn,
+  countStaleFiles,
+} from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
-import { parseStaleFiles } from "../git/parsers.js";
 import { errorResponse, successResponse } from "./response.js";
 
-async function countTrackedFiles(repoPath: string): Promise<number> {
+async function getTrackedFiles(repoPath: string): Promise<string[]> {
   const output = await execGit(["ls-files"], repoPath);
   return output
     .trim()
     .split("\n")
-    .filter((l) => l.length > 0).length;
+    .filter((l) => l.length > 0);
 }
 
 async function countTotalCommits(repoPath: string, since?: string): Promise<number> {
@@ -20,36 +21,6 @@ async function countTotalCommits(repoPath: string, since?: string): Promise<numb
   if (since) args.push(`--since=${since}`);
   const output = await execGit(args, repoPath);
   return parseInt(output.trim(), 10);
-}
-
-async function getStaleFileCount(
-  repoPath: string,
-  thresholdDays: number,
-): Promise<number> {
-  const trackedOutput = await execGit(["ls-files"], repoPath);
-  const trackedFiles = trackedOutput
-    .trim()
-    .split("\n")
-    .filter((f) => f.length > 0);
-
-  if (trackedFiles.length === 0) return 0;
-
-  const dateLines: string[] = [];
-  for (const file of trackedFiles) {
-    try {
-      const dateOutput = await execGit(
-        ["log", "--format=%aI", "--max-count=1", "--", file],
-        repoPath,
-      );
-      const date = dateOutput.trim();
-      if (date) dateLines.push(`${date}\t${file}`);
-    } catch {
-      // Skip files that fail
-    }
-  }
-
-  const raw = dateLines.join("\n");
-  return parseStaleFiles(raw, thresholdDays).length;
 }
 
 export function registerGitRepoHealth(server: McpServer): void {
@@ -85,25 +56,31 @@ export function registerGitRepoHealth(server: McpServer): void {
       try {
         await validateGitRepo(repo_path);
 
-        const analysisOptions = { since, maxCommits: max_commits };
+        // Single ls-files call shared by file count and stale detection
+        const trackedFiles = await getTrackedFiles(repo_path);
 
-        // Run independent analyses in parallel
+        // Run independent analyses in parallel:
+        // - Combined hotspots+churn uses a single git log --numstat scan
+        // - Stale detection uses a single git log --since scan
         const [
-          fileCount,
           totalCommits,
-          hotspots,
-          churnFiles,
+          combined,
           contributorData,
           staleCount,
         ] = await Promise.all([
-          countTrackedFiles(repo_path),
           countTotalCommits(repo_path, since),
-          analyzeHotspots(repo_path, { ...analysisOptions, topN: 10 }),
-          analyzeChurn(repo_path, { ...analysisOptions, topN: 10 }),
-          analyzeContributors(repo_path, analysisOptions),
-          getStaleFileCount(repo_path, stale_threshold_days),
+          analyzeHotspotsAndChurn(repo_path, {
+            since,
+            maxCommits: max_commits,
+            hotspotsTopN: 10,
+            churnTopN: 10,
+          }),
+          analyzeContributors(repo_path, { since, maxCommits: max_commits }),
+          countStaleFiles(repo_path, trackedFiles, stale_threshold_days),
         ]);
 
+        const { hotspots, churn: churnFiles } = combined;
+        const fileCount = trackedFiles.length;
         const sinceLabel = since ? ` (since ${since})` : "";
         const sections: string[] = [];
 

@@ -7,6 +7,7 @@ import {
   parseDiffStatOutput,
   parseFileFrequency,
   parseNumstatOutput,
+  parseCombinedNumstat,
   parseStaleFiles,
   parseTagOutput,
 } from "./parsers.js";
@@ -475,5 +476,71 @@ describe("parseTagOutput", () => {
 
     const result = parseTagOutput(raw);
     expect(result).toHaveLength(1);
+  });
+});
+
+describe("parseCombinedNumstat", () => {
+  const sampleNumstat = [
+    "COMMIT:abc123",
+    "5\t3\tsrc/foo.ts",
+    "10\t2\tsrc/bar.ts",
+    "",
+    "COMMIT:def456",
+    "3\t1\tsrc/foo.ts",
+    "20\t0\tsrc/baz.ts",
+    "",
+    "COMMIT:ghi789",
+    "1\t1\tsrc/foo.ts",
+  ].join("\n");
+
+  it("hotspotsとchurnを同時に算出する", () => {
+    const result = parseCombinedNumstat(sampleNumstat);
+
+    // foo.ts: 3 commits, bar.ts: 1, baz.ts: 1 → total changes = 5
+    expect(result.hotspots[0].filePath).toBe("src/foo.ts");
+    expect(result.hotspots[0].changeCount).toBe(3);
+    expect(result.hotspots).toHaveLength(3);
+
+    // foo: (5+3)+(3+1)+(1+1)=14 churn, baz: 20 churn, bar: 12 churn
+    expect(result.churn[0].filePath).toBe("src/baz.ts");
+    expect(result.churn[0].totalChurn).toBe(20);
+    expect(result.churn[1].filePath).toBe("src/foo.ts");
+    expect(result.churn[1].totalChurn).toBe(14);
+    expect(result.churn[2].filePath).toBe("src/bar.ts");
+    expect(result.churn[2].totalChurn).toBe(12);
+  });
+
+  it("topNで結果を制限する", () => {
+    const result = parseCombinedNumstat(sampleNumstat, {
+      hotspotsTopN: 1,
+      churnTopN: 2,
+    });
+
+    expect(result.hotspots).toHaveLength(1);
+    expect(result.churn).toHaveLength(2);
+  });
+
+  it("parseNumstatOutputと同じchurn結果を返す", () => {
+    const combined = parseCombinedNumstat(sampleNumstat, { churnTopN: 20 });
+    const legacy = parseNumstatOutput(sampleNumstat, 20);
+
+    expect(combined.churn).toEqual(legacy);
+  });
+
+  it("空入力で空結果を返す", () => {
+    const result = parseCombinedNumstat("");
+    expect(result.hotspots).toEqual([]);
+    expect(result.churn).toEqual([]);
+  });
+
+  it("バイナリファイル（- - path）を処理する", () => {
+    const raw = ["COMMIT:aaa111", "-\t-\timage.png", "5\t0\tsrc/a.ts"].join(
+      "\n",
+    );
+    const result = parseCombinedNumstat(raw);
+
+    expect(result.hotspots).toHaveLength(2);
+    const png = result.churn.find((c) => c.filePath === "image.png");
+    expect(png?.totalChurn).toBe(0);
   });
 });

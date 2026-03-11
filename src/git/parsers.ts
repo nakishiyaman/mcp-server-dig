@@ -224,6 +224,25 @@ export function parseNumstatOutput(
   raw: string,
   topN: number = 20,
 ): FileChurn[] {
+  return parseCombinedNumstat(raw, { churnTopN: topN }).churn;
+}
+
+export interface CombinedNumstatResult {
+  hotspots: FileHotspot[];
+  churn: FileChurn[];
+}
+
+/**
+ * Parse `git log --numstat --format=COMMIT:%H` output into both hotspots and churn.
+ * A single numstat scan contains file paths (for frequency/hotspots) AND
+ * insertions/deletions (for churn), eliminating the need for separate git calls.
+ */
+export function parseCombinedNumstat(
+  raw: string,
+  options: { hotspotsTopN?: number; churnTopN?: number } = {},
+): CombinedNumstatResult {
+  const { hotspotsTopN = 20, churnTopN = 20 } = options;
+
   const lines = raw.trim().split("\n");
   const fileMap = new Map<
     string,
@@ -255,7 +274,25 @@ export function parseNumstatOutput(
     fileMap.set(path, existing);
   }
 
-  const sorted = [...fileMap.entries()]
+  // Build hotspots (sorted by commit count = change frequency)
+  const totalChanges = [...fileMap.values()].reduce(
+    (sum, d) => sum + d.commits.size,
+    0,
+  );
+  const hotspots = [...fileMap.entries()]
+    .map(([filePath, data]) => ({
+      filePath,
+      changeCount: data.commits.size,
+      percentage:
+        totalChanges > 0
+          ? Math.round((data.commits.size / totalChanges) * 100)
+          : 0,
+    }))
+    .sort((a, b) => b.changeCount - a.changeCount)
+    .slice(0, hotspotsTopN);
+
+  // Build churn (sorted by total churn)
+  const churn = [...fileMap.entries()]
     .map(([filePath, data]) => ({
       filePath,
       insertions: data.insertions,
@@ -264,9 +301,9 @@ export function parseNumstatOutput(
       commits: data.commits.size,
     }))
     .sort((a, b) => b.totalChurn - a.totalChurn)
-    .slice(0, topN);
+    .slice(0, churnTopN);
 
-  return sorted;
+  return { hotspots, churn };
 }
 
 /**
