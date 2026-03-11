@@ -21,6 +21,11 @@ import {
   parseStaleFiles,
   parseTagOutput,
 } from "../git/parsers.js";
+import { analyzeHotspots } from "../analysis/hotspots.js";
+import { analyzeChurn } from "../analysis/churn.js";
+import { analyzeContributors } from "../analysis/contributors.js";
+import { analyzeCoChanges } from "../analysis/co-changes.js";
+import { analyzeFileStaleness } from "../analysis/staleness.js";
 
 const execFileAsync = promisify(execFileCb);
 
@@ -657,5 +662,116 @@ describe("git_tag_list (end-to-end)", () => {
     expect(tags).toHaveLength(1);
     expect(tags[0].name).toBe("v0.1.0");
     expect(tags[0].subject).toBe("Initial release");
+  });
+});
+
+// ─── analysis layer (extracted functions) ────────────────
+
+describe("analyzeHotspots", () => {
+  it("ファイルの変更頻度を分析する", async () => {
+    const hotspots = await analyzeHotspots(repoDir, { topN: 10 });
+
+    expect(hotspots.length).toBeGreaterThanOrEqual(1);
+    const indexTs = hotspots.find((h) => h.filePath === "src/index.ts");
+    expect(indexTs).toBeDefined();
+    expect(indexTs!.changeCount).toBe(4);
+  });
+});
+
+describe("analyzeChurn", () => {
+  it("ファイルのコードチャーンを分析する", async () => {
+    const churnFiles = await analyzeChurn(repoDir, { topN: 10 });
+
+    expect(churnFiles.length).toBeGreaterThanOrEqual(1);
+    const indexTs = churnFiles.find((f) => f.filePath === "src/index.ts");
+    expect(indexTs).toBeDefined();
+    expect(indexTs!.totalChurn).toBeGreaterThan(0);
+  });
+});
+
+describe("analyzeContributors", () => {
+  it("コントリビューター分布を分析する", async () => {
+    const { stats, totalCommits } = await analyzeContributors(repoDir);
+
+    expect(totalCommits).toBe(4);
+    expect(stats).toHaveLength(2);
+
+    const alice = stats.find((s) => s.name === "Alice");
+    expect(alice).toBeDefined();
+    expect(alice!.lastActive).toMatch(/^\d{4}-\d{2}-\d{2}/);
+  });
+});
+
+describe("analyzeCoChanges", () => {
+  it("共変更ファイルを分析する", async () => {
+    const { results, totalCommits } = await analyzeCoChanges(
+      repoDir,
+      "src/index.ts",
+      { minCoupling: 1 },
+    );
+
+    expect(totalCommits).toBe(4);
+    expect(results.length).toBeGreaterThanOrEqual(1);
+
+    const utils = results.find((r) => r.filePath === "src/utils.ts");
+    expect(utils).toBeDefined();
+    expect(utils!.coChangeCount).toBe(2);
+  });
+});
+
+describe("analyzeFileStaleness", () => {
+  it("ファイルの最終更新日と経過日数を返す", async () => {
+    const result = await analyzeFileStaleness(repoDir, "src/index.ts");
+
+    expect(result.lastModified).toMatch(/^\d{4}-\d{2}-\d{2}/);
+    expect(result.daysSinceLastChange).toBeGreaterThanOrEqual(0);
+  });
+});
+
+// ─── git_file_risk_profile (composite) ──────────────────
+
+describe("git_file_risk_profile (end-to-end)", () => {
+  it("ファイルのリスクプロファイルを生成する", async () => {
+    const hotspots = await analyzeHotspots(repoDir, { topN: 100 });
+    const churnFiles = await analyzeChurn(repoDir, { topN: 100 });
+    const contributorData = await analyzeContributors(repoDir, {
+      pathPattern: "src/index.ts",
+    });
+    const coChangeData = await analyzeCoChanges(repoDir, "src/index.ts", {
+      minCoupling: 1,
+    });
+    const stalenessData = await analyzeFileStaleness(repoDir, "src/index.ts");
+
+    // All analyses should return data
+    expect(hotspots.length).toBeGreaterThan(0);
+    expect(churnFiles.length).toBeGreaterThan(0);
+    expect(contributorData.stats.length).toBeGreaterThan(0);
+    expect(coChangeData.results.length).toBeGreaterThan(0);
+    expect(stalenessData.daysSinceLastChange).toBeGreaterThanOrEqual(0);
+
+    // The target file should appear in hotspots and churn
+    const fileHotspot = hotspots.find((h) => h.filePath === "src/index.ts");
+    expect(fileHotspot).toBeDefined();
+    const fileChurn = churnFiles.find((f) => f.filePath === "src/index.ts");
+    expect(fileChurn).toBeDefined();
+  });
+});
+
+// ─── git_repo_health (composite) ────────────────────────
+
+describe("git_repo_health (end-to-end)", () => {
+  it("リポジトリの健全性サマリーを生成する", async () => {
+    // Run the same analyses the tool would run
+    const [hotspots, churnFiles, contributorData] = await Promise.all([
+      analyzeHotspots(repoDir, { topN: 10 }),
+      analyzeChurn(repoDir, { topN: 10 }),
+      analyzeContributors(repoDir),
+    ]);
+
+    // Should have data from the test repo
+    expect(hotspots.length).toBeGreaterThan(0);
+    expect(churnFiles.length).toBeGreaterThan(0);
+    expect(contributorData.stats.length).toBe(2);
+    expect(contributorData.totalCommits).toBe(4);
   });
 });

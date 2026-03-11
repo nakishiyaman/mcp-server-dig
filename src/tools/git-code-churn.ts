@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { execGit, validateGitRepo } from "../git/executor.js";
-import { parseNumstatOutput } from "../git/parsers.js";
+import { validateGitRepo } from "../git/executor.js";
+import { analyzeChurn } from "../analysis/churn.js";
 import { errorResponse, successResponse } from "./response.js";
 
 export function registerGitCodeChurn(server: McpServer): void {
@@ -37,18 +37,12 @@ export function registerGitCodeChurn(server: McpServer): void {
       try {
         await validateGitRepo(repo_path);
 
-        const args = [
-          "log",
-          "--numstat",
-          "--format=COMMIT:%H",
-          `--max-count=${max_commits}`,
-        ];
-
-        if (since) args.push(`--since=${since}`);
-        if (path_pattern) args.push("--", path_pattern);
-
-        const output = await execGit(args, repo_path);
-        const churnFiles = parseNumstatOutput(output, top_n);
+        const churnFiles = await analyzeChurn(repo_path, {
+          pathPattern: path_pattern,
+          since,
+          maxCommits: max_commits,
+          topN: top_n,
+        });
 
         if (churnFiles.length === 0) {
           return successResponse(

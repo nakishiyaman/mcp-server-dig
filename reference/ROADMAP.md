@@ -101,9 +101,39 @@
   - [x] リリースボディテンプレート（`.github/release-body.md`）
   - [x] 検証チェックリストテンプレート（`reference/templates/release-validation.md`）
 
+## v0.7.0 — 組み合わせ分析（垂直統合）
+
+- [x] 分析ロジックの抽出（`src/analysis/`）
+  - [x] `analyzeHotspots()` — 変更頻度分析
+  - [x] `analyzeChurn()` — コードチャーン分析
+  - [x] `analyzeContributors()` — コントリビューター分析
+  - [x] `analyzeCoChanges()` — 共変更分析
+  - [x] `analyzeFileStaleness()` — 鮮度分析
+  - [x] 既存4ツールのリファクタリング（hotspots, churn, contributors, related_changes）
+  - [x] 全55テストパス確認
+- [x] `git_file_risk_profile` ツール（ファイルリスク評価）
+  - [x] 5次元リスク分類（変更頻度, チャーン, 知識集中度, 結合度, 鮮度）
+  - [x] 統合テスト追加
+- [x] `git_repo_health` ツール（リポジトリ健全性サマリー）
+  - [x] 並列分析実行（Promise.all）
+  - [x] 統合テスト追加
+- [x] README.md / README.ja.md 更新
+  - [x] 新ツールドキュメント
+  - [x] Zed/Cursor/Windsurf 設定例追加
+- [x] ROADMAP更新（Zed拡張をスコープ外に移動）
+
+## スコープ外
+
+| 項目 | 理由 |
+|------|------|
+| Zed拡張のRust実装 | 設定ベース接続で十分。ROI極低 |
+| HTTP/SSEトランスポート | ADR-0003で決定済み |
+| Smithery有料プラン | MCP Registry登録済みで配布十分 |
+| git以外のVCS対応 | スコープ拡大は焦点を失わせる |
+| 単純ラッパーの追加 | 価値を生まない。垂直統合に注力 |
+| AIによる自動解釈・要約 | LLMの仕事。ツールはデータ提供に専念 |
+
 ## 既知の技術的課題
 
-- [ ] Smithery登録（有料プラン or URL方式でのHTTPトランスポート対応が必要）
-- [ ] Zed拡張パッケージング（API安定後、Rustラッパー必要）
 - [ ] RELEASE_PLEASE_TOKEN の年次更新（2027-03頃）
 - release-please re-runでは `release_created` が false になる（workflow_dispatch で手動publish可能）

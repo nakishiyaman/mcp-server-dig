@@ -6,6 +6,15 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 
 ## Tools
 
+### Composite Analysis
+
+| Tool | Description |
+|------|-------------|
+| `git_file_risk_profile` | Multi-dimensional risk assessment for a single file |
+| `git_repo_health` | Repository-wide health summary |
+
+### Data Retrieval
+
 ### git_file_history
 
 Get the commit history for a specific file with diff stats.
@@ -157,6 +166,43 @@ List tags sorted by creation date with associated messages. Useful for understan
 | max_tags | number | no | Maximum number of tags to return (default: 50) |
 | sort | string | no | Sort order: `"newest"` or `"oldest"` (default: `"newest"`) |
 
+### git_file_risk_profile
+
+Comprehensive risk assessment for a single file combining change frequency, code churn, knowledge concentration, implicit coupling, and staleness into a multi-dimensional profile.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| file_path | string | yes | Relative path to the file within the repo |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Number of commits to analyze (default: 500) |
+
+Example output:
+
+```
+Risk profile for: src/core/engine.ts
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Change frequency:  HIGH (47 changes, top 3%)
+Code churn:        HIGH (1,230 lines churned)
+Knowledge risk:    MEDIUM (2 contributors, top owns 78%)
+Coupling:          HIGH (12 co-changed files)
+Staleness:         LOW (last changed 3 days ago)
+
+Overall: HIGH RISK
+Concerns: frequently changing, high code churn, highly coupled
+```
+
+### git_repo_health
+
+Repository-wide health summary combining file count, commit activity, top hotspots, highest churn files, contributor distribution, and stale file count into a single overview.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Date filter for activity analysis |
+| max_commits | number | no | Number of commits to analyze (default: 500) |
+| stale_threshold_days | number | no | Days without change to consider stale (default: 180) |
+
 ## Setup
 
 ### Prerequisites
@@ -201,6 +247,51 @@ Or if running from source:
     "dig": {
       "command": "node",
       "args": ["./build/index.js"]
+    }
+  }
+}
+```
+
+### Zed
+
+Add to your Zed `settings.json`:
+
+```json
+{
+  "context_servers": {
+    "dig": {
+      "command": {
+        "path": "mcp-server-dig",
+        "args": []
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to `.cursor/mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "dig": {
+      "command": "mcp-server-dig"
+    }
+  }
+}
+```
+
+### Windsurf
+
+Add to your Windsurf MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "dig": {
+      "command": "mcp-server-dig"
     }
   }
 }
