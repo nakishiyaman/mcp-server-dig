@@ -3,29 +3,36 @@
 日時: 2026-03-11
 
 ### 完了したタスク
-- `git_review_prep` ツール実装（PRレビュー準備ブリーフィング）
-  - diff stat, commit一覧, hotspots, churn分析の並列実行
-  - リスクファイル検出 + レビュアー推薦 + 変更漏れ候補警告
-- `git_why` ツール実装（コード考古学ナラティブ）
-  - blame + commit詳細 + contributors + co-changes統合
-  - 行範囲指定対応
-- 両ツールの統合テスト追加（5テスト）
-- index.ts にワークフロー統合ツール登録
-- CLAUDE.md ツール数・バージョン更新（15→17ツール, v0.7.0→v0.8.0）
-- ROADMAP.md v0.8.0セクション追加
+- v0.8.1 リリース済み（前セッション）
+- **dogfooding実施**: mcp-server-dig自身のリポジトリに対してツールを実行
+
+### dogfooding結果
+
+#### 良好: `git_repo_health`
+- 一発でリポジトリ全体像を把握できる
+- 「knowledge concentration risk（95%が1人）」警告が有用
+
+#### 良好: `git_file_risk_profile`
+- 5次元リスク評価が簡潔で判断材料になる
+- co-changedファイル一覧が具体的
+
+#### 要改善: `git_why` の出力が冗長
+- `src/index.ts`（71行）に対し、同一コミット情報が何度も繰り返される
+  - 例: `a567496`（Initial commit）が6回、`685b076`が5回出現
+- LLMコンテキストの浪費（50,000文字制限の哲学と矛盾）
+- **改善案**: 同一コミットの行範囲をグループ化し、コミット詳細は1回だけ出力
 
 ### 現在の状態
-- ブランチ: `feat/v0.8.0-workflow-tools`（未push、PR未作成）
+- ブランチ: `docs/handoff-v0.8.1`
 - 未コミット変更: `.claude/settings.local.json`（個人設定、コミット対象外）
 - ツール数: 17（データ取得13 + 組み合わせ分析2 + ワークフロー統合2）
-- テスト: 67テスト全通過（既存62 + 新規5）
-- build / test / lint 全パス確認済み
+- テスト: 82テスト全通過
+- npm: mcp-server-dig@0.8.1 公開済み
 
 ### 次にやるべきこと
-1. **ブランチをpush → PR作成 → CIパス確認 → マージ**
-2. **README.md / README.ja.md 更新**（新2ツールのドキュメント追加）
-3. **v0.8.0リリース**（release-please PRマージ → npm公開）
+1. **`git_why` 出力のグループ化改善を実装**
+2. 他ツールのdogfooding継続
+3. v0.9.0ロードマップ設計
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
-- `.claude/settings.local.json` がgit statusに出ているが個人設定なのでコミットしない

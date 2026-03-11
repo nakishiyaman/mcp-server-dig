@@ -102,6 +102,21 @@ export function registerGitWhy(server: McpServer): void {
           commitFilesMap.set(hash, filesInCommit);
         }
 
+        // Group line ranges by commit hash
+        const commitLineRanges = new Map<string, string[]>();
+        for (const block of blocks) {
+          const range =
+            block.startLine === block.endLine
+              ? `L${block.startLine}`
+              : `L${block.startLine}-${block.endLine}`;
+          const existing = commitLineRanges.get(block.commitHash);
+          if (existing) {
+            existing.push(range);
+          } else {
+            commitLineRanges.set(block.commitHash, [range]);
+          }
+        }
+
         // Build line range label
         const lineLabel =
           start_line !== undefined
@@ -120,26 +135,32 @@ export function registerGitWhy(server: McpServer): void {
           "",
         ];
 
-        // Blame blocks with commit context
-        for (const block of blocks) {
-          const lineRange =
-            block.startLine === block.endLine
-              ? `L${block.startLine}`
-              : `L${block.startLine}-${block.endLine}`;
-          const shortHash = block.commitHash.slice(0, 7);
+        // Deduplicated commit details
+        for (const hash of limitedHashes) {
+          const block = blocks.find((b) => b.commitHash === hash);
+          if (!block) continue;
+
+          const shortHash = hash.slice(0, 7);
           const date = block.date.slice(0, 10);
+          const ranges = commitLineRanges.get(hash) ?? [];
 
-          lines.push(
-            `[${lineRange}] ${shortHash} | ${date} | ${block.author}`,
-          );
-          lines.push(`  Commit: ${block.summary}`);
+          lines.push(`  ${shortHash} | ${date} | ${block.author}`);
+          lines.push(`    Commit: ${block.summary}`);
+          lines.push(`    Lines: ${ranges.join(", ")}`);
 
-          const filesInCommit = commitFilesMap.get(block.commitHash);
+          const filesInCommit = commitFilesMap.get(hash);
           if (filesInCommit && filesInCommit.length > 0) {
             lines.push(
-              `  Files in commit: ${filesInCommit.join(", ")}`,
+              `    Files in commit: ${filesInCommit.join(", ")}`,
             );
           }
+          lines.push("");
+        }
+
+        if (uniqueCommitHashes.length > limitedHashes.length) {
+          lines.push(
+            `  ... and ${uniqueCommitHashes.length - limitedHashes.length} more commit(s)`,
+          );
           lines.push("");
         }
 
