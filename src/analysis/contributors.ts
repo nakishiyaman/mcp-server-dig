@@ -6,20 +6,21 @@ export interface ContributorsOptions {
   pathPattern?: string;
   since?: string;
   maxCommits?: number;
+  timeoutMs?: number;
 }
 
 export async function analyzeContributors(
   repoPath: string,
   options: ContributorsOptions = {},
 ): Promise<{ stats: ContributorStats[]; totalCommits: number }> {
-  const { pathPattern, since, maxCommits = 500 } = options;
+  const { pathPattern, since, maxCommits = 500, timeoutMs } = options;
 
   const shortlogArgs = ["shortlog", "-sne", `--max-count=${maxCommits}`];
   if (since) shortlogArgs.push(`--since=${since}`);
   shortlogArgs.push("HEAD");
   if (pathPattern) shortlogArgs.push("--", pathPattern);
 
-  const shortlogOutput = await execGit(shortlogArgs, repoPath);
+  const shortlogOutput = await execGit(shortlogArgs, repoPath, timeoutMs);
 
   const totalCommits = shortlogOutput
     .trim()
@@ -43,7 +44,7 @@ export async function analyzeContributors(
       ];
       if (pathPattern) logArgs.push("--", pathPattern);
 
-      const lastDate = await execGit(logArgs, repoPath);
+      const lastDate = await execGit(logArgs, repoPath, timeoutMs);
       contributor.lastActive = lastDate.trim().slice(0, 10);
     } catch {
       contributor.lastActive = "unknown";

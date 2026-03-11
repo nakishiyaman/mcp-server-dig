@@ -10,6 +10,7 @@ export interface CoChangeResult {
 export interface CoChangesOptions {
   maxCommits?: number;
   minCoupling?: number;
+  timeoutMs?: number;
 }
 
 export async function analyzeCoChanges(
@@ -17,7 +18,7 @@ export async function analyzeCoChanges(
   filePath: string,
   options: CoChangesOptions = {},
 ): Promise<{ results: CoChangeResult[]; totalCommits: number; skipped: string[] }> {
-  const { maxCommits = 100, minCoupling = 2 } = options;
+  const { maxCommits = 100, minCoupling = 2, timeoutMs } = options;
 
   const output = await execGit(
     [
@@ -29,6 +30,7 @@ export async function analyzeCoChanges(
       filePath,
     ],
     repoPath,
+    timeoutMs,
   );
 
   const commitFiles = parseNameOnlyLog(output);
@@ -46,6 +48,7 @@ export async function analyzeCoChanges(
       const allFiles = await execGit(
         ["show", "--name-only", "--format=", hash],
         repoPath,
+        timeoutMs,
       );
       const files = allFiles
         .trim()

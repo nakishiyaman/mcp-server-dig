@@ -40,8 +40,17 @@ export function registerGitWhy(server: McpServer): void {
         .describe(
           "Maximum number of commits to show in detail (default: 10)",
         ),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, file_path, start_line, end_line, max_commits }) => {
+    async ({ repo_path, file_path, start_line, end_line, max_commits, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -57,7 +66,7 @@ export function registerGitWhy(server: McpServer): void {
         }
         blameArgs.push("--", file_path);
 
-        const blameOutput = await execGit(blameArgs, repo_path);
+        const blameOutput = await execGit(blameArgs, repo_path, timeout_ms);
         const blocks = parseBlameOutput(blameOutput);
 
         if (blocks.length === 0) {
@@ -85,6 +94,7 @@ export function registerGitWhy(server: McpServer): void {
                 const filesOutput = await execGit(
                   ["show", "--name-only", "--format=", hash],
                   repo_path,
+                  timeout_ms,
                 );
                 const filesInCommit = filesOutput
                   .trim()
@@ -93,8 +103,8 @@ export function registerGitWhy(server: McpServer): void {
                 return { hash, filesInCommit };
               }),
             ),
-            analyzeContributors(repo_path, { pathPattern: file_path }),
-            analyzeCoChanges(repo_path, file_path, { minCoupling: 2 }),
+            analyzeContributors(repo_path, { pathPattern: file_path, timeoutMs: timeout_ms }),
+            analyzeCoChanges(repo_path, file_path, { minCoupling: 2, timeoutMs: timeout_ms }),
           ]);
 
         const commitFilesMap = new Map<string, string[]>();

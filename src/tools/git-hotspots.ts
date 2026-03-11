@@ -32,8 +32,17 @@ export function registerGitHotspots(server: McpServer): void {
         .optional()
         .default(20)
         .describe("Number of top files to return (default: 20)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, path_pattern, since, max_commits, top_n }) => {
+    async ({ repo_path, path_pattern, since, max_commits, top_n, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -42,6 +51,7 @@ export function registerGitHotspots(server: McpServer): void {
           since,
           maxCommits: max_commits,
           topN: top_n,
+          timeoutMs: timeout_ms,
         });
 
         if (hotspots.length === 0) {

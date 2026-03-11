@@ -30,8 +30,17 @@ export function registerGitReviewPrep(server: McpServer): void {
         .optional()
         .default(500)
         .describe("Number of commits to analyze (default: 500)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, base_ref, head_ref, max_commits }) => {
+    async ({ repo_path, base_ref, head_ref, max_commits, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -75,6 +84,7 @@ export function registerGitReviewPrep(server: McpServer): void {
               maxCommits: max_commits,
               hotspotsTopN: 100,
               churnTopN: 100,
+              timeoutMs: timeout_ms,
             }),
           ]);
 
@@ -110,10 +120,12 @@ export function registerGitReviewPrep(server: McpServer): void {
               analyzeContributors(repo_path, {
                 pathPattern: file,
                 maxCommits: max_commits,
+                timeoutMs: timeout_ms,
               }),
               analyzeCoChanges(repo_path, file, {
                 maxCommits: max_commits,
                 minCoupling: 2,
+                timeoutMs: timeout_ms,
               }),
             ]);
             return { file, contributors, coChanges };

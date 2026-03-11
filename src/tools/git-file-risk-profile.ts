@@ -183,13 +183,22 @@ export function registerGitFileRiskProfile(server: McpServer): void {
         .optional()
         .default(500)
         .describe("Number of commits to analyze (default: 500)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, file_path, since, max_commits }) => {
+    async ({ repo_path, file_path, since, max_commits, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
 
-        const analysisOptions = { since, maxCommits: max_commits };
+        const analysisOptions = { since, maxCommits: max_commits, timeoutMs: timeout_ms };
 
         // Run independent analyses in parallel
         // Combined hotspots+churn uses a single git log --numstat scan
@@ -207,6 +216,7 @@ export function registerGitFileRiskProfile(server: McpServer): void {
             analyzeCoChanges(repo_path, file_path, {
               maxCommits: max_commits,
               minCoupling: 1,
+              timeoutMs: timeout_ms,
             }),
             analyzeFileStaleness(repo_path, file_path),
           ]);
