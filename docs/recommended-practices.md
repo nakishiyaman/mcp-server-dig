@@ -24,6 +24,8 @@ Tessera (~/projects/tessera) の成熟した開発ワークフローを分析し
 | 14 | `/lint` コマンド | .claude/commands/lint.md | prettier --write + eslint --fix 一括実行 |
 | 15 | `/test` コマンド | .claude/commands/test.md | build + vitest 一括実行、失敗分析付き |
 | 16 | Zedエディタ設定 | .zed/settings.json | format_on_save, prettier, tab_size:2, inline_blame |
+| 17 | `.claude/rules/` ディレクトリ | .claude/rules/git-workflow.md, implementation.md | ルールの自動ロードによる規律の実効性確保 |
+| 18 | CLAUDE.md | CLAUDE.md | プロジェクト概要+ゴール駆動+規律の最上位文書 |
 
 ## 適合性評価の全記録
 
@@ -45,7 +47,9 @@ Tesseraの主要ワークフロー（CLAUDE.md, AGENTS.md, .claude/rules/, .clau
 | 8 | 隠蔽パターン禁止 | @ts-ignore, eslint-disable, 空catch等 | **採用** | TypeScriptプロジェクトとして同じリスク |
 | 9 | Plan Modeデフォルト | 3ステップ以上は計画から開始 | **採用** | コンテキスト管理として有効 |
 | 10 | セッション引き継ぎ (`/handoff`) | HANDOFF.md生成 + commit + push | **採用** | 初回から導入（後の評価で格上げ） |
-| 11 | ADR | `docs/adr/` で設計判断を記録 | **見送り** | v0.1の小規模プロジェクトには過剰 |
+| 11 | `.claude/rules/` ディレクトリ | ルールファイルの自動ロード | **採用** | git-workflow.md, implementation.md を導入（v0.6.0） |
+| 12 | CLAUDE.md | プロジェクト概要+規律の最上位文書 | **採用** | tessera準拠で作成（v0.6.0） |
+| 13 | ADR | `docs/adr/` で設計判断を記録 | **見送り** | v0.1の小規模プロジェクトには過剰 |
 | 12 | E2Eテスト (WebdriverIO) | Tauri + ブラウザ自動テスト | **見送り** | MCPサーバーにはstdio統合テストで十分 |
 | 13 | release-please自動リリース | feat:/fix:でRelease PR自動生成 | **見送り** | npm公開時に導入 |
 | 14 | 検証チェックリスト (Write-Through) | `reference/validations/` | **見送り** | v1リリース時に検討 |
@@ -79,31 +83,28 @@ Tesseraの主要ワークフロー（CLAUDE.md, AGENTS.md, .claude/rules/, .clau
 
 以下はプロジェクトの成長に応じて段階的に取り込む。
 
-### npm公開時に導入
+### 採用済み（v0.6.0で導入）
+
+以下は当初見送りだったが、導入条件を満たしたため v0.6.0 で採用。
+
+| プラクティス | 導入先 | 当初の判定 |
+|------------|-------|----------|
+| release-please自動リリース | `.github/workflows/release-please.yml` | npm公開時 → v0.2.0で導入済み |
+| CI/CDパイプライン | `.github/workflows/ci.yml` | npm公開時 → v0.2.0で導入済み |
+| main保護ルール | GitHub Branch Protection Rules | npm公開時 → v0.2.0で導入済み |
+| GitHub Issueテンプレート | `.github/ISSUE_TEMPLATE/bug.yml` + `feature.yml` | npm公開時 → v0.6.0で導入 |
+| リリースボディテンプレート | `.github/release-body.md` | 初回リリース時 → v0.6.0で導入 |
+| ADR | `docs/adr/` | 規模拡大時（ツール8以上）→ v0.6.0で導入（13ツール） |
+| Exploreサブエージェント | CLAUDE.md | ソースファイル20以上 → v0.6.0で導入（17ファイル） |
+| 検証チェックリスト | `reference/validations/` + `.claude/rules/validation.md` | v1.0時 → v0.6.0で導入 |
+| 検証マイクロコミット | `.claude/rules/validation.md` | チェックリスト導入時 → v0.6.0で導入 |
+
+### 今後の導入候補
 
 | プラクティス | Tessera実装 | 導入条件 | アクション |
 |------------|------------|---------|----------|
-| **release-please自動リリース** | `.github/workflows/release-please.yml` + `release-please-config.json` | npm公開を決定した時点 | GitHub Actionsワークフロー追加、`release-please-config.json` 作成、`scripts/set-version.mjs` で package.json のバージョン同期 |
-| **CI/CDパイプライン** | `.github/workflows/ci.yml` (lint→typecheck→test→build) | GitHubリポジトリ公開時 | ci.yml作成: `npm run lint` → `npm run typecheck` → `npm run test` → `npm run build` |
-| **main保護ルール** | GitHub Branch Protection Rules | GitHubリポジトリ公開時 | Settings → Branches → main に保護ルール設定、CI必須、PR必須 |
-| **GitHub Issueテンプレート** | `.github/ISSUE_TEMPLATE/bug.yml` + `feature.yml` | GitHubリポジトリ公開時 | Tessera版をベースに、MCP固有のフィールド（ツール名、再現git操作等）にカスタマイズ |
-| **リリースボディテンプレート** | `.github/release-body.md` | 初回リリース時 | インストール手順（npx, claude mcp add, Zed設定）を記載 |
-
-### プロジェクト規模拡大時に導入
-
-| プラクティス | Tessera実装 | 導入条件 | アクション |
-|------------|------------|---------|----------|
-| **ADR (Architecture Decision Records)** | `docs/adr/` ディレクトリ | ツール数が8以上、またはアーキテクチャ判断で迷いが生じた時 | `docs/adr/` 作成、テンプレート（Status/Context/Decision/Consequences）を用意 |
-| **Exploreサブエージェント活用** | CLAUDE.mdに記載 | ソースファイルが20以上になった時 | AGENTS.mdの「Claude Code使用時の規律」に追記 |
 | **code-reviewerエージェント** | `.claude/agents/code-reviewer.md` | PRレビューの自動化が必要になった時 | MCP固有のレビュー観点（stdio安全性、execFile使用、パストラバーサル、タイムアウト）で定義 |
 | **カスタムスキル** | `.claude/skills/` | ドメイン知識が蓄積された時 | git考古学パターン（blame解析、co-change分析等）をスキル化 |
-
-### v1.0リリース時に導入
-
-| プラクティス | Tessera実装 | 導入条件 | アクション |
-|------------|------------|---------|----------|
-| **検証チェックリスト (Write-Through)** | `reference/validations/` + `.claude/rules/validation.md` | リリース候補のQA時 | `reference/validations/` にチェックリスト作成、ツールごとの検証項目（正常系/異常系/エッジケース） |
-| **検証マイクロコミット** | `.claude/rules/validation.md` | 検証チェックリスト導入時 | セクション単位の確認完了で即コミット（`docs: 検証 git_blame_context PASS`） |
 
 ### 評価の結果見送ったもの
 
