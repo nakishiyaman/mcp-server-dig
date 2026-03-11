@@ -19,13 +19,14 @@ describe("git_merge_base (end-to-end)", () => {
       [
         "log",
         "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=50",
+        "--max-count=100",
         `${mergeBase}..main`,
       ],
       repoDir,
     );
     const mainCommits = parseLogOutput(mainOutput);
-    expect(mainCommits.length).toBeGreaterThanOrEqual(2);
+    // 4 original post-merge-base + 50 bulk = 54
+    expect(mainCommits.length).toBeGreaterThanOrEqual(54);
     const mainSubjects = mainCommits.map((c) => c.subject);
     expect(mainSubjects).toContain("feat: add w variable");
 

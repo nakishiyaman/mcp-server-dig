@@ -10,6 +10,7 @@ export interface CombinedAnalysisOptions {
   maxCommits?: number;
   hotspotsTopN?: number;
   churnTopN?: number;
+  timeoutMs?: number;
 }
 
 /**
@@ -27,6 +28,7 @@ export async function analyzeHotspotsAndChurn(
     maxCommits = 500,
     hotspotsTopN = 20,
     churnTopN = 20,
+    timeoutMs,
   } = options;
 
   const args = [
@@ -39,7 +41,7 @@ export async function analyzeHotspotsAndChurn(
   if (since) args.push(`--since=${since}`);
   if (pathPattern) args.push("--", pathPattern);
 
-  const output = await execGit(args, repoPath);
+  const output = await execGit(args, repoPath, timeoutMs);
   return parseCombinedNumstat(output, { hotspotsTopN, churnTopN });
 }
 
@@ -51,12 +53,14 @@ export async function countStaleFiles(
   repoPath: string,
   trackedFiles: string[],
   thresholdDays: number,
+  timeoutMs?: number,
 ): Promise<number> {
   if (trackedFiles.length === 0) return 0;
 
   const output = await execGit(
     ["log", "--format=", "--name-only", `--since=${thresholdDays} days ago`],
     repoPath,
+    timeoutMs,
   );
 
   const recentlyModified = new Set(

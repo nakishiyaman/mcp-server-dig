@@ -6,7 +6,9 @@ import {
   countStaleFiles,
 } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
+import { cachedAnalyzeHotspotsAndChurn, cachedAnalyzeContributors } from "../analysis/cached-analysis.js";
 import { errorResponse, successResponse } from "./response.js";
+import type { ToolContext } from "../index.js";
 
 async function getTrackedFiles(repoPath: string): Promise<string[]> {
   const output = await execGit(["ls-files"], repoPath);
@@ -23,7 +25,7 @@ async function countTotalCommits(repoPath: string, since?: string): Promise<numb
   return parseInt(output.trim(), 10);
 }
 
-export function registerGitRepoHealth(server: McpServer): void {
+export function registerGitRepoHealth(server: McpServer, context?: ToolContext): void {
   server.tool(
     "git_repo_health",
     "Repository-wide health summary combining multiple analyses into a single overview. Answers 'what is the state of this repo?' by reporting: file count, commit activity, top hotspots, highest churn files, contributor distribution, and stale file count.",
@@ -51,8 +53,17 @@ export function registerGitRepoHealth(server: McpServer): void {
         .describe(
           "Days without change to consider a file stale (default: 180)",
         ),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, since, max_commits, stale_threshold_days }) => {
+    async ({ repo_path, since, max_commits, stale_threshold_days, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -69,14 +80,25 @@ export function registerGitRepoHealth(server: McpServer): void {
           staleCount,
         ] = await Promise.all([
           countTotalCommits(repo_path, since),
-          analyzeHotspotsAndChurn(repo_path, {
-            since,
-            maxCommits: max_commits,
-            hotspotsTopN: 10,
-            churnTopN: 10,
-          }),
-          analyzeContributors(repo_path, { since, maxCommits: max_commits }),
-          countStaleFiles(repo_path, trackedFiles, stale_threshold_days),
+          context
+            ? cachedAnalyzeHotspotsAndChurn(context.cache, repo_path, {
+                since,
+                maxCommits: max_commits,
+                hotspotsTopN: 10,
+                churnTopN: 10,
+                timeoutMs: timeout_ms,
+              })
+            : analyzeHotspotsAndChurn(repo_path, {
+                since,
+                maxCommits: max_commits,
+                hotspotsTopN: 10,
+                churnTopN: 10,
+                timeoutMs: timeout_ms,
+              }),
+          context
+            ? cachedAnalyzeContributors(context.cache, repo_path, { since, maxCommits: max_commits, timeoutMs: timeout_ms })
+            : analyzeContributors(repo_path, { since, maxCommits: max_commits, timeoutMs: timeout_ms }),
+          countStaleFiles(repo_path, trackedFiles, stale_threshold_days, timeout_ms),
         ]);
 
         const { hotspots, churn: churnFiles } = combined;

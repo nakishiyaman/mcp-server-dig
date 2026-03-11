@@ -5,11 +5,13 @@ import { parseLogOutput, parseDiffStatOutput } from "../git/parsers.js";
 import { analyzeHotspotsAndChurn } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
+import { cachedAnalyzeHotspotsAndChurn } from "../analysis/cached-analysis.js";
 import { errorResponse, successResponse } from "./response.js";
+import type { ToolContext } from "../index.js";
 
 const MAX_RISK_FILES = 10;
 
-export function registerGitReviewPrep(server: McpServer): void {
+export function registerGitReviewPrep(server: McpServer, context?: ToolContext): void {
   server.tool(
     "git_review_prep",
     "Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.",
@@ -30,8 +32,17 @@ export function registerGitReviewPrep(server: McpServer): void {
         .optional()
         .default(500)
         .describe("Number of commits to analyze (default: 500)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, base_ref, head_ref, max_commits }) => {
+    async ({ repo_path, base_ref, head_ref, max_commits, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -71,11 +82,19 @@ export function registerGitReviewPrep(server: McpServer): void {
               ],
               repo_path,
             ),
-            analyzeHotspotsAndChurn(repo_path, {
-              maxCommits: max_commits,
-              hotspotsTopN: 100,
-              churnTopN: 100,
-            }),
+            context
+              ? cachedAnalyzeHotspotsAndChurn(context.cache, repo_path, {
+                  maxCommits: max_commits,
+                  hotspotsTopN: 100,
+                  churnTopN: 100,
+                  timeoutMs: timeout_ms,
+                })
+              : analyzeHotspotsAndChurn(repo_path, {
+                  maxCommits: max_commits,
+                  hotspotsTopN: 100,
+                  churnTopN: 100,
+                  timeoutMs: timeout_ms,
+                }),
           ]);
 
         const { hotspots, churn: churnFiles } = combined;
@@ -110,10 +129,12 @@ export function registerGitReviewPrep(server: McpServer): void {
               analyzeContributors(repo_path, {
                 pathPattern: file,
                 maxCommits: max_commits,
+                timeoutMs: timeout_ms,
               }),
               analyzeCoChanges(repo_path, file, {
                 maxCommits: max_commits,
                 minCoupling: 2,
+                timeoutMs: timeout_ms,
               }),
             ]);
             return { file, contributors, coChanges };

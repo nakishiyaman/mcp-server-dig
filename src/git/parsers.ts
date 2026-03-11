@@ -62,6 +62,12 @@ export function parseBlameOutput(raw: string): BlameBlock[] {
       const content = line.slice(1);
       const lineNum = current.lineNum ?? 0;
 
+      // Skip blocks with no commit hash (malformed data)
+      if (!current.commitHash) {
+        current = {};
+        continue;
+      }
+
       // Try to merge with the last block if same commit
       const lastBlock = blocks[blocks.length - 1];
       if (
@@ -73,7 +79,7 @@ export function parseBlameOutput(raw: string): BlameBlock[] {
         lastBlock.lines.push(content);
       } else {
         blocks.push({
-          commitHash: current.commitHash ?? "",
+          commitHash: current.commitHash,
           author: current.author ?? "",
           email: current.email ?? "",
           date: current.date ?? "",
@@ -148,6 +154,9 @@ export function parseDiffStatOutput(raw: string): DiffStat {
   let totalDeletions = 0;
 
   for (const line of lines) {
+    // Skip binary diff stat lines like: " image.png | Bin 0 -> 1234 bytes"
+    if (/\|\s+Bin\s/.test(line)) continue;
+
     // Match file stat lines like: " src/index.ts | 5 +++--"
     const fileMatch = line.match(/^\s*(.+?)\s+\|\s+(\d+)\s*([+-]*)\s*$/);
     if (fileMatch) {

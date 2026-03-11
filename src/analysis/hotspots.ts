@@ -7,13 +7,14 @@ export interface HotspotsOptions {
   since?: string;
   maxCommits?: number;
   topN?: number;
+  timeoutMs?: number;
 }
 
 export async function analyzeHotspots(
   repoPath: string,
   options: HotspotsOptions = {},
 ): Promise<FileHotspot[]> {
-  const { pathPattern, since, maxCommits = 500, topN = 20 } = options;
+  const { pathPattern, since, maxCommits = 500, topN = 20, timeoutMs } = options;
 
   const args = [
     "log",
@@ -25,6 +26,6 @@ export async function analyzeHotspots(
   if (since) args.push(`--since=${since}`);
   if (pathPattern) args.push("--", pathPattern);
 
-  const output = await execGit(args, repoPath);
+  const output = await execGit(args, repoPath, timeoutMs);
   return parseFileFrequency(output, topN);
 }

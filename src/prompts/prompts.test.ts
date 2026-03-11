@@ -5,6 +5,8 @@ import { buildAssessHealthPrompt } from "./assess-health.js";
 import { buildTraceChangePrompt } from "./trace-change.js";
 import { buildOnboardCodebasePrompt } from "./onboard-codebase.js";
 import { buildFindBugOriginPrompt } from "./find-bug-origin.js";
+import { buildTechnicalDebtPrompt } from "./technical-debt.js";
+import { buildOnboardAreaPrompt } from "./onboard-area.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -185,5 +187,39 @@ describe("find-bug-origin prompt", () => {
     const text = (result.messages[0].content as { type: string; text: string }).text;
     expect(text).toContain("症状に関連する");
     expect(text).not.toContain("バグの症状:");
+  });
+});
+
+describe("technical-debt prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildTechnicalDebtPrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("git_hotspots");
+    expect(text).toContain("git_code_churn");
+    expect(text).toContain("git_stale_files");
+    expect(text).toContain("git_knowledge_map");
+  });
+});
+
+describe("onboard-area prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildOnboardAreaPrompt({
+      repo_path: "/path/to/repo",
+      directory: "src/tools/",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("src/tools/");
+    expect(text).toContain("git_knowledge_map");
+    expect(text).toContain("git_contributor_patterns");
+    expect(text).toContain("git_hotspots");
+    expect(text).toContain("git_file_history");
   });
 });

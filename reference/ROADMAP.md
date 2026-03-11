@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12
+最終更新: 2026-03-11
 
 ## v0.4.0 — 品質改善
 
@@ -192,6 +192,42 @@
 - [x] ツール出力へのアクション提案（組み合わせ・ワークフローツールのみ）
 - [x] README更新（EN/JA: 3新ツール + 2新Prompt + 1新Resource）
 - [x] ROADMAP更新
+
+## v0.11.0 — 品質強化・パフォーマンス・運用改善
+
+### Phase 1: エッジケーステスト拡充 + パーサー堅牢化
+- [x] テストデータ拡充（バイナリファイル、非ASCIIファイル名、大量コミット）
+- [x] エッジケース統合テスト（3→14テストに拡充）
+- [x] パーサー防御的改善（Bin行スキップ、空commitHashガード）
+
+### Phase 2: タイムアウト柔軟化
+- [x] `timeout_ms` パラメータ追加（6ツール: repo_health, review_prep, file_risk_profile, why, code_churn, hotspots）
+- [x] 分析関数への `timeoutMs` 伝播
+
+### Phase 3: 結果キャッシュ層
+- [x] `AnalysisCache`（TTL 60秒、LRU eviction、最大100エントリ）
+- [x] `cachedAnalyzeHotspotsAndChurn` / `cachedAnalyzeContributors`
+- [x] `ToolContext` 型定義、複合ツールへのcontext伝播
+- [x] ADR-0004: キャッシュ設計判断
+
+### Phase 4: 構造化ログ
+- [x] `Logger` クラス（JSON形式stderr出力、DIG_LOG_LEVEL環境変数制御）
+- [x] index.ts の console.error → logger 置換
+
+### Phase 5: Prompt追加 + ドキュメント
+- [x] `technical-debt` Prompt（技術的負債分析ワークフロー）
+- [x] `onboard-area` Prompt（領域別オンボーディング）
+- [x] ADR-0004
+- [x] tool-guide リソース更新（timeout_ms、新連携パターン）
+- [x] ROADMAP更新
+
+## v0.12.0候補
+
+- [ ] executor層キャッシュ（粒度検証後）
+- [ ] 全20ツールへのtimeout_ms展開（必要性評価後）
+- [ ] ログ出力のツール実行タイミング計測
+- [ ] MCP Sampling API活用（AIによる分析結果の自動要約）
+- [ ] JSON出力モード（構造化出力オプション）
 
 ## スコープ外
 
