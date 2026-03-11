@@ -32,13 +32,38 @@ export async function execGit(
       { cwd: resolvedCwd, timeout: timeoutMs, maxBuffer: 10 * 1024 * 1024 },
       (error, stdout, stderr) => {
         if (error) {
-          const code = (error as NodeJS.ErrnoException & { code?: number })
-            .code;
+          const errnoCode = (error as NodeJS.ErrnoException).code;
+          const exitCode =
+            "exitCode" in error && typeof error.exitCode === "number"
+              ? error.exitCode
+              : undefined;
           const cmd = `git ${args.join(" ")}`;
-          const exitCode = typeof code === "number" ? code : undefined;
+
+          if (errnoCode === "ENOENT") {
+            reject(
+              new GitExecutorError(
+                `git is not installed or not found in PATH. Install git and ensure it is available on your system PATH. (command: ${cmd})`,
+              ),
+            );
+            return;
+          }
+
+          const stderrStr = stderr || error.message;
+          const isNotRepo =
+            stderrStr.includes("not a git repository") ||
+            stderrStr.includes("not a git repository (or any");
+          if (isNotRepo) {
+            reject(
+              new GitExecutorError(
+                `Not a git repository: ${resolvedCwd}. Run this tool on a directory that contains a .git folder, or initialize one with 'git init'.`,
+              ),
+            );
+            return;
+          }
+
           reject(
             new GitExecutorError(
-              `${cmd} failed: ${stderr || error.message}`,
+              `${cmd} failed: ${stderrStr}`,
               exitCode,
             ),
           );

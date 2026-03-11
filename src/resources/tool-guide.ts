@@ -23,10 +23,13 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | ブランチの分岐点を知りたい | git_merge_base |
 | タグ一覧を見たい | git_tag_list |
 | ファイルのリスクを評価したい | git_file_risk_profile |
+| 誰がどのディレクトリを所有している？ | git_knowledge_map |
+| ディレクトリ間の依存関係を知りたい | git_dependency_map |
+| バグ導入コミットを特定したい | git_bisect_guide |
 
 ## カテゴリ別一覧
 
-### データ取得ツール（13個）
+### データ取得ツール（16個）
 - **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
 - **git_file_history** — ファイルのコミット履歴を時系列で表示
 - **git_commit_show** — 特定コミットの詳細（diff含む）を表示
@@ -40,6 +43,9 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_stale_files** — 長期間更新されていないファイルを特定
 - **git_merge_base** — 2つのブランチの共通祖先（分岐点）を特定
 - **git_tag_list** — タグ一覧を表示
+- **git_knowledge_map** — ディレクトリ別の知識所有者マップとバス係数を表示
+- **git_dependency_map** — ディレクトリ間の共変更ネットワークを可視化
+- **git_bisect_guide** — バグ導入コミット特定の事前分析（bisect自体は実行しない）
 
 ### 組み合わせ分析ツール（2個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
@@ -68,6 +74,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 ### 変更追跡
 1. git_pickaxe → 特定の文字列変更を含むコミットを検索
 2. git_commit_show → 該当コミットの詳細を確認
+
+### オンボーディング（新規参入者向け）
+1. git_repo_health → 全体の健全性と基本統計を確認
+2. git_contributor_patterns → 主要な貢献者と担当領域を把握
+3. git_knowledge_map → ディレクトリ別の知識所有者とバス係数を確認
+4. git_hotspots → 開発が活発な領域を特定
+5. git_stale_files → メンテナンスが必要なファイルを特定
+
+### バグ原因調査
+1. git_bisect_guide → 範囲内のコミット分析とbisectステップ推定
+2. git_blame_context → 疑わしいコードの著者と経緯を確認
+3. git_commit_show → 該当コミットの詳細を確認
 `;
 
 export function getToolGuideContent(): string {
@@ -80,7 +98,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "17ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "20ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

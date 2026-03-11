@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-11
+最終更新: 2026-03-12
 
 ## v0.4.0 — 品質改善
 
@@ -163,6 +163,35 @@
 
 ### D. ドキュメント
 - [x] README更新（Prompts/Resources機能の記載追加）
+
+## v0.10.0 — ツール拡充 + UX強化
+
+### Phase 1（並行実装可能）
+- [x] `git_knowledge_map` ツール（ディレクトリ別知識所有者マップ + バス係数）
+  - [x] `src/analysis/knowledge-map.ts`（分析関数 + 純粋関数テスト）
+  - [x] `src/tools/git-knowledge-map.ts`（ツール登録）
+  - [x] 統合テスト（6件）+ 単体テスト（10件）
+- [x] `git_dependency_map` ツール（ディレクトリ間共変更ネットワーク）
+  - [x] `src/analysis/dependency-map.ts`（分析関数）
+  - [x] `src/tools/git-dependency-map.ts`（ツール登録）
+  - [x] 統合テスト（4件）
+- [x] `git_bisect_guide` ツール（bisect事前分析）
+  - [x] `src/tools/git-bisect-guide.ts`（ツール登録）
+  - [x] 統合テスト（5件）
+- [x] `onboard-codebase` Prompt（新規参入者向けオンボーディングガイド）
+  - [x] `src/prompts/onboard-codebase.ts`
+  - [x] プロンプトテスト追加
+- [x] エラーメッセージ改善（ENOENT / not a git repository のガイダンス付きメッセージ）
+- [x] `tool-guide` リソース更新（20ツール対応 + 新連携パターン追加）
+
+### Phase 2（Phase 1に依存）
+- [ ] `find-bug-origin` Prompt（git_bisect_guide依存）
+- [ ] `dig://repo-summary/{path}` 動的Resource（ResourceTemplate使用）
+
+### Phase 3（最終）
+- [ ] ツール出力へのアクション提案（組み合わせ・ワークフローツールのみ）
+- [ ] README更新
+- [ ] ROADMAP更新
 
 ## スコープ外
 

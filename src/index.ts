@@ -23,10 +23,14 @@ import { registerGitFileRiskProfile } from "./tools/git-file-risk-profile.js";
 import { registerGitRepoHealth } from "./tools/git-repo-health.js";
 import { registerGitReviewPrep } from "./tools/git-review-prep.js";
 import { registerGitWhy } from "./tools/git-why.js";
+import { registerGitKnowledgeMap } from "./tools/git-knowledge-map.js";
+import { registerGitDependencyMap } from "./tools/git-dependency-map.js";
+import { registerGitBisectGuide } from "./tools/git-bisect-guide.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
 import { registerTraceChange } from "./prompts/trace-change.js";
+import { registerOnboardCodebase } from "./prompts/onboard-codebase.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 
 function createServer() {
@@ -35,7 +39,7 @@ function createServer() {
     version,
   });
 
-  // Data retrieval tools (13)
+  // Data retrieval tools (16)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -49,6 +53,9 @@ function createServer() {
   registerGitStaleFiles(server);
   registerGitMergeBase(server);
   registerGitTagList(server);
+  registerGitKnowledgeMap(server);
+  registerGitDependencyMap(server);
+  registerGitBisectGuide(server);
 
   // Composite analysis tools
   registerGitFileRiskProfile(server);
@@ -63,6 +70,7 @@ function createServer() {
   registerReviewPr(server);
   registerAssessHealth(server);
   registerTraceChange(server);
+  registerOnboardCodebase(server);
 
   // Resources
   registerToolGuide(server);
