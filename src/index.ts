@@ -31,7 +31,9 @@ import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
 import { registerTraceChange } from "./prompts/trace-change.js";
 import { registerOnboardCodebase } from "./prompts/onboard-codebase.js";
+import { registerFindBugOrigin } from "./prompts/find-bug-origin.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
+import { registerRepoSummary } from "./resources/repo-summary.js";
 
 function createServer() {
   const server = new McpServer({
@@ -71,9 +73,11 @@ function createServer() {
   registerAssessHealth(server);
   registerTraceChange(server);
   registerOnboardCodebase(server);
+  registerFindBugOrigin(server);
 
   // Resources
   registerToolGuide(server);
+  registerRepoSummary(server);
 
   return server;
 }

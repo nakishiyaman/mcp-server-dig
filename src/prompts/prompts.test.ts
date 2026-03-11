@@ -4,6 +4,7 @@ import { buildReviewPrPrompt } from "./review-pr.js";
 import { buildAssessHealthPrompt } from "./assess-health.js";
 import { buildTraceChangePrompt } from "./trace-change.js";
 import { buildOnboardCodebasePrompt } from "./onboard-codebase.js";
+import { buildFindBugOriginPrompt } from "./find-bug-origin.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -139,5 +140,50 @@ describe("onboard-codebase prompt", () => {
     expect(text).toContain("git_hotspots");
     expect(text).toContain("git_tag_list");
     expect(text).toContain("git_stale_files");
+  });
+});
+
+describe("find-bug-origin prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildFindBugOriginPrompt({
+      repo_path: "/path/to/repo",
+      good_ref: "v1.0.0",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("v1.0.0");
+    expect(text).toContain("HEAD");
+    expect(text).toContain("git_bisect_guide");
+    expect(text).toContain("git_commit_show");
+    expect(text).toContain("git_blame_context");
+  });
+
+  it("オプション引数が指定された場合メッセージに含まれる", () => {
+    const result = buildFindBugOriginPrompt({
+      repo_path: "/path/to/repo",
+      good_ref: "v1.0.0",
+      bad_ref: "v2.0.0",
+      file_path: "src/main.ts",
+      symptom: "NullPointerException",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("v2.0.0");
+    expect(text).toContain("src/main.ts");
+    expect(text).toContain("NullPointerException");
+    expect(text).toContain("「NullPointerException」に関連する");
+  });
+
+  it("symptomが未指定の場合デフォルト表現が使われる", () => {
+    const result = buildFindBugOriginPrompt({
+      repo_path: "/path/to/repo",
+      good_ref: "v1.0.0",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("症状に関連する");
+    expect(text).not.toContain("バグの症状:");
   });
 });
