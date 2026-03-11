@@ -3,34 +3,20 @@
 日時: 2026-03-11
 
 ### 完了したタスク
-- v0.8.1 リリース済み（前セッション）
-- **dogfooding実施**: mcp-server-dig自身のリポジトリに対してツールを実行
-
-### dogfooding結果
-
-#### 良好: `git_repo_health`
-- 一発でリポジトリ全体像を把握できる
-- 「knowledge concentration risk（95%が1人）」警告が有用
-
-#### 良好: `git_file_risk_profile`
-- 5次元リスク評価が簡潔で判断材料になる
-- co-changedファイル一覧が具体的
-
-#### 要改善: `git_why` の出力が冗長
-- `src/index.ts`（71行）に対し、同一コミット情報が何度も繰り返される
-  - 例: `a567496`（Initial commit）が6回、`685b076`が5回出現
-- LLMコンテキストの浪費（50,000文字制限の哲学と矛盾）
-- **改善案**: 同一コミットの行範囲をグループ化し、コミット詳細は1回だけ出力
+- **`git_why` 出力のコミット重複排除を実装** (`src/tools/git-why.ts`)
+  - 同一コミットの行範囲をグループ化（`Lines: L1-5, L8, L10` 形式）
+  - `max_commits` 超過時の truncation 通知追加
+  - 全82テスト通過確認
 
 ### 現在の状態
-- ブランチ: `docs/handoff-v0.8.1`
+- ブランチ: `fix/git-why-dedup`（PRマージ待ち）
 - 未コミット変更: `.claude/settings.local.json`（個人設定、コミット対象外）
 - ツール数: 17（データ取得13 + 組み合わせ分析2 + ワークフロー統合2）
 - テスト: 82テスト全通過
 - npm: mcp-server-dig@0.8.1 公開済み
 
 ### 次にやるべきこと
-1. **`git_why` 出力のグループ化改善を実装**
+1. `fix/git-why-dedup` ブランチのPR作成・マージ
 2. 他ツールのdogfooding継続
 3. v0.9.0ロードマップ設計
 
