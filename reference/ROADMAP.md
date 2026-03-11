@@ -136,6 +136,16 @@
 - [x] index.ts にワークフロー統合ツール登録
 - [x] CLAUDE.md ツール数・バージョン更新
 
+## v0.8.1 — 品質強化
+
+- [x] `git_why` / `git_blame_context`: `end_line`のみ指定時のサイレント無視を修正
+- [x] `git_review_prep`: per-file分析を`Promise.allSettled`で耐障害化
+- [x] パーサー単体テスト追加（`parseNumstatOutput`, `parseStaleFiles`, `parseTagOutput`）
+- [x] 統合テストエッジケース追加（空ファイルblame、存在しないファイル、end_lineのみ指定）
+- [x] テスト総数: 67 → 82
+- [x] 古いPRクリーンアップ（#29, #36 クローズ）
+- [x] npm公開（mcp-server-dig@0.8.1）
+
 ## スコープ外
 
 | 項目 | 理由 |
