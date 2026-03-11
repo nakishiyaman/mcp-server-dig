@@ -3,22 +3,25 @@
 日時: 2026-03-11
 
 ### 完了したタスク
-- **`git_why` 出力のコミット重複排除を実装** (`src/tools/git-why.ts`)
-  - 同一コミットの行範囲をグループ化（`Lines: L1-5, L8, L10` 形式）
-  - `max_commits` 超過時の truncation 通知追加
-  - 全82テスト通過確認
+- **v0.9.0-B: MCP Prompts/Resources 追加**
+  - Resource 1つ: `tool-guide` (`dig://tool-guide`) — 17ツールの使い分けガイド
+  - Prompt 4つ: `investigate-code`, `review-pr`, `assess-health`, `trace-change`
+  - テスト: 13テスト追加（prompts 9 + resources 4）、全95テスト通過
+  - ビルド成功確認済み
 
 ### 現在の状態
-- ブランチ: `fix/git-why-dedup`（PRマージ待ち）
-- 未コミット変更: `.claude/settings.local.json`（個人設定、コミット対象外）
+- ブランチ: `feat/v0.9.0-prompts-resources`（コミット・PR待ち）
+- 未コミット変更: あり（新規6ファイル + index.ts変更 + ROADMAP/HANDOFF更新）
 - ツール数: 17（データ取得13 + 組み合わせ分析2 + ワークフロー統合2）
-- テスト: 82テスト全通過
+- Prompts: 4、Resources: 1
+- テスト: 95テスト全通過
 - npm: mcp-server-dig@0.8.1 公開済み
 
 ### 次にやるべきこと
-1. `fix/git-why-dedup` ブランチのPR作成・マージ
-2. 他ツールのdogfooding継続
-3. v0.9.0ロードマップ設計
+1. このブランチのPR作成・マージ
+2. v0.9.0-A: コード品質・保守性向上（統合テスト分割、ボイラープレート削減、version修正）
+3. v0.9.0-C: パフォーマンス最適化（重複git呼び出し削減、キャッシュ層）
+4. README更新（Prompts/Resources機能の記載）
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）

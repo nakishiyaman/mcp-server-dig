@@ -19,6 +19,11 @@ import { registerGitFileRiskProfile } from "./tools/git-file-risk-profile.js";
 import { registerGitRepoHealth } from "./tools/git-repo-health.js";
 import { registerGitReviewPrep } from "./tools/git-review-prep.js";
 import { registerGitWhy } from "./tools/git-why.js";
+import { registerInvestigateCode } from "./prompts/investigate-code.js";
+import { registerReviewPr } from "./prompts/review-pr.js";
+import { registerAssessHealth } from "./prompts/assess-health.js";
+import { registerTraceChange } from "./prompts/trace-change.js";
+import { registerToolGuide } from "./resources/tool-guide.js";
 
 function createServer() {
   const server = new McpServer({
@@ -48,6 +53,15 @@ function createServer() {
   // Workflow integration tools
   registerGitReviewPrep(server);
   registerGitWhy(server);
+
+  // Prompts
+  registerInvestigateCode(server);
+  registerReviewPr(server);
+  registerAssessHealth(server);
+  registerTraceChange(server);
+
+  // Resources
+  registerToolGuide(server);
 
   return server;
 }
