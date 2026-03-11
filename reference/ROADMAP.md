@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12
+最終更新: 2026-03-11
 
 ## v0.4.0 — 品質改善
 
@@ -68,11 +68,9 @@
 - [x] README英語化（README.md → 英語、README.ja.md → 日本語）
 - [x] LICENSE ファイル追加（MIT）
 - [x] smithery.yaml 追加（Smithery対応準備）
-- [ ] Smithery登録（有料プラン必要 — hosted deploymentは無料プラン非対応）
 - [x] 公式MCP Registry登録（`io.github.nakishiyaman/dig`）
 - [x] mcpName フィールド追加 + createSandboxServer エクスポート
 - [x] npm公開（mcp-server-dig@0.4.1）
-- [ ] Zed拡張パッケージング（API安定後、Rustラッパー必要）
 
 ## v0.6.0 — コード考古学ツール拡充 第2弾
 

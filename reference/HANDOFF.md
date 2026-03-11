@@ -3,34 +3,31 @@
 日時: 2026-03-11
 
 ### 完了したタスク
-- PR #30 マージ（v0.6.0 新5ツール）
-- PR #31 マージ（release-please PAT修正 — GITHUB_TOKEN → Fine-Grained PAT）
-- PR #28 auto-merge完了（chore(main): release 0.6.0）
-- npm公開（mcp-server-dig@0.6.0 — 13ツール）
-- Auto-merge有効化（リポジトリ設定）
-- PR #32 作成（開発ワークフロー強化 — CI通過待ち）:
-  - `.claude/rules/` 導入（general, git-workflow, implementation, testing, validation）
-  - `CLAUDE.md` 作成
-  - ADR導入（3件: PAT導入, execFile, stdio専用）
-  - GitHub Issueテンプレート（bug.yml, feature.yml）
-  - リリースボディテンプレート
-  - 検証チェックリストテンプレート
-  - `docs/recommended-practices.md` 見送り項目の採用済み移動
+- v0.7.0 組み合わせ分析ツール実装・リリース（PR #33）
+  - `src/analysis/` に分析ロジック抽出（hotspots, churn, contributors, co-changes, staleness）
+  - 既存4ツールをリファクタリング（動作変更なし）
+  - `git_file_risk_profile` ツール（5次元リスク評価）
+  - `git_repo_health` ツール（リポジトリ健全性サマリー）
+  - README.md/README.ja.md に新ツールドキュメント + Zed/Cursor/Windsurf設定例追加
+  - ROADMAP更新（Zed拡張をスコープ外に移動）
+- Release PR auto-merge 自動設定（PR #35）
+  - release-please.yml に `gh pr merge --auto --merge` ステップ追加
+  - git-workflow.md / ADR-0001 更新
+- npm publish 完了（mcp-server-dig@0.7.0）
 
 ### 現在の状態
-- ブランチ: `chore/workflow-rules-templates`（PR #32 — CI通過待ち）
-- 未コミット変更: `.claude/settings.local.json`（セッション管理用）
-- ツール数: 13
-- テスト: 55テスト全通過
-- npm: mcp-server-dig@0.6.0 公開済み
+- ブランチ: `main`（最新）
+- 未コミット変更: `.claude/settings.local.json`（ローカル設定）
+- ツール数: 15（データ取得13 + 組み合わせ分析2）
+- テスト: 62テスト全通過
+- npm: mcp-server-dig@0.7.0 公開済み
 
-### 次にやるべきこと（優先順）
-1. **PR #32 のCI通過確認 → マージ**
-2. **npmjs.com Publishing access を最厳格設定に変更**（Require 2FA and disallow tokens — Web UI手動操作）
-3. **MCP Registry 更新確認**（v0.6.0公開後、新ツール情報の反映確認）
+### 次にやるべきこと
+1. **v0.8.0 ワークフロー統合ツール**（プランに記載済み）
+   - `git_review_prep` — PRレビュー準備（変更ファイル + ホットスポット警告 + レビュアー候補 + 変更漏れ検出）
+   - `git_why` — コード考古学の本質的な問い（blame + コミット詳細 + 同時変更ファイルの統合）
+2. **実リポジトリでの手動検証** — 新ツール（git_file_risk_profile, git_repo_health）を実際のリポジトリで実行し、出力の有用性を確認
 
 ### ブロッカー/注意点
-- Smithery登録は有料プラン or HTTPトランスポート対応が必要（ブロッカー継続）
-- Zed拡張はRustラッパー必要（低優先度）
-- RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
-- `.claude/rules/` がセッションに自動ロードされるようになったため、CI/CD変更時は `git-workflow.md` を参照してから提案すること
+- RELEASE_PLEASE_TOKEN の年次更新が必要（2027-03頃）
+- Release PR の `strict: true` により、main が先に進むと `gh pr update-branch` が必要になる場合がある
