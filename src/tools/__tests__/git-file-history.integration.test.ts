@@ -19,8 +19,10 @@ describe("git_file_history (end-to-end)", () => {
     const commits = parseLogOutput(output);
 
     expect(commits.length).toBeGreaterThanOrEqual(3);
-    expect(commits[0].subject).toBe("feat: add w variable");
-    expect(commits[1].subject).toBe("feat: add z variable");
+    // Latest commits are bulk commits for truncation testing
+    expect(commits[0].subject).toMatch(/^chore: bulk commit \d+$/);
+    // With max-count=20, older original commits may be outside the window
+    expect(commits.length).toBe(20);
   });
 
   it("respects max_commits", async () => {

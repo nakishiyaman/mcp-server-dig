@@ -256,6 +256,29 @@ describe("parseNameOnlyLog", () => {
   });
 });
 
+describe("parseBlameOutput — edge cases", () => {
+  it("commitHashが空のブロックをスキップする", () => {
+    // Malformed blame data where tab-line appears without a preceding commit header
+    const raw = [
+      "\torphan line without commit",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 1 1 1",
+      "author Alice",
+      "author-mail <alice@example.com>",
+      "author-time 1700000000",
+      "summary Valid commit",
+      "filename file.ts",
+      "\tvalid line",
+    ].join("\n");
+
+    const result = parseBlameOutput(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0].commitHash).toBe(
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    );
+    expect(result[0].lines).toEqual(["valid line"]);
+  });
+});
+
 describe("parseDiffStatOutput", () => {
   it("parses diff stat with insertions and deletions", () => {
     const raw = [
@@ -301,6 +324,23 @@ describe("parseDiffStatOutput", () => {
     const result = parseDiffStatOutput("");
     expect(result.filesChanged).toBe(0);
     expect(result.files).toEqual([]);
+  });
+
+  it("バイナリファイルのBin行をスキップする", () => {
+    const raw = [
+      " src/index.ts  | 5 +++--",
+      " image.png     | Bin 0 -> 1234 bytes",
+      " src/utils.ts  | 3 +++",
+      " 3 files changed, 8 insertions(+), 2 deletions(-)",
+    ].join("\n");
+
+    const result = parseDiffStatOutput(raw);
+    expect(result.filesChanged).toBe(2);
+    expect(result.files).toHaveLength(2);
+    expect(result.files.map((f) => f.path)).toEqual([
+      "src/index.ts",
+      "src/utils.ts",
+    ]);
   });
 });
 

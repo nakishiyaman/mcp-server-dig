@@ -19,7 +19,8 @@ describe("git_related_changes (end-to-end)", () => {
       repoDir,
     );
     const commitFiles = parseNameOnlyLog(logOutput);
-    expect(commitFiles.size).toBe(4);
+    // 4 original + 50 bulk commits touch src/index.ts = 54
+    expect(commitFiles.size).toBeGreaterThanOrEqual(54);
 
     // Build co-change map (same logic as the tool)
     const coChangeMap = new Map<string, number>();

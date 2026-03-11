@@ -85,6 +85,32 @@ export async function setup({ provide }: GlobalSetupContext) {
   await git("add", ".");
   await git("commit", "-m", "chore: add empty file");
 
+  // Commit 6 (Bob): add binary file for edge case testing
+  await mkdir(join(repoDir, "assets"), { recursive: true });
+  const binaryContent = Buffer.from([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, // PNG header
+    0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+  ]);
+  await writeFile(join(repoDir, "assets", "logo.png"), binaryContent);
+  await git("add", ".");
+  await git("commit", "-m", "chore: add binary file");
+
+  // Commit 7 (Bob): add non-ASCII filename for edge case testing
+  await writeFile(join(repoDir, "src", "日本語ファイル.ts"), "export const greeting = 'こんにちは';\n");
+  await writeFile(join(repoDir, "src", "file with spaces.ts"), "export const spaced = true;\n");
+  await git("add", ".");
+  await git("commit", "-m", "chore: add non-ASCII and spaced filenames");
+
+  // Commits 8-57 (Bob): bulk commits for truncation testing
+  for (let i = 0; i < 50; i++) {
+    await writeFile(
+      join(repoDir, "src", "index.ts"),
+      `const x = 1;\nconst y = 2;\nconst z = 3;\nconst w = 4;\n// iteration ${i}\n`,
+    );
+    await git("add", ".");
+    await git("commit", "-m", `chore: bulk commit ${i}`);
+  }
+
   provide("integrationRepoDir", repoDir);
 }
 

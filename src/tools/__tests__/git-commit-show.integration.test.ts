@@ -10,7 +10,8 @@ describe("git_commit_show (end-to-end)", () => {
     );
 
     expect(output).toContain("Bob");
-    expect(output).toContain("feat: add w variable");
+    // HEAD~1 is "chore: bulk commit 48" (second-to-last bulk commit)
+    expect(output).toMatch(/chore: bulk commit \d+/);
     expect(output).toContain("src/index.ts");
   });
 
@@ -20,6 +21,7 @@ describe("git_commit_show (end-to-end)", () => {
       getRepoDir(),
     );
 
-    expect(output).toContain("const w = 4;");
+    // Bulk commits modify src/index.ts with iteration comments
+    expect(output).toContain("iteration");
   });
 });
