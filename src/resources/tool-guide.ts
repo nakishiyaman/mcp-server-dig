@@ -55,6 +55,13 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_review_prep** — PRレビュー用の変更サマリーとリスク情報を一括取得
 - **git_why** — コード行の存在理由を blame + コミット詳細で解説
 
+## 共通オプション
+
+### timeout_ms（対応ツール: git_repo_health, git_review_prep, git_file_risk_profile, git_why, git_code_churn, git_hotspots）
+- 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
+- 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
+- 例: \`timeout_ms: 120000\` で2分に延長
+
 ## 連携パターン
 
 ### コード考古学（なぜこのコードがあるのか調査）
@@ -86,6 +93,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 1. git_bisect_guide → 範囲内のコミット分析とbisectステップ推定
 2. git_blame_context → 疑わしいコードの著者と経緯を確認
 3. git_commit_show → 該当コミットの詳細を確認
+
+### 技術的負債分析（technical-debt Prompt推奨）
+1. git_hotspots → 変更集中ファイルを特定
+2. git_code_churn → 変動量の多いファイルを特定
+3. git_stale_files → 放置ファイルを特定
+4. git_knowledge_map → 知識集中度を分析
+
+### 領域別オンボーディング（onboard-area Prompt推奨）
+1. git_knowledge_map → ディレクトリの知識所有者を確認
+2. git_contributor_patterns → 領域の主要貢献者を特定
+3. git_hotspots → 変更が集中しているファイルを確認
+4. git_file_history → 主要ファイルの変更履歴を確認
 `;
 
 export function getToolGuideContent(): string {

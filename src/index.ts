@@ -38,6 +38,8 @@ import { registerAssessHealth } from "./prompts/assess-health.js";
 import { registerTraceChange } from "./prompts/trace-change.js";
 import { registerOnboardCodebase } from "./prompts/onboard-codebase.js";
 import { registerFindBugOrigin } from "./prompts/find-bug-origin.js";
+import { registerTechnicalDebt } from "./prompts/technical-debt.js";
+import { registerOnboardArea } from "./prompts/onboard-area.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -83,6 +85,8 @@ function createServer() {
   registerTraceChange(server);
   registerOnboardCodebase(server);
   registerFindBugOrigin(server);
+  registerTechnicalDebt(server);
+  registerOnboardArea(server);
 
   // Resources
   registerToolGuide(server);

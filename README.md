@@ -325,6 +325,8 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `trace-change` | Change tracing — tracks when and why a specific string was added or removed | `repo_path`, `search_term` |
 | `onboard-codebase` | New contributor onboarding — guided tour of repo structure, key contributors, and active areas | `repo_path` |
 | `find-bug-origin` | Bug origin hunting — uses bisect analysis to identify bug-introducing commits | `repo_path`, `good_ref`, `bad_ref?`, `file_path?`, `symptom?` |
+| `technical-debt` | Technical debt analysis — identifies high-risk files, knowledge concentration, and stale areas | `repo_path` |
+| `onboard-area` | Area-specific onboarding — knowledge owners, contributors, and change history for a directory | `repo_path`, `directory` |
 
 ## Resources
 
@@ -426,6 +428,31 @@ Add to your Windsurf MCP configuration:
   }
 }
 ```
+
+## Configuration
+
+### Timeout
+
+Composite and workflow tools (`git_repo_health`, `git_review_prep`, `git_file_risk_profile`, `git_why`, `git_code_churn`, `git_hotspots`) accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+
+### Structured Logging
+
+Set `DIG_LOG_LEVEL` environment variable to control log verbosity on stderr:
+
+```json
+{
+  "mcpServers": {
+    "dig": {
+      "command": "mcp-server-dig",
+      "env": {
+        "DIG_LOG_LEVEL": "debug"
+      }
+    }
+  }
+}
+```
+
+Available levels: `debug`, `info` (default), `warn`, `error`. Output format: JSON lines on stderr.
 
 ## Development
 
