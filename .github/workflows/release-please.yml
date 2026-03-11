@@ -28,6 +28,18 @@ jobs:
           release-type: node
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
+      - name: Enable auto-merge on Release PR
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list --repo "$GITHUB_REPOSITORY" --label "autorelease: pending" --json number --jq '.[0].number')
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --auto --merge
+            echo "Auto-merge enabled on PR #$PR_NUMBER"
+          else
+            echo "No pending release PR found"
+          fi
+
   publish:
     needs: [release-please]
     if: >-

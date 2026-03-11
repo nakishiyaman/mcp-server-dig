@@ -52,14 +52,15 @@
 mainへのpush
   → CI (ci.yml): lint → typecheck → test → build (Node 18/20/22)
   → Release Please (release-please.yml):
-      1. release-pleaseジョブ: Release PR自動作成/更新
-         - token: RELEASE_PLEASE_TOKEN (Fine-Grained PAT)
+      1. release-pleaseジョブ:
+         a. Release PR自動作成/更新 (token: RELEASE_PLEASE_TOKEN)
+         b. PRにauto-mergeを自動有効化 (gh pr merge --auto --merge)
       2. publishジョブ: release_created == true の場合のみ
          - npm publish --access public (OIDC Trusted Publishing)
 
-Release PR (auto-merge有効)
+Release PR
   → CIがトリガーされる（PATで作成されたPRのため）
-  → CI全パス → auto-mergeが発動 → 自動マージ
+  → CI全パス → auto-mergeが発動 → 自動マージ（ワークフローが自動設定）
   → マージによりrelease-pleaseがGitHub Release + tag作成
   → publishジョブがnpmに公開
 ```
@@ -78,7 +79,7 @@ Release PR (auto-merge有効)
 |------|------|------|---------|
 | `RELEASE_PLEASE_TOKEN` | Fine-Grained PAT | release-pleaseのPR作成（CIトリガーのため） | 年1回 |
 | OIDC (id-token) | 自動 | npm Trusted Publishing | 不要 |
-| Auto-merge | リポジトリ設定 | Release PRの自動マージ | 不要 |
+| Auto-merge | リポジトリ設定 + ワークフロー | Release PRの自動マージ（release-please.ymlが各PRに自動設定） | 不要 |
 
 ### CI/CD変更時のルール
 
