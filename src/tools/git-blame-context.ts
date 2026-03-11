@@ -27,6 +27,8 @@ export function registerGitBlameContext(server: McpServer): void {
           args.push(`-L`, `${start_line},${end_line}`);
         } else if (start_line !== undefined) {
           args.push(`-L`, `${start_line},`);
+        } else if (end_line !== undefined) {
+          args.push(`-L`, `1,${end_line}`);
         }
 
         args.push("--", file_path);
