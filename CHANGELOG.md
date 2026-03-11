@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.9.0...v0.9.1) (2026-03-11)
+
+
+### Performance Improvements
+
+* 組み合わせツールの重複gitスキャン削減 ([7533fac](https://github.com/nakishiyaman/mcp-server-dig/commit/7533fac5068df107b99dd8e2407b6d9100654d1f))
+* 組み合わせツールの重複gitスキャン削減 ([8a4edb7](https://github.com/nakishiyaman/mcp-server-dig/commit/8a4edb7f2cacd85f52d19b1f9059c73e8af15579))
+
 ## [0.9.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.8.1...v0.9.0) (2026-03-11)
 
 
