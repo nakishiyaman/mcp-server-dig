@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
+import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json") as { version: string };
 import { registerGitBlameContext } from "./tools/git-blame-context.js";
 import { registerGitCodeChurn } from "./tools/git-code-churn.js";
 import { registerGitCommitShow } from "./tools/git-commit-show.js";
@@ -28,7 +32,7 @@ import { registerToolGuide } from "./resources/tool-guide.js";
 function createServer() {
   const server = new McpServer({
     name: "dig",
-    version: "0.1.0",
+    version,
   });
 
   // Data retrieval tools (13)

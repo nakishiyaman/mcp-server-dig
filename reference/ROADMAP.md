@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-11
+最終更新: 2026-03-12
 
 ## v0.4.0 — 品質改善
 
@@ -149,9 +149,9 @@
 - [x] ツール選択ガイドのResource提供（dig://tool-guide）
 
 ### A. コード品質・保守性向上
-- [ ] 統合テストファイルの分割（925行の単一ファイル → ツール別ファイル）
-- [ ] ツール登録パターンの共通化（17ファイルのボイラープレート削減）
-- [ ] `index.ts` の `version` ハードコード修正（package.jsonから読む）
+- [x] 統合テストファイルの分割（925行 → 18ファイル、vitest globalSetup + provide/inject）
+- [ ] ツール登録パターンの共通化（ROI低のため保留 — ハンドラー多様性が高い）
+- [x] `index.ts` の `version` ハードコード修正（createRequireでpackage.jsonから動的取得）
 
 ### C. パフォーマンス最適化
 - [ ] 組み合わせツール内の重複git呼び出し削減（`git_repo_health`, `git_review_prep`）
