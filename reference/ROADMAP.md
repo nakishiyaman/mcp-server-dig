@@ -189,9 +189,9 @@
 - [x] `dig://repo-summary/{path}` 動的Resource（ResourceTemplate使用）
 
 ### Phase 3（最終）
-- [ ] ツール出力へのアクション提案（組み合わせ・ワークフローツールのみ）
-- [ ] README更新
-- [ ] ROADMAP更新
+- [x] ツール出力へのアクション提案（組み合わせ・ワークフローツールのみ）
+- [x] README更新（EN/JA: 3新ツール + 2新Prompt + 1新Resource）
+- [x] ROADMAP更新
 
 ## スコープ外
 

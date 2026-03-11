@@ -283,6 +283,27 @@ export function registerGitFileRiskProfile(server: McpServer): void {
           }
         }
 
+        // Next actions
+        const actions: string[] = [];
+        if (changeFreq.level === "HIGH" || churn.level === "HIGH") {
+          actions.push(`git_file_history — ${file_path} の変更履歴を確認`);
+        }
+        if (knowledgeRisk.level === "HIGH") {
+          actions.push(`git_knowledge_map — 知識分散の改善候補を特定`);
+        }
+        if (coupling.level === "HIGH") {
+          actions.push(`git_dependency_map — 結合関係の詳細を確認`);
+        }
+        if (overall === "HIGH") {
+          actions.push(`git_why — リスクの高いコード行の経緯を調査`);
+        }
+        if (actions.length > 0) {
+          lines.push("", "Next actions:");
+          for (const a of actions) {
+            lines.push(`  → ${a}`);
+          }
+        }
+
         return successResponse(lines.join("\n"));
       } catch (error) {
         return errorResponse(error);

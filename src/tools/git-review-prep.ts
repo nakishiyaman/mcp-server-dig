@@ -216,6 +216,25 @@ export function registerGitReviewPrep(server: McpServer): void {
           }
         }
 
+        // Next actions
+        const actions: string[] = [];
+        if (riskFiles.length > 0) {
+          actions.push(
+            `git_file_risk_profile — リスクフラグ付きファイルの詳細リスク評価`,
+          );
+        }
+        if (uniqueMissingFiles.length > 0) {
+          actions.push(
+            `git_related_changes — 変更漏れ候補ファイルの共変更パターンを確認`,
+          );
+        }
+        if (actions.length > 0) {
+          lines.push("", "Next actions:");
+          for (const a of actions) {
+            lines.push(`  → ${a}`);
+          }
+        }
+
         return successResponse(lines.join("\n"));
       } catch (error) {
         return errorResponse(error);
