@@ -6,6 +6,9 @@ import {
   parseNameOnlyLog,
   parseDiffStatOutput,
   parseFileFrequency,
+  parseNumstatOutput,
+  parseStaleFiles,
+  parseTagOutput,
 } from "./parsers.js";
 
 describe("parseLogOutput", () => {
@@ -337,5 +340,140 @@ describe("parseFileFrequency", () => {
 
   it("returns empty for empty input", () => {
     expect(parseFileFrequency("")).toEqual([]);
+  });
+});
+
+describe("parseNumstatOutput", () => {
+  it("ファイルごとのchurn統計をパースする", () => {
+    const raw = [
+      "COMMIT:abc1234",
+      "10\t5\tsrc/index.ts",
+      "3\t1\tsrc/utils.ts",
+      "COMMIT:def5678",
+      "8\t2\tsrc/index.ts",
+    ].join("\n");
+
+    const result = parseNumstatOutput(raw);
+    expect(result).toHaveLength(2);
+
+    const indexTs = result.find((f) => f.filePath === "src/index.ts");
+    expect(indexTs).toBeDefined();
+    expect(indexTs!.insertions).toBe(18);
+    expect(indexTs!.deletions).toBe(7);
+    expect(indexTs!.totalChurn).toBe(25);
+    expect(indexTs!.commits).toBe(2);
+  });
+
+  it("バイナリファイルをchurn 0として扱う", () => {
+    const raw = [
+      "COMMIT:abc1234",
+      "-\t-\timage.png",
+      "5\t2\tsrc/index.ts",
+    ].join("\n");
+
+    const result = parseNumstatOutput(raw, 10);
+    const binary = result.find((f) => f.filePath === "image.png");
+    expect(binary).toBeDefined();
+    expect(binary!.insertions).toBe(0);
+    expect(binary!.deletions).toBe(0);
+    expect(binary!.totalChurn).toBe(0);
+  });
+
+  it("topNでファイル数を制限する", () => {
+    const raw = [
+      "COMMIT:abc1234",
+      "10\t0\ta.ts",
+      "5\t0\tb.ts",
+      "1\t0\tc.ts",
+    ].join("\n");
+
+    const result = parseNumstatOutput(raw, 2);
+    expect(result).toHaveLength(2);
+    expect(result[0].filePath).toBe("a.ts");
+    expect(result[1].filePath).toBe("b.ts");
+  });
+
+  it("空入力で空配列を返す", () => {
+    expect(parseNumstatOutput("")).toEqual([]);
+  });
+});
+
+describe("parseStaleFiles", () => {
+  it("閾値以上の古いファイルを検出する", () => {
+    const now = new Date("2026-06-01T00:00:00Z");
+    const raw = [
+      "2026-01-01T00:00:00+00:00\tsrc/old.ts",
+      "2026-05-30T00:00:00+00:00\tsrc/recent.ts",
+    ].join("\n");
+
+    const result = parseStaleFiles(raw, 30, now);
+    expect(result).toHaveLength(1);
+    expect(result[0].filePath).toBe("src/old.ts");
+    expect(result[0].daysSinceLastChange).toBeGreaterThan(100);
+  });
+
+  it("同一ファイルの複数エントリは最新日付を使う", () => {
+    const now = new Date("2026-06-01T00:00:00Z");
+    const raw = [
+      "2025-01-01T00:00:00+00:00\tsrc/file.ts",
+      "2026-05-31T00:00:00+00:00\tsrc/file.ts",
+    ].join("\n");
+
+    const result = parseStaleFiles(raw, 30, now);
+    expect(result).toHaveLength(0);
+  });
+
+  it("古い順にソートする", () => {
+    const now = new Date("2026-06-01T00:00:00Z");
+    const raw = [
+      "2026-03-01T00:00:00+00:00\tsrc/medium.ts",
+      "2025-01-01T00:00:00+00:00\tsrc/oldest.ts",
+      "2026-04-01T00:00:00+00:00\tsrc/newer.ts",
+    ].join("\n");
+
+    const result = parseStaleFiles(raw, 30, now);
+    expect(result[0].filePath).toBe("src/oldest.ts");
+  });
+
+  it("空入力で空配列を返す", () => {
+    expect(parseStaleFiles("", 30)).toEqual([]);
+  });
+});
+
+describe("parseTagOutput", () => {
+  it("タグ情報をパースする", () => {
+    const raw = [
+      "v1.0.0|2026-01-01T00:00:00+09:00|Initial release",
+      "v0.9.0|2025-12-01T00:00:00+09:00|Beta release",
+    ].join("\n");
+
+    const result = parseTagOutput(raw);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({
+      name: "v1.0.0",
+      date: "2026-01-01T00:00:00+09:00",
+      subject: "Initial release",
+    });
+  });
+
+  it("subjectにパイプ文字を含む場合も正しくパースする", () => {
+    const raw = "v1.0.0|2026-01-01T00:00:00+09:00|fix: handle a|b case";
+
+    const result = parseTagOutput(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0].subject).toBe("fix: handle a|b case");
+  });
+
+  it("空入力で空配列を返す", () => {
+    expect(parseTagOutput("")).toEqual([]);
+  });
+
+  it("不正な行をスキップする", () => {
+    const raw = ["v1.0.0|2026-01-01T00:00:00+09:00|OK", "malformed"].join(
+      "\n",
+    );
+
+    const result = parseTagOutput(raw);
+    expect(result).toHaveLength(1);
   });
 });

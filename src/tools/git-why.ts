@@ -52,6 +52,8 @@ export function registerGitWhy(server: McpServer): void {
           blameArgs.push("-L", `${start_line},${end_line}`);
         } else if (start_line !== undefined) {
           blameArgs.push("-L", `${start_line},`);
+        } else if (end_line !== undefined) {
+          blameArgs.push("-L", `1,${end_line}`);
         }
         blameArgs.push("--", file_path);
 

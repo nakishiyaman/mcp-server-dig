@@ -98,6 +98,11 @@ beforeAll(async () => {
   await git("add", ".");
   await git("commit", "-m", "feat: add w variable");
   await git("tag", "-a", "v0.2.0", "-m", "Second release");
+
+  // Commit 5 (Bob): add an empty file for edge case testing
+  await writeFile(join(repoDir, "src", "empty.ts"), "");
+  await git("add", ".");
+  await git("commit", "-m", "chore: add empty file");
 }, 30_000);
 
 afterAll(async () => {
@@ -290,7 +295,7 @@ describe("git_contributor_patterns (end-to-end)", () => {
         return sum + (match ? parseInt(match[1], 10) : 0);
       }, 0);
 
-    expect(totalCommits).toBe(4);
+    expect(totalCommits).toBe(5);
 
     const stats = parseShortlogOutput(shortlogOutput, totalCommits);
     expect(stats).toHaveLength(2);
@@ -301,7 +306,7 @@ describe("git_contributor_patterns (end-to-end)", () => {
     expect(alice).toBeDefined();
     expect(alice!.commitCount).toBe(2);
     expect(bob).toBeDefined();
-    expect(bob!.commitCount).toBe(2);
+    expect(bob!.commitCount).toBe(3);
   });
 
   it("enriches with last active date", async () => {
@@ -372,7 +377,7 @@ describe("git_search_commits (end-to-end)", () => {
 describe("git_commit_show (end-to-end)", () => {
   it("shows commit metadata and stat", async () => {
     const output = await execGit(
-      ["show", "--stat", "--format=%H|%an|%ae|%aI|%P%n%B", "HEAD"],
+      ["show", "--stat", "--format=%H|%an|%ae|%aI|%P%n%B", "HEAD~1"],
       repoDir,
     );
 
@@ -382,7 +387,7 @@ describe("git_commit_show (end-to-end)", () => {
   });
 
   it("shows diff for a commit", async () => {
-    const output = await execGit(["show", "-U3", "--format=", "HEAD"], repoDir);
+    const output = await execGit(["show", "-U3", "--format=", "HEAD~1"], repoDir);
 
     expect(output).toContain("const w = 4;");
   });
@@ -606,8 +611,9 @@ describe("git_merge_base (end-to-end)", () => {
       repoDir,
     );
     const mainCommits = parseLogOutput(mainOutput);
-    expect(mainCommits.length).toBeGreaterThanOrEqual(1);
-    expect(mainCommits[0].subject).toBe("feat: add w variable");
+    expect(mainCommits.length).toBeGreaterThanOrEqual(2);
+    const mainSubjects = mainCommits.map((c) => c.subject);
+    expect(mainSubjects).toContain("feat: add w variable");
 
     // Commits on feature-branch since merge base
     const featureOutput = await execGit(
@@ -693,7 +699,7 @@ describe("analyzeContributors", () => {
   it("コントリビューター分布を分析する", async () => {
     const { stats, totalCommits } = await analyzeContributors(repoDir);
 
-    expect(totalCommits).toBe(4);
+    expect(totalCommits).toBe(5);
     expect(stats).toHaveLength(2);
 
     const alice = stats.find((s) => s.name === "Alice");
@@ -772,7 +778,36 @@ describe("git_repo_health (end-to-end)", () => {
     expect(hotspots.length).toBeGreaterThan(0);
     expect(churnFiles.length).toBeGreaterThan(0);
     expect(contributorData.stats.length).toBe(2);
-    expect(contributorData.totalCommits).toBe(4);
+    expect(contributorData.totalCommits).toBe(5);
+  });
+});
+
+// ─── edge cases ─────────────────────────────────────────
+
+describe("エッジケース", () => {
+  it("空ファイルのblameは空ブロックを返す", async () => {
+    const output = await execGit(
+      ["blame", "--porcelain", "--", "src/empty.ts"],
+      repoDir,
+    );
+    const blocks = parseBlameOutput(output);
+    expect(blocks).toHaveLength(0);
+  });
+
+  it("存在しないファイルへのblameはエラーを返す", async () => {
+    await expect(
+      execGit(["blame", "--porcelain", "--", "nonexistent.ts"], repoDir),
+    ).rejects.toThrow();
+  });
+
+  it("end_lineのみ指定でblameが動作する", async () => {
+    const output = await execGit(
+      ["blame", "--porcelain", "-L", "1,2", "--", "src/index.ts"],
+      repoDir,
+    );
+    const blocks = parseBlameOutput(output);
+    expect(blocks.length).toBeGreaterThanOrEqual(1);
+    expect(blocks[0].startLine).toBe(1);
   });
 });
 

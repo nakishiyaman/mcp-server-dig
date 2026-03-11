@@ -106,7 +106,7 @@ export function registerGitReviewPrep(server: McpServer): void {
         const topRiskFiles = riskFiles.slice(0, MAX_RISK_FILES);
         const changedFileSet = new Set(changedFiles);
 
-        const perFileResults = await Promise.all(
+        const perFileSettled = await Promise.allSettled(
           topRiskFiles.map(async ({ file }) => {
             const [contributors, coChanges] = await Promise.all([
               analyzeContributors(repo_path, {
@@ -120,6 +120,9 @@ export function registerGitReviewPrep(server: McpServer): void {
             ]);
             return { file, contributors, coChanges };
           }),
+        );
+        const perFileResults = perFileSettled.flatMap((r) =>
+          r.status === "fulfilled" ? [r.value] : [],
         );
 
         // Collect suggested reviewers (deduplicate by email)
