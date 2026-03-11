@@ -1,0 +1,80 @@
+name: バグ報告
+description: 不具合の報告
+labels: ["type/bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        バグ報告ありがとうございます。以下の項目を記入してください。
+  - type: textarea
+    id: description
+    attributes:
+      label: 現象
+      description: 何が起きていますか？
+      placeholder: 具体的に説明してください
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 再現手順
+      description: バグを再現する手順を教えてください
+      placeholder: |
+        1. `git_blame_context` ツールを実行
+        2. パラメータ: repo_path="...", file_path="...", start_line=1, end_line=10
+        3. エラーが発生する
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待動作
+      description: 本来どうあるべきですか？
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: バージョン
+      description: mcp-server-dig のバージョン
+      placeholder: "例: 0.6.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: tool
+    attributes:
+      label: 対象ツール
+      options:
+        - git_file_history
+        - git_blame_context
+        - git_related_changes
+        - git_contributor_patterns
+        - git_search_commits
+        - git_commit_show
+        - git_diff_context
+        - git_hotspots
+        - git_pickaxe
+        - git_code_churn
+        - git_stale_files
+        - git_merge_base
+        - git_tag_list
+        - サーバー全体 / その他
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: MCPクライアント
+      options:
+        - Claude Desktop
+        - Claude Code (CLI)
+        - Zed
+        - MCP Inspector
+        - その他
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js バージョン
+      placeholder: "例: v22.0.0"

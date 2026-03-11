@@ -1,0 +1,49 @@
+name: 機能リクエスト
+description: 新機能や機能改善の提案
+labels: ["type/feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        機能リクエストありがとうございます。以下の項目を記入してください。
+  - type: textarea
+    id: summary
+    attributes:
+      label: 概要
+      description: この機能は何をするものですか？
+      placeholder: 1〜2文で説明してください
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 動機
+      description: なぜこの機能が必要ですか？どのような問題を解決しますか？
+      placeholder: ユースケースや背景を記述してください
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: 受入条件
+      description: この機能が完了したと判断できる条件は？
+      placeholder: |
+        - [ ] 条件1
+        - [ ] 条件2
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 領域
+      description: この機能はどの領域に関係しますか？
+      options:
+        - 新ツール追加
+        - 既存ツール改善
+        - パーサー / 出力フォーマット
+        - セキュリティ / バリデーション
+        - CI/CD / 配布
+        - ドキュメント
+        - その他
+    validations:
+      required: true
