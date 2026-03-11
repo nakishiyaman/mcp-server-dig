@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.6.0...v0.7.0) (2026-03-11)
+
+
+### Features
+
+* 組み合わせ分析ツール導入（git_file_risk_profile, git_repo_health） ([4a586ab](https://github.com/nakishiyaman/mcp-server-dig/commit/4a586abcf73944a956b7ec5e8d2afca88264bba6))
+* 組み合わせ分析ツール導入（v0.7.0） ([2f9a141](https://github.com/nakishiyaman/mcp-server-dig/commit/2f9a141565f3bb627026eba1cd7a4d0a5dc5bada))
+
 ## [0.6.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.5.0...v0.6.0) (2026-03-10)
 
 
