@@ -82,7 +82,7 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 4. git_hotspots → 開発が活発な領域を特定
 5. git_stale_files → メンテナンスが必要なファイルを特定
 
-### バグ原因調査
+### バグ原因調査（find-bug-origin Prompt推奨）
 1. git_bisect_guide → 範囲内のコミット分析とbisectステップ推定
 2. git_blame_context → 疑わしいコードの著者と経緯を確認
 3. git_commit_show → 該当コミットの詳細を確認

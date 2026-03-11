@@ -185,8 +185,8 @@
 - [x] `tool-guide` リソース更新（20ツール対応 + 新連携パターン追加）
 
 ### Phase 2（Phase 1に依存）
-- [ ] `find-bug-origin` Prompt（git_bisect_guide依存）
-- [ ] `dig://repo-summary/{path}` 動的Resource（ResourceTemplate使用）
+- [x] `find-bug-origin` Prompt（git_bisect_guide依存）
+- [x] `dig://repo-summary/{path}` 動的Resource（ResourceTemplate使用）
 
 ### Phase 3（最終）
 - [ ] ツール出力へのアクション提案（組み合わせ・ワークフローツールのみ）
