@@ -278,6 +278,23 @@ Concerns: frequently changing, high code churn, highly coupled
 | max_commits | number | いいえ | 分析するコミット数（デフォルト: 500） |
 | stale_threshold_days | number | いいえ | 古いと判定する日数（デフォルト: 180） |
 
+## プロンプト
+
+MCP Prompts は複数のツールを連携させたガイド付きワークフローを提供します。
+
+| プロンプト | 説明 | パラメータ |
+|-----------|------|-----------|
+| `investigate-code` | コード調査 — blame、pickaxe、ファイル履歴を使ってコードの経緯を解明 | `repo_path`, `file_path`, `line_range?` |
+| `review-pr` | PRレビュー — リスク評価付きのレビューブリーフィングを生成 | `repo_path`, `base_ref`, `head_ref?` |
+| `assess-health` | リポジトリ健全性評価 — リポジトリ全体の品質を評価 | `repo_path` |
+| `trace-change` | 変更追跡 — 特定の文字列がいつ・なぜ追加/削除されたかを追跡 | `repo_path`, `search_term` |
+
+## リソース
+
+| URI | 説明 |
+|-----|------|
+| `dig://tool-guide` | ツール使い分けガイド — よくある質問から適切なツールを案内 |
+
 ## セットアップ
 
 ### 前提条件
