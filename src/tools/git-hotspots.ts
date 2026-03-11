@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { execGit, validateGitRepo } from "../git/executor.js";
-import { parseFileFrequency } from "../git/parsers.js";
+import { validateGitRepo } from "../git/executor.js";
+import { analyzeHotspots } from "../analysis/hotspots.js";
 import { errorResponse, successResponse } from "./response.js";
 
 export function registerGitHotspots(server: McpServer): void {
@@ -37,18 +37,12 @@ export function registerGitHotspots(server: McpServer): void {
       try {
         await validateGitRepo(repo_path);
 
-        const args = [
-          "log",
-          "--format=",
-          "--name-only",
-          `--max-count=${max_commits}`,
-        ];
-
-        if (since) args.push(`--since=${since}`);
-        if (path_pattern) args.push("--", path_pattern);
-
-        const output = await execGit(args, repo_path);
-        const hotspots = parseFileFrequency(output, top_n);
+        const hotspots = await analyzeHotspots(repo_path, {
+          pathPattern: path_pattern,
+          since,
+          maxCommits: max_commits,
+          topN: top_n,
+        });
 
         if (hotspots.length === 0) {
           return successResponse("No file changes found in the specified range.");

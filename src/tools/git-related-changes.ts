@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { execGit, validateFilePath, validateGitRepo } from "../git/executor.js";
-import { parseNameOnlyLog } from "../git/parsers.js";
+import { validateFilePath, validateGitRepo } from "../git/executor.js";
+import { analyzeCoChanges } from "../analysis/co-changes.js";
 import { errorResponse, successResponse } from "./response.js";
 
 export function registerGitRelatedChanges(server: McpServer): void {
@@ -33,57 +33,15 @@ export function registerGitRelatedChanges(server: McpServer): void {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
 
-        // Single git command to get all commits with their changed files
-        const output = await execGit(
-          [
-            "log",
-            "--format=COMMIT:%H",
-            "--name-only",
-            `--max-count=${max_commits}`,
-            "--",
-            file_path,
-          ],
+        const { results, totalCommits, skipped } = await analyzeCoChanges(
           repo_path,
+          file_path,
+          { maxCommits: max_commits, minCoupling: min_coupling },
         );
-
-        const commitFiles = parseNameOnlyLog(output);
-        const totalCommits = commitFiles.size;
 
         if (totalCommits === 0) {
           return successResponse(`No commits found for ${file_path}`);
         }
-
-        // For each commit, get ALL files changed (not just the target file)
-        const coChangeMap = new Map<string, number>();
-        const skipped: string[] = [];
-
-        for (const [hash] of commitFiles) {
-          try {
-            const allFiles = await execGit(
-              ["show", "--name-only", "--format=", hash],
-              repo_path,
-            );
-            const files = allFiles
-              .trim()
-              .split("\n")
-              .filter((f) => f.length > 0 && f !== file_path);
-
-            for (const f of files) {
-              coChangeMap.set(f, (coChangeMap.get(f) ?? 0) + 1);
-            }
-          } catch {
-            skipped.push(hash.slice(0, 8));
-          }
-        }
-
-        const results = Array.from(coChangeMap.entries())
-          .filter(([, count]) => count >= min_coupling)
-          .sort((a, b) => b[1] - a[1])
-          .map(([filePath, count]) => ({
-            filePath,
-            coChangeCount: count,
-            percentage: Math.round((count / totalCommits) * 100),
-          }));
 
         if (results.length === 0) {
           return successResponse(
@@ -100,7 +58,9 @@ export function registerGitRelatedChanges(server: McpServer): void {
           `Analyzed ${totalCommits} commit(s), found ${results.length} related file(s)`,
         ];
         if (skipped.length > 0) {
-          parts.push(`(${skipped.length} commit(s) skipped due to read errors)`);
+          parts.push(
+            `(${skipped.length} commit(s) skipped due to read errors)`,
+          );
         }
         parts.push("", ...lines);
 

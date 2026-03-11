@@ -15,6 +15,8 @@ import { registerGitRelatedChanges } from "./tools/git-related-changes.js";
 import { registerGitSearchCommits } from "./tools/git-search-commits.js";
 import { registerGitStaleFiles } from "./tools/git-stale-files.js";
 import { registerGitTagList } from "./tools/git-tag-list.js";
+import { registerGitFileRiskProfile } from "./tools/git-file-risk-profile.js";
+import { registerGitRepoHealth } from "./tools/git-repo-health.js";
 
 function createServer() {
   const server = new McpServer({
@@ -22,6 +24,7 @@ function createServer() {
     version: "0.1.0",
   });
 
+  // Data retrieval tools (13)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -35,6 +38,10 @@ function createServer() {
   registerGitStaleFiles(server);
   registerGitMergeBase(server);
   registerGitTagList(server);
+
+  // Composite analysis tools
+  registerGitFileRiskProfile(server);
+  registerGitRepoHealth(server);
 
   return server;
 }
