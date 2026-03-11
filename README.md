@@ -278,6 +278,23 @@ Repository-wide health summary combining file count, commit activity, top hotspo
 | max_commits | number | no | Number of commits to analyze (default: 500) |
 | stale_threshold_days | number | no | Days without change to consider stale (default: 180) |
 
+## Prompts
+
+MCP Prompts provide guided workflows that chain multiple tools together for common use cases.
+
+| Prompt | Description | Parameters |
+|--------|-------------|------------|
+| `investigate-code` | Code investigation — traces why code exists using blame, pickaxe, and file history | `repo_path`, `file_path`, `line_range?` |
+| `review-pr` | PR review workflow — generates a review briefing with risk assessment | `repo_path`, `base_ref`, `head_ref?` |
+| `assess-health` | Repository health assessment — evaluates overall repo quality | `repo_path` |
+| `trace-change` | Change tracing — tracks when and why a specific string was added or removed | `repo_path`, `search_term` |
+
+## Resources
+
+| URI | Description |
+|-----|-------------|
+| `dig://tool-guide` | Tool selection guide — maps common questions to the right tool |
+
 ## Setup
 
 ### Prerequisites
