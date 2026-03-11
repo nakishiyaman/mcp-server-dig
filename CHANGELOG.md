@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.7.0...v0.8.0) (2026-03-11)
+
+
+### Features
+
+* git_review_prep・git_whyワークフロー統合ツール追加 ([bee1cb0](https://github.com/nakishiyaman/mcp-server-dig/commit/bee1cb0c19520ac737779c4d3806d834707f522b))
+* v0.8.0 ワークフロー統合ツール (git_review_prep, git_why) ([a577bc1](https://github.com/nakishiyaman/mcp-server-dig/commit/a577bc19eefe99605fcc15f6f66326153a8ea0a4))
+
 ## [0.7.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.6.0...v0.7.0) (2026-03-11)
 
 
