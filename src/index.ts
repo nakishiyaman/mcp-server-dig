@@ -3,9 +3,14 @@
 import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { AnalysisCache } from "./analysis/cache.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
+
+export interface ToolContext {
+  cache: AnalysisCache;
+}
 import { registerGitBlameContext } from "./tools/git-blame-context.js";
 import { registerGitCodeChurn } from "./tools/git-code-churn.js";
 import { registerGitCommitShow } from "./tools/git-commit-show.js";
@@ -40,6 +45,9 @@ function createServer() {
     name: "dig",
     version,
   });
+  const context: ToolContext = {
+    cache: new AnalysisCache(),
+  };
 
   // Data retrieval tools (16)
   registerGitFileHistory(server);
@@ -59,12 +67,12 @@ function createServer() {
   registerGitDependencyMap(server);
   registerGitBisectGuide(server);
 
-  // Composite analysis tools
-  registerGitFileRiskProfile(server);
-  registerGitRepoHealth(server);
+  // Composite analysis tools (with cache context)
+  registerGitFileRiskProfile(server, context);
+  registerGitRepoHealth(server, context);
 
-  // Workflow integration tools
-  registerGitReviewPrep(server);
+  // Workflow integration tools (with cache context)
+  registerGitReviewPrep(server, context);
   registerGitWhy(server);
 
   // Prompts

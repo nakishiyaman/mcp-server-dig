@@ -5,11 +5,13 @@ import { parseLogOutput, parseDiffStatOutput } from "../git/parsers.js";
 import { analyzeHotspotsAndChurn } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
+import { cachedAnalyzeHotspotsAndChurn } from "../analysis/cached-analysis.js";
 import { errorResponse, successResponse } from "./response.js";
+import type { ToolContext } from "../index.js";
 
 const MAX_RISK_FILES = 10;
 
-export function registerGitReviewPrep(server: McpServer): void {
+export function registerGitReviewPrep(server: McpServer, context?: ToolContext): void {
   server.tool(
     "git_review_prep",
     "Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.",
@@ -80,12 +82,19 @@ export function registerGitReviewPrep(server: McpServer): void {
               ],
               repo_path,
             ),
-            analyzeHotspotsAndChurn(repo_path, {
-              maxCommits: max_commits,
-              hotspotsTopN: 100,
-              churnTopN: 100,
-              timeoutMs: timeout_ms,
-            }),
+            context
+              ? cachedAnalyzeHotspotsAndChurn(context.cache, repo_path, {
+                  maxCommits: max_commits,
+                  hotspotsTopN: 100,
+                  churnTopN: 100,
+                  timeoutMs: timeout_ms,
+                })
+              : analyzeHotspotsAndChurn(repo_path, {
+                  maxCommits: max_commits,
+                  hotspotsTopN: 100,
+                  churnTopN: 100,
+                  timeoutMs: timeout_ms,
+                }),
           ]);
 
         const { hotspots, churn: churnFiles } = combined;

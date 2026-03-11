@@ -5,7 +5,9 @@ import { analyzeHotspotsAndChurn } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
 import { analyzeFileStaleness } from "../analysis/staleness.js";
+import { cachedAnalyzeHotspotsAndChurn, cachedAnalyzeContributors } from "../analysis/cached-analysis.js";
 import { errorResponse, successResponse } from "./response.js";
+import type { ToolContext } from "../index.js";
 
 type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
 
@@ -163,7 +165,7 @@ function padLabel(label: string, width: number): string {
   return label.padEnd(width);
 }
 
-export function registerGitFileRiskProfile(server: McpServer): void {
+export function registerGitFileRiskProfile(server: McpServer, context?: ToolContext): void {
   server.tool(
     "git_file_risk_profile",
     "Comprehensive risk assessment for a single file by combining multiple analyses: change frequency, code churn, knowledge concentration, implicit coupling, and staleness. Returns a multi-dimensional risk profile to help prioritize review and refactoring efforts.",
@@ -202,17 +204,24 @@ export function registerGitFileRiskProfile(server: McpServer): void {
 
         // Run independent analyses in parallel
         // Combined hotspots+churn uses a single git log --numstat scan
+        const hotspotsChurnOptions = {
+          ...analysisOptions,
+          hotspotsTopN: 100,
+          churnTopN: 100,
+        };
+        const contributorOptions = {
+          ...analysisOptions,
+          pathPattern: file_path,
+        };
+
         const [combined, contributorData, coChangeData, stalenessData] =
           await Promise.all([
-            analyzeHotspotsAndChurn(repo_path, {
-              ...analysisOptions,
-              hotspotsTopN: 100,
-              churnTopN: 100,
-            }),
-            analyzeContributors(repo_path, {
-              ...analysisOptions,
-              pathPattern: file_path,
-            }),
+            context
+              ? cachedAnalyzeHotspotsAndChurn(context.cache, repo_path, hotspotsChurnOptions)
+              : analyzeHotspotsAndChurn(repo_path, hotspotsChurnOptions),
+            context
+              ? cachedAnalyzeContributors(context.cache, repo_path, contributorOptions)
+              : analyzeContributors(repo_path, contributorOptions),
             analyzeCoChanges(repo_path, file_path, {
               maxCommits: max_commits,
               minCoupling: 1,
