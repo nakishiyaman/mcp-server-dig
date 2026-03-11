@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.9.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.8.1...v0.9.0) (2026-03-11)
+
+
+### Features
+
+* MCP Prompts/Resources追加 — ツール選択ガイドとワークフロー誘導 ([e63543e](https://github.com/nakishiyaman/mcp-server-dig/commit/e63543ef53c093aaa60f292dcea1653dc893cba0))
+* MCP Prompts/Resources追加 — ツール選択ガイドとワークフロー誘導 ([1f1b0fa](https://github.com/nakishiyaman/mcp-server-dig/commit/1f1b0faf988b7f40514db8de50ab0111ae28a1b4))
+
+
+### Bug Fixes
+
+* git_why出力のコミット重複排除 ([a83d8ec](https://github.com/nakishiyaman/mcp-server-dig/commit/a83d8ecb1d38873efe36f9fa53953dcb93f2b57a))
+* git_why出力のコミット重複排除 — 行範囲グループ化で簡潔化 ([44f563f](https://github.com/nakishiyaman/mcp-server-dig/commit/44f563f67dbadc5e4eb2128936000a6f5a426454))
+
 ## [0.8.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.8.0...v0.8.1) (2026-03-11)
 
 
