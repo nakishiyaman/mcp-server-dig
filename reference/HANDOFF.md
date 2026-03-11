@@ -3,34 +3,29 @@
 日時: 2026-03-11
 
 ### 完了したタスク
-- PR #30 マージ（v0.6.0 新5ツール）
-- PR #31 マージ（release-please PAT修正 — GITHUB_TOKEN → Fine-Grained PAT）
-- PR #28 auto-merge完了（chore(main): release 0.6.0）
-- npm公開（mcp-server-dig@0.6.0 — 13ツール）
-- Auto-merge有効化（リポジトリ設定）
-- PR #32 作成（開発ワークフロー強化 — CI通過待ち）:
-  - `.claude/rules/` 導入（general, git-workflow, implementation, testing, validation）
-  - `CLAUDE.md` 作成
-  - ADR導入（3件: PAT導入, execFile, stdio専用）
-  - GitHub Issueテンプレート（bug.yml, feature.yml）
-  - リリースボディテンプレート
-  - 検証チェックリストテンプレート
-  - `docs/recommended-practices.md` 見送り項目の採用済み移動
+- `git_review_prep` ツール実装（PRレビュー準備ブリーフィング）
+  - diff stat, commit一覧, hotspots, churn分析の並列実行
+  - リスクファイル検出 + レビュアー推薦 + 変更漏れ候補警告
+- `git_why` ツール実装（コード考古学ナラティブ）
+  - blame + commit詳細 + contributors + co-changes統合
+  - 行範囲指定対応
+- 両ツールの統合テスト追加（5テスト）
+- index.ts にワークフロー統合ツール登録
+- CLAUDE.md ツール数・バージョン更新（15→17ツール, v0.7.0→v0.8.0）
+- ROADMAP.md v0.8.0セクション追加
 
 ### 現在の状態
-- ブランチ: `chore/workflow-rules-templates`（PR #32 — CI通過待ち）
-- 未コミット変更: `.claude/settings.local.json`（セッション管理用）
-- ツール数: 13
-- テスト: 55テスト全通過
-- npm: mcp-server-dig@0.6.0 公開済み
+- ブランチ: `feat/v0.8.0-workflow-tools`（未push、PR未作成）
+- 未コミット変更: `.claude/settings.local.json`（個人設定、コミット対象外）
+- ツール数: 17（データ取得13 + 組み合わせ分析2 + ワークフロー統合2）
+- テスト: 67テスト全通過（既存62 + 新規5）
+- build / test / lint 全パス確認済み
 
-### 次にやるべきこと（優先順）
-1. **PR #32 のCI通過確認 → マージ**
-2. **npmjs.com Publishing access を最厳格設定に変更**（Require 2FA and disallow tokens — Web UI手動操作）
-3. **MCP Registry 更新確認**（v0.6.0公開後、新ツール情報の反映確認）
+### 次にやるべきこと
+1. **ブランチをpush → PR作成 → CIパス確認 → マージ**
+2. **README.md / README.ja.md 更新**（新2ツールのドキュメント追加）
+3. **v0.8.0リリース**（release-please PRマージ → npm公開）
 
 ### ブロッカー/注意点
-- Smithery登録は有料プラン or HTTPトランスポート対応が必要（ブロッカー継続）
-- Zed拡張はRustラッパー必要（低優先度）
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
-- `.claude/rules/` がセッションに自動ロードされるようになったため、CI/CD変更時は `git-workflow.md` を参照してから提案すること
+- `.claude/settings.local.json` がgit statusに出ているが個人設定なのでコミットしない
