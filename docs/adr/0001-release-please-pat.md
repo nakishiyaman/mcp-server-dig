@@ -21,7 +21,8 @@ Fine-Grained PAT (`RELEASE_PLEASE_TOKEN`) を使用する。
 
 - スコープ: `nakishiyaman/mcp-server-dig` リポジトリのみ
 - パーミッション: Contents (Read & write), Pull requests (Read & write)
-- リポジトリ設定: Auto-merge有効化（CIパス後に自動マージ）
+- リポジトリ設定: Auto-merge有効化
+- ワークフロー: release-pleaseジョブ内で `gh pr merge --auto --merge` を実行し、各Release PRに自動でauto-mergeを設定
 
 将来マルチメンテナーになった場合は GitHub App トークン（選択肢2）に移行する。
 
