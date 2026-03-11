@@ -1,47 +1,48 @@
 ## セッション引き継ぎ
 
-日時: 2026-03-12
+日時: 2026-03-11
 
 ### 完了したタスク
-- **v0.10.0 Phase 1 実装完了**（feat/v0.10.0-phase1ブランチ）
-  - `git_knowledge_map` ツール: ディレクトリ別知識所有者マップ + バス係数計算
-    - `src/analysis/knowledge-map.ts`（分析関数 + computeBusFactor, getDirectoryAtDepth）
-    - `src/tools/git-knowledge-map.ts`（ツール登録）
-    - 統合テスト6件 + 単体テスト10件
-  - `git_dependency_map` ツール: ディレクトリ間共変更ネットワーク可視化
-    - `src/analysis/dependency-map.ts`（分析関数、parseNameOnlyLog再利用）
-    - `src/tools/git-dependency-map.ts`（ツール登録）
-    - 統合テスト4件
-  - `git_bisect_guide` ツール: bisect事前分析
-    - `src/tools/git-bisect-guide.ts`（ツール登録、既存パーサー再利用）
-    - 統合テスト5件
-  - `onboard-codebase` Prompt: 新規参入者向けオンボーディングガイド
-    - `src/prompts/onboard-codebase.ts`
-    - プロンプトテスト追加
-  - エラーメッセージ改善: ENOENT / not a git repository のガイダンス付きメッセージ
-  - `tool-guide` リソース更新: 20ツール対応 + 新連携パターン2件追加
+- **v0.11.0 全5フェーズ実装完了**（feat/v0.11.0-phase1ブランチ、PR #56）
+  - Phase 1: エッジケーステスト拡充 + パーサー堅牢化
+    - テストデータ拡充（バイナリファイル、非ASCIIファイル名、50件バルクコミット）
+    - 統合テスト 3→14テストに拡充
+    - `parseDiffStatOutput` Bin行スキップ、`parseBlameOutput` 空commitHashガード
+  - Phase 2: タイムアウト柔軟化
+    - 6ツールに `timeout_ms` パラメータ追加（min 1000, max 300000）
+    - 全分析関数（combined-log-analysis, contributors, co-changes, churn, hotspots）に `timeoutMs` 伝播
+  - Phase 3: 結果キャッシュ層
+    - `AnalysisCache`（TTL 60秒、LRU eviction、最大100エントリ）
+    - `cachedAnalyzeHotspotsAndChurn` / `cachedAnalyzeContributors` ラッパー
+    - `ToolContext` 型定義、複合ツール3件（repo_health, file_risk_profile, review_prep）にcontext伝播
+  - Phase 4: 構造化ログ
+    - `Logger` クラス（JSON形式stderr、debug/info/warn/error）
+    - `DIG_LOG_LEVEL` 環境変数制御
+    - index.ts の console.error → logger 置換
+  - Phase 5: Prompt追加 + ドキュメント
+    - `technical-debt` Prompt（技術的負債分析ワークフロー）
+    - `onboard-area` Prompt（領域別オンボーディング）
+    - ADR-0004: 分析関数レベルキャッシュ設計判断
+    - tool-guide リソース更新、README/README.ja/ROADMAP/CLAUDE.md 更新
 
 ### 現在の状態
-- ブランチ: `feat/v0.10.0-phase1`（PR作成前）
-- 未コミット変更: `.claude/settings.local.json` のみ
+- ブランチ: `feat/v0.11.0-phase1`（PR #56 作成済み、CIチェック待ち）
+- 未コミット変更: `.claude/settings.local.json` のみ（ローカル設定）
 - ツール数: 20（データ取得16 + 組み合わせ分析2 + ワークフロー統合2）
-- Prompts: 5、Resources: 1
-- テスト: 126テスト全通過（25ファイル）
+- Prompts: 8、Resources: 2
+- テスト: 161テスト全通過（27ファイル）
 - build / lint / typecheck 全パス
-- npm: mcp-server-dig@0.9.1（release-please管理）
 
 ### 次にやるべきこと
-1. **PR作成**: feat/v0.10.0-phase1 → main
-2. **Phase 2 実装**:
-   - `find-bug-origin` Prompt（git_bisect_guide依存 → 完了済み）
-   - `dig://repo-summary/{path}` 動的Resource（ResourceTemplate使用）
-3. **Phase 3 実装**:
-   - ツール出力へのアクション提案（組み合わせ・ワークフローツールのみ）
-   - README更新
-   - ROADMAP最終更新
-4. v0.10.0リリース
+1. **PR #56 マージ**: CI全パス確認後にマージ
+2. **v0.11.0 リリース**: release-please PRの自動作成 → auto-merge → npm publish
+3. **v0.12.0 計画**:
+   - ツール実行タイミングのログ計測（logger活用）
+   - キャッシュhit/miss ログ出力
+   - 全20ツールへのtimeout_ms展開検討
+   - MCP Sampling API活用の検討
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
-- `git_branch_summary` はスコープ外（git_review_prepとの重複が大きい）
-- v0.11.0以降: 結果キャッシュ層、構造化ログ、タイムアウト柔軟化
+- キャッシュのTTL 60秒は保守的な値。実運用でチューニング可能
+- バルクコミット50件追加により既存テストの数値アサーションを柔軟化した（`toBeGreaterThanOrEqual`）
