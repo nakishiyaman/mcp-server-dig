@@ -6,6 +6,13 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 
 ## Tools
 
+### Workflow Integration
+
+| Tool | Description |
+|------|-------------|
+| `git_review_prep` | PR review briefing with risk flags, reviewer suggestions, and missing file detection |
+| `git_why` | Code archaeology narrative — explains why code exists by combining blame, commits, contributors, and co-changes |
+
 ### Composite Analysis
 
 | Tool | Description |
@@ -165,6 +172,74 @@ List tags sorted by creation date with associated messages. Useful for understan
 | pattern | string | no | Glob pattern to filter tags, e.g. `"v1.*"` |
 | max_tags | number | no | Maximum number of tags to return (default: 50) |
 | sort | string | no | Sort order: `"newest"` or `"oldest"` (default: `"newest"`) |
+
+### git_review_prep
+
+Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| base_ref | string | yes | Base ref for comparison, e.g. `"main"` |
+| head_ref | string | no | Head ref for comparison (default: `"HEAD"`) |
+| max_commits | number | no | Number of commits to analyze (default: 500) |
+
+Example output:
+
+```
+PR Review Briefing: main...HEAD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Commits (2):
+  abc1234 feat: add new feature
+  def5678 fix: handle edge case
+
+Changed files (3, +35 -10):
+  src/foo.ts | +25 -5
+  src/bar.ts | +10 -5
+
+Risk flags:
+  src/foo.ts — HOTSPOT (15 changes), HIGH CHURN (450 lines)
+
+Suggested reviewers:
+  Alice <alice@example.com> — 12 commits to src/foo.ts
+
+Potentially missing files:
+  src/foo.test.ts — co-changes with src/foo.ts 85% of the time
+```
+
+### git_why
+
+Explain why code exists by combining blame, commit context, contributor patterns, and co-change analysis into a narrative. Answers the question "Why does this code look this way?" for a file or line range.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| file_path | string | yes | Relative path to the file within the repo |
+| start_line | number | no | Start of line range |
+| end_line | number | no | End of line range |
+| max_commits | number | no | Maximum number of commits to show in detail (default: 10) |
+
+Example output:
+
+```
+Why does this code exist? — src/foo.ts L10-25
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Blame summary (3 commits, 2 authors):
+
+[L10-15] abc1234 | 2024-06-15 | Alice
+  Commit: feat: add validation logic
+  Files in commit: src/foo.ts, src/foo.test.ts
+
+[L16-25] def5678 | 2024-08-20 | Bob
+  Commit: fix: handle null input (Fixes #42)
+  Files in commit: src/foo.ts, src/bar.ts
+
+File context:
+  Contributors: Alice (80%), Bob (20%)
+  Co-changed with: src/foo.test.ts (85%), src/types.ts (60%)
+```
 
 ### git_file_risk_profile
 
