@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.11.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.10.0...v0.11.0) (2026-03-11)
+
+
+### Features
+
+* Phase 1 — エッジケーステスト拡充 + パーサー堅牢化 ([1cdf3dc](https://github.com/nakishiyaman/mcp-server-dig/commit/1cdf3dc7c69c41e74ecacd1cd205331fe079ef22))
+* Phase 2 — タイムアウト柔軟化（timeout_ms パラメータ追加） ([89ba793](https://github.com/nakishiyaman/mcp-server-dig/commit/89ba793fe0aa5a09fe5ddc4e6a5533de29911767))
+* Phase 3 — 結果キャッシュ層（AnalysisCache + cached wrappers） ([57581f5](https://github.com/nakishiyaman/mcp-server-dig/commit/57581f51cee76642bebe4ab26c1a726192febc83))
+* Phase 4 — 構造化ログ（Logger + DIG_LOG_LEVEL環境変数） ([6764d5b](https://github.com/nakishiyaman/mcp-server-dig/commit/6764d5bd413e2072e34f2c11890db3a109910b81))
+* Phase 5 — Prompt追加 + ドキュメント + リリース準備 ([aa960c0](https://github.com/nakishiyaman/mcp-server-dig/commit/aa960c0b21fca8b10d64e06b05d7790532c2fd11))
+* v0.11.0 品質強化・パフォーマンス・運用改善 ([9e330d7](https://github.com/nakishiyaman/mcp-server-dig/commit/9e330d7a2cfba3421e0fe818958e2b42b06d2971))
+
 ## [0.10.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.9.1...v0.10.0) (2026-03-11)
 
 
