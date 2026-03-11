@@ -122,6 +122,20 @@
   - [x] Zed/Cursor/Windsurf 設定例追加
 - [x] ROADMAP更新（Zed拡張をスコープ外に移動）
 
+## v0.8.0 — ワークフロー統合ツール
+
+- [x] `git_review_prep` ツール（PRレビュー準備ブリーフィング）
+  - [x] diff stat, commit一覧, hotspots, churn分析の並列実行
+  - [x] リスクファイル検出 + 変更漏れ候補の警告
+  - [x] レビュアー推薦（コントリビューター分析ベース）
+  - [x] 統合テスト追加
+- [x] `git_why` ツール（コード考古学ナラティブ）
+  - [x] blame + commit詳細 + contributors + co-changes統合
+  - [x] 行範囲指定対応
+  - [x] 統合テスト追加
+- [x] index.ts にワークフロー統合ツール登録
+- [x] CLAUDE.md ツール数・バージョン更新
+
 ## スコープ外
 
 | 項目 | 理由 |

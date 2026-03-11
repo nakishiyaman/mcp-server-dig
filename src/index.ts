@@ -17,6 +17,8 @@ import { registerGitStaleFiles } from "./tools/git-stale-files.js";
 import { registerGitTagList } from "./tools/git-tag-list.js";
 import { registerGitFileRiskProfile } from "./tools/git-file-risk-profile.js";
 import { registerGitRepoHealth } from "./tools/git-repo-health.js";
+import { registerGitReviewPrep } from "./tools/git-review-prep.js";
+import { registerGitWhy } from "./tools/git-why.js";
 
 function createServer() {
   const server = new McpServer({
@@ -42,6 +44,10 @@ function createServer() {
   // Composite analysis tools
   registerGitFileRiskProfile(server);
   registerGitRepoHealth(server);
+
+  // Workflow integration tools
+  registerGitReviewPrep(server);
+  registerGitWhy(server);
 
   return server;
 }
