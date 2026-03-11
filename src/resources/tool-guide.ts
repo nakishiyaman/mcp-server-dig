@@ -1,0 +1,96 @@
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
+
+## 質問パターン → ツール対応表
+
+| 質問 | 使うツール |
+|------|-----------|
+| このコードは誰がいつ書いた？ | git_blame_context |
+| このファイルの変更履歴を見たい | git_file_history |
+| この関数はなぜこうなっている？ | git_why |
+| この文字列を追加/削除したコミットは？ | git_pickaxe |
+| このコミットの詳細を見たい | git_commit_show |
+| 2つのブランチの差分は？ | git_diff_context |
+| よく一緒に変更されるファイルは？ | git_related_changes |
+| このファイルの変更頻度は？ | git_code_churn |
+| リポジトリの健全性を知りたい | git_repo_health |
+| 変更が多いホットスポットは？ | git_hotspots |
+| 放置されているファイルは？ | git_stale_files |
+| PRレビューの準備をしたい | git_review_prep |
+| コミットメッセージで検索したい | git_search_commits |
+| 誰がどの領域を担当している？ | git_contributor_patterns |
+| ブランチの分岐点を知りたい | git_merge_base |
+| タグ一覧を見たい | git_tag_list |
+| ファイルのリスクを評価したい | git_file_risk_profile |
+
+## カテゴリ別一覧
+
+### データ取得ツール（13個）
+- **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
+- **git_file_history** — ファイルのコミット履歴を時系列で表示
+- **git_commit_show** — 特定コミットの詳細（diff含む）を表示
+- **git_diff_context** — 2つのref間の差分を表示
+- **git_pickaxe** — 特定の文字列を追加/削除したコミットを検索
+- **git_search_commits** — コミットメッセージをキーワード検索
+- **git_related_changes** — あるファイルと一緒に変更されることが多いファイルを特定
+- **git_contributor_patterns** — ファイル/ディレクトリごとの貢献者パターンを分析
+- **git_code_churn** — ファイルの変更頻度（追加/削除行数）を分析
+- **git_hotspots** — リポジトリ内で変更頻度の高いファイルを特定
+- **git_stale_files** — 長期間更新されていないファイルを特定
+- **git_merge_base** — 2つのブランチの共通祖先（分岐点）を特定
+- **git_tag_list** — タグ一覧を表示
+
+### 組み合わせ分析ツール（2個）
+- **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
+- **git_repo_health** — リポジトリ全体の健全性レポート
+
+### ワークフロー統合ツール（2個）
+- **git_review_prep** — PRレビュー用の変更サマリーとリスク情報を一括取得
+- **git_why** — コード行の存在理由を blame + コミット詳細で解説
+
+## 連携パターン
+
+### コード考古学（なぜこのコードがあるのか調査）
+1. git_why → 対象行の来歴を把握
+2. git_pickaxe → 関連する文字列の追加/削除履歴を追跡
+3. git_file_history → ファイル全体の変遷を確認
+
+### PRレビュー
+1. git_review_prep → 変更概要とリスクファイルを把握
+2. git_file_risk_profile → 気になるファイルのリスク詳細を確認
+
+### リポジトリ健全性評価
+1. git_repo_health → 全体の健全性スコアを確認
+2. git_hotspots → 変更集中箇所を特定
+3. git_stale_files → メンテナンスが必要なファイルを特定
+
+### 変更追跡
+1. git_pickaxe → 特定の文字列変更を含むコミットを検索
+2. git_commit_show → 該当コミットの詳細を確認
+`;
+
+export function getToolGuideContent(): string {
+  return TOOL_GUIDE;
+}
+
+export function registerToolGuide(server: McpServer): void {
+  server.registerResource(
+    "tool-guide",
+    "dig://tool-guide",
+    {
+      description:
+        "17ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+      mimeType: "text/markdown",
+    },
+    () => ({
+      contents: [
+        {
+          uri: "dig://tool-guide",
+          mimeType: "text/markdown",
+          text: TOOL_GUIDE,
+        },
+      ],
+    }),
+  );
+}
