@@ -136,6 +136,27 @@
 - [x] index.ts にワークフロー統合ツール登録
 - [x] CLAUDE.md ツール数・バージョン更新
 
+## v0.9.0 — MCP体験強化・品質・パフォーマンス
+
+優先順: B → A → C
+
+### B. MCP体験強化（Prompts/Resources）
+- [x] MCP Promptsの追加（ユースケース別ガイドテンプレート）
+  - [x] investigate-code: コード調査（git_why → git_pickaxe → git_file_history）
+  - [x] review-pr: PRレビュー（git_review_prep → git_file_risk_profile）
+  - [x] assess-health: リポジトリ健全性評価（git_repo_health → git_hotspots → git_stale_files）
+  - [x] trace-change: 変更追跡（git_pickaxe → git_commit_show）
+- [x] ツール選択ガイドのResource提供（dig://tool-guide）
+
+### A. コード品質・保守性向上
+- [ ] 統合テストファイルの分割（925行の単一ファイル → ツール別ファイル）
+- [ ] ツール登録パターンの共通化（17ファイルのボイラープレート削減）
+- [ ] `index.ts` の `version` ハードコード修正（package.jsonから読む）
+
+### C. パフォーマンス最適化
+- [ ] 組み合わせツール内の重複git呼び出し削減（`git_repo_health`, `git_review_prep`）
+- [ ] 結果キャッシュ層の導入
+
 ## スコープ外
 
 | 項目 | 理由 |
