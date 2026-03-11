@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12
+最終更新: 2026-03-11
 
 ## v0.4.0 — 品質改善
 
@@ -154,8 +154,15 @@
 - [x] `index.ts` の `version` ハードコード修正（createRequireでpackage.jsonから動的取得）
 
 ### C. パフォーマンス最適化
-- [ ] 組み合わせツール内の重複git呼び出し削減（`git_repo_health`, `git_review_prep`）
-- [ ] 結果キャッシュ層の導入
+- [x] 組み合わせツール内の重複git呼び出し削減（`git_repo_health`, `git_review_prep`, `git_file_risk_profile`）
+  - [x] `parseCombinedNumstat`: 1回のnumstat出力からhotspots+churn同時算出
+  - [x] `analyzeHotspotsAndChurn`: 統合分析関数（git log 2回→1回）
+  - [x] `countStaleFiles`: git log --since による一括判定（N回→1回）
+  - [x] `git ls-files` 重複排除（2回→1回）
+- [ ] 結果キャッシュ層の導入（プロファイリングで必要性確認後）
+
+### D. ドキュメント
+- [x] README更新（Prompts/Resources機能の記載追加）
 
 ## スコープ外
 
