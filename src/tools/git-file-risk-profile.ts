@@ -1,8 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateFilePath, validateGitRepo } from "../git/executor.js";
-import { analyzeHotspots } from "../analysis/hotspots.js";
-import { analyzeChurn } from "../analysis/churn.js";
+import { analyzeHotspotsAndChurn } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
 import { analyzeFileStaleness } from "../analysis/staleness.js";
@@ -193,10 +192,14 @@ export function registerGitFileRiskProfile(server: McpServer): void {
         const analysisOptions = { since, maxCommits: max_commits };
 
         // Run independent analyses in parallel
-        const [hotspots, churnFiles, contributorData, coChangeData, stalenessData] =
+        // Combined hotspots+churn uses a single git log --numstat scan
+        const [combined, contributorData, coChangeData, stalenessData] =
           await Promise.all([
-            analyzeHotspots(repo_path, { ...analysisOptions, topN: 100 }),
-            analyzeChurn(repo_path, { ...analysisOptions, topN: 100 }),
+            analyzeHotspotsAndChurn(repo_path, {
+              ...analysisOptions,
+              hotspotsTopN: 100,
+              churnTopN: 100,
+            }),
             analyzeContributors(repo_path, {
               ...analysisOptions,
               pathPattern: file_path,
@@ -207,6 +210,8 @@ export function registerGitFileRiskProfile(server: McpServer): void {
             }),
             analyzeFileStaleness(repo_path, file_path),
           ]);
+
+        const { hotspots, churn: churnFiles } = combined;
 
         // Extract file-specific data from repo-wide analyses
         const fileHotspot = hotspots.find((h) => h.filePath === file_path);

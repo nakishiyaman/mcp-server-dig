@@ -2,8 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput, parseDiffStatOutput } from "../git/parsers.js";
-import { analyzeHotspots } from "../analysis/hotspots.js";
-import { analyzeChurn } from "../analysis/churn.js";
+import { analyzeHotspotsAndChurn } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
 import { errorResponse, successResponse } from "./response.js";
@@ -56,8 +55,8 @@ export function registerGitReviewPrep(server: McpServer): void {
           );
         }
 
-        // Parallel: diff stat, commit list, hotspots, churn
-        const [diffStatOutput, commitLogOutput, hotspots, churnFiles] =
+        // Parallel: diff stat, commit list, combined hotspots+churn (single git scan)
+        const [diffStatOutput, commitLogOutput, combined] =
           await Promise.all([
             execGit(
               ["diff", "--stat", `${base_ref}...${head_ref}`],
@@ -72,15 +71,14 @@ export function registerGitReviewPrep(server: McpServer): void {
               ],
               repo_path,
             ),
-            analyzeHotspots(repo_path, {
+            analyzeHotspotsAndChurn(repo_path, {
               maxCommits: max_commits,
-              topN: 100,
-            }),
-            analyzeChurn(repo_path, {
-              maxCommits: max_commits,
-              topN: 100,
+              hotspotsTopN: 100,
+              churnTopN: 100,
             }),
           ]);
+
+        const { hotspots, churn: churnFiles } = combined;
 
         const diffStat = parseDiffStatOutput(diffStatOutput);
         const commits = parseLogOutput(commitLogOutput);
