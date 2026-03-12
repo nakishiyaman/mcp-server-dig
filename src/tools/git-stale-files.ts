@@ -30,15 +30,24 @@ export function registerGitStaleFiles(server: McpServer): void {
         .optional()
         .default(30)
         .describe("Maximum number of stale files to return (default: 30)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, threshold_days, path_pattern, top_n }) => {
+    async ({ repo_path, threshold_days, path_pattern, top_n, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
         // Get all tracked files
         const lsArgs = ["ls-files"];
         if (path_pattern) lsArgs.push(path_pattern);
-        const trackedOutput = await execGit(lsArgs, repo_path);
+        const trackedOutput = await execGit(lsArgs, repo_path, timeout_ms);
         const trackedFiles = trackedOutput
           .trim()
           .split("\n")
@@ -62,6 +71,7 @@ export function registerGitStaleFiles(server: McpServer): void {
               const dateOutput = await execGit(
                 ["log", "--format=%aI", "--max-count=1", "--", file],
                 repo_path,
+                timeout_ms,
               );
               const date = dateOutput.trim();
               if (date) {

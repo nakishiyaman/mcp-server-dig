@@ -19,8 +19,17 @@ export function registerGitMergeBase(server: McpServer): void {
         .optional()
         .default(50)
         .describe("Maximum number of commits to show per side (default: 50)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, ref1, ref2, max_commits }) => {
+    async ({ repo_path, ref1, ref2, max_commits, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -28,6 +37,7 @@ export function registerGitMergeBase(server: McpServer): void {
         const mergeBaseOutput = await execGit(
           ["merge-base", ref1, ref2],
           repo_path,
+          timeout_ms,
         );
         const mergeBase = mergeBaseOutput.trim();
 
@@ -46,6 +56,7 @@ export function registerGitMergeBase(server: McpServer): void {
             `${mergeBase}..${ref1}`,
           ],
           repo_path,
+          timeout_ms,
         );
         const ref1Commits = parseLogOutput(ref1Output);
 
@@ -58,6 +69,7 @@ export function registerGitMergeBase(server: McpServer): void {
             `${mergeBase}..${ref2}`,
           ],
           repo_path,
+          timeout_ms,
         );
         const ref2Commits = parseLogOutput(ref2Output);
 

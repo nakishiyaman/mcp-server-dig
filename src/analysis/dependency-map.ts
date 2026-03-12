@@ -14,6 +14,7 @@ export interface DependencyMapOptions {
   maxCommits?: number;
   minCoupling?: number;
   pathPattern?: string;
+  timeoutMs?: number;
 }
 
 /**
@@ -32,6 +33,7 @@ export async function analyzeDependencyMap(
     maxCommits = 500,
     minCoupling = 2,
     pathPattern,
+    timeoutMs,
   } = options;
 
   const args = [
@@ -43,7 +45,7 @@ export async function analyzeDependencyMap(
   if (since) args.push(`--since=${since}`);
   if (pathPattern) args.push("--", pathPattern);
 
-  const output = await execGit(args, repoPath);
+  const output = await execGit(args, repoPath, timeoutMs);
   if (!output.trim()) return { pairs: [], totalCommits: 0 };
 
   const commitFiles = parseNameOnlyLog(output);

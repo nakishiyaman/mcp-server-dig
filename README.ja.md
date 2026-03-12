@@ -433,7 +433,7 @@ Windsurf の MCP 設定に追加してください：
 
 ### タイムアウト
 
-組み合わせ分析・ワークフローツール（`git_repo_health`, `git_review_prep`, `git_file_risk_profile`, `git_why`, `git_code_churn`, `git_hotspots`）は、大規模リポジトリ向けにオプションの `timeout_ms` パラメータ（デフォルト: 30000ms、最大: 300000ms）を受け付けます。
+全20ツールが、大規模リポジトリ向けにオプションの `timeout_ms` パラメータ（デフォルト: 30000ms、最大: 300000ms）を受け付けます。
 
 ### 構造化ログ
 
@@ -453,6 +453,8 @@ Windsurf の MCP 設定に追加してください：
 ```
 
 利用可能なレベル: `debug`, `info`（デフォルト）, `warn`, `error`。出力形式: stderrへのJSON lines。
+
+`DIG_LOG_LEVEL=debug` 設定時は、全gitコマンドの実行時間と分析キャッシュのhit/missイベントがログ出力されます。パフォーマンスのプロファイリングやボトルネック特定に活用できます。
 
 ## 開発
 

@@ -12,6 +12,7 @@ export interface KnowledgeMapOptions {
   since?: string;
   maxCommits?: number;
   pathPattern?: string;
+  timeoutMs?: number;
 }
 
 /**
@@ -24,7 +25,7 @@ export async function analyzeKnowledgeMap(
   repoPath: string,
   options: KnowledgeMapOptions = {},
 ): Promise<DirectoryKnowledge[]> {
-  const { depth = 1, since, maxCommits = 500, pathPattern } = options;
+  const { depth = 1, since, maxCommits = 500, pathPattern, timeoutMs } = options;
 
   const args = [
     "log",
@@ -35,7 +36,7 @@ export async function analyzeKnowledgeMap(
   if (since) args.push(`--since=${since}`);
   if (pathPattern) args.push("--", pathPattern);
 
-  const output = await execGit(args, repoPath);
+  const output = await execGit(args, repoPath, timeoutMs);
   if (!output.trim()) return [];
 
   // Parse: each section starts with AUTHOR:<email>, followed by file paths

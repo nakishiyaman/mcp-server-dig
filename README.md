@@ -433,7 +433,7 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-Composite and workflow tools (`git_repo_health`, `git_review_prep`, `git_file_risk_profile`, `git_why`, `git_code_churn`, `git_hotspots`) accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 20 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Structured Logging
 
@@ -453,6 +453,8 @@ Set `DIG_LOG_LEVEL` environment variable to control log verbosity on stderr:
 ```
 
 Available levels: `debug`, `info` (default), `warn`, `error`. Output format: JSON lines on stderr.
+
+When `DIG_LOG_LEVEL=debug`, every git command execution logs its duration, and the analysis cache logs hit/miss events. This enables performance profiling and bottleneck identification.
 
 ## Development
 

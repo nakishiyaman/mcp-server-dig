@@ -41,6 +41,15 @@ export function registerGitDependencyMap(server: McpServer): void {
         .string()
         .optional()
         .describe("Limit analysis to a specific directory, e.g. 'src/'"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
     async ({
       repo_path,
@@ -49,6 +58,7 @@ export function registerGitDependencyMap(server: McpServer): void {
       max_commits,
       min_coupling,
       path_pattern,
+      timeout_ms,
     }) => {
       try {
         await validateGitRepo(repo_path);
@@ -59,6 +69,7 @@ export function registerGitDependencyMap(server: McpServer): void {
           maxCommits: max_commits,
           minCoupling: min_coupling,
           pathPattern: path_pattern,
+          timeoutMs: timeout_ms,
         });
 
         if (pairs.length === 0) {

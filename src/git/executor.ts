@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { access } from "node:fs/promises";
 import { resolve } from "node:path";
+import { logger } from "../logger.js";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
@@ -25,19 +26,23 @@ export async function execGit(
     throw new GitExecutorError(`Directory does not exist: ${resolvedCwd}`);
   });
 
+  const startTime = performance.now();
+
   return new Promise((resolve, reject) => {
     execFile(
       "git",
       args,
       { cwd: resolvedCwd, timeout: timeoutMs, maxBuffer: 10 * 1024 * 1024 },
       (error, stdout, stderr) => {
+        const durationMs = Math.round(performance.now() - startTime);
+        const cmd = `git ${args.join(" ")}`;
+        logger.debug("git executed", { cmd, durationMs, cwd: resolvedCwd });
         if (error) {
           const errnoCode = (error as NodeJS.ErrnoException).code;
           const exitCode =
             "exitCode" in error && typeof error.exitCode === "number"
               ? error.exitCode
               : undefined;
-          const cmd = `git ${args.join(" ")}`;
 
           if (errnoCode === "ENOENT") {
             reject(

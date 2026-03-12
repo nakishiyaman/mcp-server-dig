@@ -27,8 +27,17 @@ export function registerGitRelatedChanges(server: McpServer): void {
         .optional()
         .default(2)
         .describe("Minimum co-change count to include in results"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, file_path, max_commits, min_coupling }) => {
+    async ({ repo_path, file_path, max_commits, min_coupling, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -36,7 +45,7 @@ export function registerGitRelatedChanges(server: McpServer): void {
         const { results, totalCommits, skipped } = await analyzeCoChanges(
           repo_path,
           file_path,
-          { maxCommits: max_commits, minCoupling: min_coupling },
+          { maxCommits: max_commits, minCoupling: min_coupling, timeoutMs: timeout_ms },
         );
 
         if (totalCommits === 0) {

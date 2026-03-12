@@ -33,6 +33,15 @@ export function registerGitDiffContext(server: McpServer): void {
         .optional()
         .default(3)
         .describe("Number of context lines in unified diff (default: 3)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
     async ({
       repo_path,
@@ -41,6 +50,7 @@ export function registerGitDiffContext(server: McpServer): void {
       file_path,
       stat_only,
       context_lines,
+      timeout_ms,
     }) => {
       try {
         await validateGitRepo(repo_path);
@@ -54,7 +64,7 @@ export function registerGitDiffContext(server: McpServer): void {
           const args = ["diff", "--stat", base, commit];
           if (file_path) args.push("--", file_path);
 
-          const output = await execGit(args, repo_path);
+          const output = await execGit(args, repo_path, timeout_ms);
           const stat = parseDiffStatOutput(output);
 
           const fileLines = stat.files.map(
@@ -75,7 +85,7 @@ export function registerGitDiffContext(server: McpServer): void {
         const args = ["diff", `-U${context_lines}`, base, commit];
         if (file_path) args.push("--", file_path);
 
-        const output = await execGit(args, repo_path);
+        const output = await execGit(args, repo_path, timeout_ms);
 
         if (output.trim().length === 0) {
           return successResponse(`No differences between ${base} and ${commit}`);
@@ -86,7 +96,7 @@ export function registerGitDiffContext(server: McpServer): void {
           // Fallback to stat + truncated diff
           const statArgs = ["diff", "--stat", base, commit];
           if (file_path) statArgs.push("--", file_path);
-          const statOutput = await execGit(statArgs, repo_path);
+          const statOutput = await execGit(statArgs, repo_path, timeout_ms);
 
           text = [
             `Diff: ${base} → ${commit}`,
