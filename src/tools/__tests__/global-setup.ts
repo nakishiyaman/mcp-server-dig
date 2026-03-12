@@ -104,7 +104,24 @@ export async function setup({
   await git("add", ".");
   await git("commit", "-m", "chore: add non-ASCII and spaced filenames");
 
-  // Commits 8-57 (Bob): bulk commits for truncation testing
+  // Commit 8 (Bob): rename a file for rename_history tests
+  await git("mv", "src/utils.ts", "src/helpers.ts");
+  await git("add", ".");
+  await git("commit", "-m", "refactor: rename utils to helpers");
+
+  // Create and merge a separate branch for commit_graph tests
+  // (feature-branch must remain unmerged for merge_base tests)
+  await git("checkout", "-b", "merge-test-branch");
+  await writeFile(
+    join(repoDir, "src", "merged-feature.ts"),
+    "export const merged = true;\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "feat: add merged feature");
+  await git("checkout", "main");
+  await git("merge", "merge-test-branch", "--no-ff", "--no-edit");
+
+  // Commits (Bob): bulk commits for truncation testing
   for (let i = 0; i < 50; i++) {
     await writeFile(
       join(repoDir, "src", "index.ts"),

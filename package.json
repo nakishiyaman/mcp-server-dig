@@ -12,6 +12,7 @@
     "build": "tsc && chmod 755 build/index.js",
     "watch": "tsc --watch",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit"
@@ -51,6 +52,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^10.0.3",
     "prettier": "^3.8.1",
     "typescript": "^5.8.0",

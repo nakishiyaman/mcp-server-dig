@@ -32,6 +32,8 @@ import { registerGitWhy } from "./tools/git-why.js";
 import { registerGitKnowledgeMap } from "./tools/git-knowledge-map.js";
 import { registerGitDependencyMap } from "./tools/git-dependency-map.js";
 import { registerGitBisectGuide } from "./tools/git-bisect-guide.js";
+import { registerGitRenameHistory } from "./tools/git-rename-history.js";
+import { registerGitCommitGraph } from "./tools/git-commit-graph.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -52,7 +54,7 @@ function createServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (16)
+  // Data retrieval tools (18)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -69,6 +71,8 @@ function createServer() {
   registerGitKnowledgeMap(server);
   registerGitDependencyMap(server);
   registerGitBisectGuide(server);
+  registerGitRenameHistory(server);
+  registerGitCommitGraph(server);
 
   // Composite analysis tools (with cache context)
   registerGitFileRiskProfile(server, context);

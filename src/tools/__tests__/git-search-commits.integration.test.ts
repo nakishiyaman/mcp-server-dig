@@ -35,8 +35,8 @@ describe("git_search_commits (end-to-end)", () => {
     );
     const commits = parseLogOutput(output);
 
-    expect(commits).toHaveLength(2);
-    expect(commits[0].author).toBe("Bob");
+    expect(commits.length).toBeGreaterThanOrEqual(2);
+    expect(commits.every((c) => c.author === "Bob")).toBe(true);
   });
 
   it("returns empty for no matches", async () => {

@@ -6,6 +6,7 @@ import type {
   DiffStat,
   FileChurn,
   FileHotspot,
+  RenameEntry,
   StaleFile,
   TagInfo,
 } from "./types.js";
@@ -357,6 +358,55 @@ export function parseStaleFiles(
   }
 
   return results.sort((a, b) => b.daysSinceLastChange - a.daysSinceLastChange);
+}
+
+/**
+ * Parse `git log --follow --diff-filter=R --find-renames --format=%H|%an|%ae|%aI|%s --name-status`
+ * output into rename entries.
+ *
+ * The output alternates between commit header lines (pipe-separated) and
+ * name-status lines like "R100\told-path\tnew-path".
+ */
+export function parseRenameOutput(raw: string): RenameEntry[] {
+  const lines = raw
+    .trim()
+    .split("\n")
+    .filter((l) => l.length > 0);
+  const entries: RenameEntry[] = [];
+  let current: Partial<RenameEntry> = {};
+
+  for (const line of lines) {
+    // Rename status line: R<score>\t<old>\t<new>
+    const renameMatch = line.match(/^R\d*\t(.+)\t(.+)$/);
+    if (renameMatch) {
+      if (current.hash) {
+        entries.push({
+          hash: current.hash,
+          author: current.author ?? "",
+          email: current.email ?? "",
+          date: current.date ?? "",
+          subject: current.subject ?? "",
+          oldPath: renameMatch[1],
+          newPath: renameMatch[2],
+        });
+      }
+      continue;
+    }
+
+    // Commit header line: hash|author|email|date|subject
+    const parts = line.split(LOG_SEPARATOR);
+    if (parts.length >= 5) {
+      current = {
+        hash: parts[0],
+        author: parts[1],
+        email: parts[2],
+        date: parts[3],
+        subject: parts.slice(4).join(LOG_SEPARATOR),
+      };
+    }
+  }
+
+  return entries;
 }
 
 /**
