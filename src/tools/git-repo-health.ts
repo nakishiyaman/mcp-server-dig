@@ -7,7 +7,7 @@ import {
 } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { cachedAnalyzeHotspotsAndChurn, cachedAnalyzeContributors } from "../analysis/cached-analysis.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 import type { ToolContext } from "../index.js";
 
 async function getTrackedFiles(repoPath: string): Promise<string[]> {
@@ -62,8 +62,9 @@ export function registerGitRepoHealth(server: McpServer, context?: ToolContext):
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, since, max_commits, stale_threshold_days, timeout_ms }) => {
+    async ({ repo_path, since, max_commits, stale_threshold_days, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -206,7 +207,28 @@ export function registerGitRepoHealth(server: McpServer, context?: ToolContext):
           }
         }
 
-        return successResponse(sections.join("\n"));
+        const data = {
+          trackedFiles: fileCount,
+          totalCommits,
+          contributors: contributorData.stats,
+          staleFiles: staleCount,
+          staleThresholdDays: stale_threshold_days,
+          hotspots: hotspots.map((h) => ({
+            filePath: h.filePath,
+            changeCount: h.changeCount,
+            percentage: h.percentage,
+          })),
+          churn: churnFiles.map((f) => ({
+            filePath: f.filePath,
+            totalChurn: f.totalChurn,
+            insertions: f.insertions,
+            deletions: f.deletions,
+            commits: f.commits,
+          })),
+          since: since ?? null,
+        };
+
+        return formatResponse(data, () => sections.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitMergeBase(server: McpServer): void {
   server.tool(
@@ -28,8 +28,9 @@ export function registerGitMergeBase(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, ref1, ref2, max_commits, timeout_ms }) => {
+    async ({ repo_path, ref1, ref2, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -81,6 +82,24 @@ export function registerGitMergeBase(server: McpServer): void {
                   `  ${c.hash.slice(0, 8)} | ${c.date.slice(0, 10)} | ${c.author} | ${c.subject}`,
               );
 
+        const data = {
+          ref1,
+          ref2,
+          mergeBase,
+          ref1Commits: ref1Commits.map((c) => ({
+            hash: c.hash,
+            date: c.date,
+            author: c.author,
+            subject: c.subject,
+          })),
+          ref2Commits: ref2Commits.map((c) => ({
+            hash: c.hash,
+            date: c.date,
+            author: c.author,
+            subject: c.subject,
+          })),
+        };
+
         const text = [
           `Merge base: ${mergeBase.slice(0, 8)}`,
           "",
@@ -91,7 +110,7 @@ export function registerGitMergeBase(server: McpServer): void {
           ...formatCommits(ref2Commits),
         ].join("\n");
 
-        return successResponse(text);
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

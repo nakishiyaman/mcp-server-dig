@@ -9,7 +9,7 @@ import { parseBlameOutput } from "../git/parsers.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { cachedAnalyzeContributors } from "../analysis/cached-analysis.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 import type { ToolContext } from "../index.js";
 
 export function registerGitWhy(server: McpServer, context?: ToolContext): void {
@@ -51,8 +51,9 @@ export function registerGitWhy(server: McpServer, context?: ToolContext): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, file_path, start_line, end_line, max_commits, timeout_ms }) => {
+    async ({ repo_path, file_path, start_line, end_line, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -204,7 +205,31 @@ export function registerGitWhy(server: McpServer, context?: ToolContext): void {
           `  → git_file_history — ${file_path} の全体的な変遷を確認`,
         );
 
-        return successResponse(lines.join("\n"));
+        const data = {
+          file: file_path,
+          startLine: start_line ?? null,
+          endLine: end_line ?? null,
+          blocks: blocks.map((b) => ({
+            commitHash: b.commitHash,
+            author: b.author,
+            date: b.date,
+            summary: b.summary,
+            startLine: b.startLine,
+            endLine: b.endLine,
+          })),
+          commitDetails: limitedHashes.map((hash) => ({
+            hash,
+            filesInCommit: commitFilesMap.get(hash) ?? [],
+          })),
+          contributors: contributorData.stats,
+          coChangedFiles: coChangeData.results.slice(0, 5).map((r) => ({
+            filePath: r.filePath,
+            coChangeCount: r.coChangeCount,
+            percentage: r.percentage,
+          })),
+        };
+
+        return formatResponse(data, () => lines.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

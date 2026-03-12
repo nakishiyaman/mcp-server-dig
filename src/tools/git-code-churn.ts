@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateGitRepo } from "../git/executor.js";
 import { analyzeChurn } from "../analysis/churn.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitCodeChurn(server: McpServer): void {
   server.tool(
@@ -41,8 +41,9 @@ export function registerGitCodeChurn(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, path_pattern, since, max_commits, top_n, timeout_ms }) => {
+    async ({ repo_path, path_pattern, since, max_commits, top_n, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -73,7 +74,20 @@ export function registerGitCodeChurn(server: McpServer): void {
           ...lines,
         ].join("\n");
 
-        return successResponse(text);
+        const data = {
+          pathPattern: path_pattern ?? null,
+          maxCommits: max_commits,
+          totalFiles: churnFiles.length,
+          files: churnFiles.map(f => ({
+            filePath: f.filePath,
+            insertions: f.insertions,
+            deletions: f.deletions,
+            totalChurn: f.totalChurn,
+            commits: f.commits,
+          })),
+        };
+
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

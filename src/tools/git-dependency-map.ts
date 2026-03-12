@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateGitRepo } from "../git/executor.js";
 import { analyzeDependencyMap } from "../analysis/dependency-map.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitDependencyMap(server: McpServer): void {
   server.tool(
@@ -50,6 +50,7 @@ export function registerGitDependencyMap(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
     async ({
       repo_path,
@@ -59,6 +60,7 @@ export function registerGitDependencyMap(server: McpServer): void {
       min_coupling,
       path_pattern,
       timeout_ms,
+      output_format,
     }) => {
       try {
         await validateGitRepo(repo_path);
@@ -93,7 +95,20 @@ export function registerGitDependencyMap(server: McpServer): void {
           );
         }
 
-        return successResponse(lines.join("\n"));
+        const data = {
+          depth,
+          pathPattern: path_pattern ?? null,
+          totalCommits,
+          totalPairs: pairs.length,
+          pairs: pairs.map(p => ({
+            source: p.source,
+            target: p.target,
+            coChangeCount: p.coChangeCount,
+            percentage: p.percentage,
+          })),
+        };
+
+        return formatResponse(data, () => lines.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

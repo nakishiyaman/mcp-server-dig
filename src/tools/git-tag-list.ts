@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseTagOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitTagList(server: McpServer): void {
   server.tool(
@@ -35,8 +35,9 @@ export function registerGitTagList(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, pattern, max_tags, sort, timeout_ms }) => {
+    async ({ repo_path, pattern, max_tags, sort, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -73,7 +74,8 @@ export function registerGitTagList(server: McpServer): void {
           ...lines,
         ].join("\n");
 
-        return successResponse(text);
+        const data = { pattern: pattern ?? null, sort, totalTags: tags.length, tags: tags.map(t => ({ name: t.name, date: t.date, subject: t.subject })) };
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

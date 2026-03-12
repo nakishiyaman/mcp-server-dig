@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseStaleFiles } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitStaleFiles(server: McpServer): void {
   server.tool(
@@ -39,8 +39,9 @@ export function registerGitStaleFiles(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, threshold_days, path_pattern, top_n, timeout_ms }) => {
+    async ({ repo_path, threshold_days, path_pattern, top_n, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -105,7 +106,8 @@ export function registerGitStaleFiles(server: McpServer): void {
           ...lines,
         ].join("\n");
 
-        return successResponse(text);
+        const data = { thresholdDays: threshold_days, pathPattern: path_pattern ?? null, totalFiles: staleFiles.length, files: staleFiles.map(f => ({ filePath: f.filePath, lastModified: f.lastModified, daysSinceLastChange: f.daysSinceLastChange })) };
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

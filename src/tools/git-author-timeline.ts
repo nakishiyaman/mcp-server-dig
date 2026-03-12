@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 interface AuthorTimeline {
   name: string;
@@ -43,8 +43,9 @@ export function registerGitAuthorTimeline(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, since, path_pattern, max_commits, timeout_ms }) => {
+    async ({ repo_path, since, path_pattern, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -189,7 +190,8 @@ export function registerGitAuthorTimeline(server: McpServer): void {
           );
         }
 
-        return successResponse(sections.join("\n"));
+        const data = { since: since ?? null, pathPattern: path_pattern ?? null, totalAuthors, totalCommits: lines.length, authors: timelines };
+        return formatResponse(data, () => sections.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

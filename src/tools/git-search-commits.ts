@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitSearchCommits(server: McpServer): void {
   server.tool(
@@ -38,8 +38,9 @@ export function registerGitSearchCommits(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, query, max_commits, since, author, path_pattern, timeout_ms }) => {
+    async ({ repo_path, query, max_commits, since, author, path_pattern, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -74,7 +75,8 @@ export function registerGitSearchCommits(server: McpServer): void {
           ...lines,
         ].join("\n");
 
-        return successResponse(text);
+        const data = { query, totalCommits: commits.length, commits: commits.map(c => ({ hash: c.hash, date: c.date, author: c.author, email: c.email, subject: c.subject })) };
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

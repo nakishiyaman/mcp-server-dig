@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 const MAX_DIFF_LENGTH = 50_000;
 
@@ -30,8 +30,9 @@ export function registerGitCommitShow(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, commit, show_diff, timeout_ms }) => {
+    async ({ repo_path, commit, show_diff, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -79,27 +80,39 @@ export function registerGitCommitShow(server: McpServer): void {
           statLines,
         ];
 
+        let rawDiffOutput: string | undefined;
         if (show_diff) {
-          const diffOutput = await execGit(
+          rawDiffOutput = await execGit(
             ["show", "-U3", "--format=", commit],
             repo_path,
             timeout_ms,
           );
 
-          if (diffOutput.length > MAX_DIFF_LENGTH) {
+          if (rawDiffOutput.length > MAX_DIFF_LENGTH) {
             outputParts.push(
               "",
               `[Diff truncated at ${MAX_DIFF_LENGTH} characters. Use file_path parameter with git_diff_context to view specific files.]`,
               "",
-              diffOutput.slice(0, MAX_DIFF_LENGTH),
+              rawDiffOutput.slice(0, MAX_DIFF_LENGTH),
             );
           } else {
-            outputParts.push("", diffOutput);
+            outputParts.push("", rawDiffOutput);
           }
         }
 
+        const data = {
+          hash,
+          author,
+          email,
+          date,
+          parents,
+          body,
+          stat: statLines,
+          diff: show_diff ? rawDiffOutput : undefined,
+        };
+
         const text = outputParts.join("\n");
-        return successResponse(text);
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitPickaxe(server: McpServer): void {
   server.tool(
@@ -45,6 +45,7 @@ export function registerGitPickaxe(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
     async ({
       repo_path,
@@ -55,6 +56,7 @@ export function registerGitPickaxe(server: McpServer): void {
       author,
       path_pattern,
       timeout_ms,
+      output_format,
     }) => {
       try {
         await validateGitRepo(repo_path);
@@ -86,6 +88,19 @@ export function registerGitPickaxe(server: McpServer): void {
             `${c.hash.slice(0, 8)} | ${c.date.slice(0, 10)} | ${c.author} | ${c.subject}`,
         );
 
+        const data = {
+          searchTerm: search_term,
+          isRegex: is_regex,
+          totalCommits: commits.length,
+          commits: commits.map((c) => ({
+            hash: c.hash,
+            date: c.date,
+            author: c.author,
+            email: c.email,
+            subject: c.subject,
+          })),
+        };
+
         const text = [
           `Pickaxe search (${mode}): "${search_term}"`,
           `Found ${commits.length} commit(s) that added/removed this ${mode}`,
@@ -93,7 +108,7 @@ export function registerGitPickaxe(server: McpServer): void {
           ...lines,
         ].join("\n");
 
-        return successResponse(text);
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

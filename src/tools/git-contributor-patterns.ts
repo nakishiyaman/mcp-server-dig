@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateGitRepo } from "../git/executor.js";
 import { analyzeContributors } from "../analysis/contributors.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitContributorPatterns(server: McpServer): void {
   server.tool(
@@ -36,8 +36,9 @@ export function registerGitContributorPatterns(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, path_pattern, since, max_commits, timeout_ms }) => {
+    async ({ repo_path, path_pattern, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -66,7 +67,20 @@ export function registerGitContributorPatterns(server: McpServer): void {
           ...lines,
         ];
 
-        return successResponse(parts.join("\n"));
+        const data = {
+          pathPattern: path_pattern ?? null,
+          totalCommits,
+          totalContributors: stats.length,
+          contributors: stats.map(s => ({
+            name: s.name,
+            email: s.email,
+            commitCount: s.commitCount,
+            percentage: s.percentage,
+            lastActive: s.lastActive,
+          })),
+        };
+
+        return formatResponse(data, () => parts.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

@@ -15,7 +15,7 @@ import {
   overallRisk,
   riskLabel,
 } from "../analysis/risk-classifiers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 import type { ToolContext } from "../index.js";
 
 function padLabel(label: string, width: number): string {
@@ -51,8 +51,9 @@ export function registerGitFileRiskProfile(server: McpServer, context?: ToolCont
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, file_path, since, max_commits, timeout_ms }) => {
+    async ({ repo_path, file_path, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -126,9 +127,9 @@ export function registerGitFileRiskProfile(server: McpServer, context?: ToolCont
         ];
 
         // Add summary explanation
+        const concerns: string[] = [];
         const highDims = dimensions.filter((d) => d.level === "HIGH");
         if (highDims.length > 0) {
-          const concerns = [];
           if (changeFreq.level === "HIGH") concerns.push("frequently changing");
           if (churn.level === "HIGH") concerns.push("high code churn");
           if (knowledgeRisk.level === "HIGH") concerns.push("knowledge concentrated");
@@ -180,7 +181,28 @@ export function registerGitFileRiskProfile(server: McpServer, context?: ToolCont
           }
         }
 
-        return successResponse(lines.join("\n"));
+        const data = {
+          file: file_path,
+          overallRisk: overall,
+          overallScore: overall,
+          dimensions: [
+            { name: "changeFrequency", level: changeFreq.level, detail: changeFreq.detail },
+            { name: "codeChurn", level: churn.level, detail: churn.detail },
+            { name: "knowledgeRisk", level: knowledgeRisk.level, detail: knowledgeRisk.detail },
+            { name: "coupling", level: coupling.level, detail: coupling.detail },
+            { name: "staleness", level: staleness.level, detail: staleness.detail },
+          ],
+          concerns,
+          contributors: contributorData.stats,
+          coChangedFiles: coChangeData.results.slice(0, 5).map((r) => ({
+            filePath: r.filePath,
+            coChangeCount: r.coChangeCount,
+            percentage: r.percentage,
+          })),
+          staleness: stalenessData,
+        };
+
+        return formatResponse(data, () => lines.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

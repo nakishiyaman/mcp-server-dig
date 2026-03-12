@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateFilePath, validateGitRepo } from "../git/executor.js";
 import { parseDiffStatOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 const MAX_DIFF_LENGTH = 50_000;
 
@@ -42,6 +42,7 @@ export function registerGitDiffContext(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
     async ({
       repo_path,
@@ -51,6 +52,7 @@ export function registerGitDiffContext(server: McpServer): void {
       stat_only,
       context_lines,
       timeout_ms,
+      output_format,
     }) => {
       try {
         await validateGitRepo(repo_path);
@@ -71,6 +73,19 @@ export function registerGitDiffContext(server: McpServer): void {
             (f) => `  ${f.path} | +${f.insertions} -${f.deletions}`,
           );
 
+          const data = {
+            ref: commit,
+            compareTo: compare_to ?? null,
+            filePath: file_path ?? null,
+            statOnly: true,
+            stat: {
+              filesChanged: stat.filesChanged,
+              insertions: stat.insertions,
+              deletions: stat.deletions,
+              files: stat.files,
+            },
+          };
+
           const text = [
             `Diff: ${base} → ${commit}`,
             `${stat.filesChanged} file(s) changed, ${stat.insertions} insertion(s), ${stat.deletions} deletion(s)`,
@@ -78,7 +93,7 @@ export function registerGitDiffContext(server: McpServer): void {
             ...fileLines,
           ].join("\n");
 
-          return successResponse(text);
+          return formatResponse(data, () => text, output_format);
         }
 
         // Full diff
@@ -91,13 +106,30 @@ export function registerGitDiffContext(server: McpServer): void {
           return successResponse(`No differences between ${base} and ${commit}`);
         }
 
-        let text: string;
-        if (output.length > MAX_DIFF_LENGTH) {
-          // Fallback to stat + truncated diff
-          const statArgs = ["diff", "--stat", base, commit];
-          if (file_path) statArgs.push("--", file_path);
-          const statOutput = await execGit(statArgs, repo_path, timeout_ms);
+        // Get stat for structured data
+        const statArgs = ["diff", "--stat", base, commit];
+        if (file_path) statArgs.push("--", file_path);
+        const statOutput = await execGit(statArgs, repo_path, timeout_ms);
+        const stat = parseDiffStatOutput(statOutput);
 
+        const diffOutput = output;
+
+        const data = {
+          ref: commit,
+          compareTo: compare_to ?? null,
+          filePath: file_path ?? null,
+          statOnly: false,
+          stat: {
+            filesChanged: stat.filesChanged,
+            insertions: stat.insertions,
+            deletions: stat.deletions,
+            files: stat.files,
+          },
+          diff: diffOutput,
+        };
+
+        let text: string;
+        if (diffOutput.length > MAX_DIFF_LENGTH) {
           text = [
             `Diff: ${base} → ${commit}`,
             `[Output truncated at ${MAX_DIFF_LENGTH} characters. Showing stat + partial diff. Use file_path to view specific files.]`,
@@ -106,13 +138,13 @@ export function registerGitDiffContext(server: McpServer): void {
             "",
             "---",
             "",
-            output.slice(0, MAX_DIFF_LENGTH),
+            diffOutput.slice(0, MAX_DIFF_LENGTH),
           ].join("\n");
         } else {
-          text = [`Diff: ${base} → ${commit}`, "", output].join("\n");
+          text = [`Diff: ${base} → ${commit}`, "", diffOutput].join("\n");
         }
 
-        return successResponse(text);
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }
