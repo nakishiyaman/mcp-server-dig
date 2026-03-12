@@ -37,6 +37,7 @@ import { registerGitCommitGraph } from "./tools/git-commit-graph.js";
 import { registerGitBranchActivity } from "./tools/git-branch-activity.js";
 import { registerGitAuthorTimeline } from "./tools/git-author-timeline.js";
 import { registerGitCommitFrequency } from "./tools/git-commit-frequency.js";
+import { registerGitReleaseNotes } from "./tools/git-release-notes.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -57,7 +58,7 @@ function createServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (21)
+  // Data retrieval tools (22)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -79,6 +80,7 @@ function createServer() {
   registerGitBranchActivity(server);
   registerGitAuthorTimeline(server);
   registerGitCommitFrequency(server);
+  registerGitReleaseNotes(server);
 
   // Composite analysis tools (with cache context)
   registerGitFileRiskProfile(server, context);
