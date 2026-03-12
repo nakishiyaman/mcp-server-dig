@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12 (v0.18.0)
+最終更新: 2026-03-12 (v0.20.0)
 
 ## v0.4.0 — 品質改善
 
@@ -435,6 +435,46 @@
 | Branches | 71% | 79% |
 | Functions | 92% | 93% |
 | Lines | 92% | 94% |
+
+## v0.20.0 — JSON出力モード + 新ツール + カバレッジ80%
+
+### Phase 1: MCP SDK + zod アップデート
+- [x] `@modelcontextprotocol/sdk` 1.26.0 → 1.27.1
+- [x] `zod` 3.23.0 → 4.3.6（zod 4はMCP SDK 1.27.1でサポート）
+
+### Phase 2: JSON出力モード基盤
+- [x] `outputFormatSchema`: text/json選択スキーマ
+- [x] `formatResponse`: テキスト/JSON出力切り替えヘルパー
+- [x] 単体テスト8件
+
+### Phase 3: 全25ツールにJSON出力モード適用
+- [x] 全ツールに`output_format`パラメータ追加
+- [x] 構造化データオブジェクト構築 + formatResponse適用
+- [x] 既存テスト全パス確認
+
+### Phase 4: `git_commit_frequency` ツール
+- [x] 時間帯別コミット頻度分析（daily/weekly/monthly粒度）
+- [x] `CommitFrequencyBucket` 型追加（src/git/types.ts）
+- [x] tool-guideリソース更新（25ツール対応）
+- [x] 統合テスト6件
+
+### Phase 5: ブランチカバレッジ80%+
+- [x] JSON出力モード統合テスト追加
+- [x] staleness/knowledge-map/dependency-mapのエッジケーステスト
+- [x] ブランチカバレッジ: 79% → 80%+
+
+### Phase 6: ドキュメント更新
+- [x] CLAUDE.md バージョン・ツール数更新（24→25）
+- [x] ROADMAP v0.20.0セクション追加
+- [x] README.md / README.ja.md 更新
+
+### カバレッジ結果
+| 指標 | v0.18.0 | v0.20.0 |
+|------|---------|---------|
+| Statements | 92% | 93% |
+| Branches | 79% | 80% |
+| Functions | 93% | 93% |
+| Lines | 94% | 94% |
 
 ## スコープ外
 
