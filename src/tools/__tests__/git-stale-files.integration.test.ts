@@ -43,6 +43,24 @@ describe("git_stale_files (MCP)", () => {
     expect(text).toContain("No files found that are stale");
   });
 
+  it("path_pattern付きでスコープ表示を含む", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        path_pattern: "src/",
+        threshold_days: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    // Either stale files found with scope, or no stale files message
+    expect(result.isError).not.toBe(true);
+    if (text.includes("Stale files")) {
+      expect(text).toContain("Scope: src/");
+    }
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_stale_files",

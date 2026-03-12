@@ -46,6 +46,20 @@ describe("git_contributor_patterns (MCP)", () => {
     expect(text).toMatch(/\d{4}-\d{2}-\d{2}/);
   });
 
+  it("存在しないパスでpath_pattern付きのメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_contributor_patterns",
+      arguments: {
+        repo_path: getRepoDir(),
+        path_pattern: "nonexistent/",
+        max_commits: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No contributors found in nonexistent/");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_contributor_patterns",

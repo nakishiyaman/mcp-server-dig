@@ -73,6 +73,21 @@ describe("git_repo_health (MCP)", () => {
     expect(text).toContain("Bob");
   });
 
+  it("sinceパラメータで分析期間を絞り込む", async () => {
+    const result = await client.callTool({
+      name: "git_repo_health",
+      arguments: {
+        repo_path: getRepoDir(),
+        since: "2099-01-01",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Repository health summary");
+    expect(text).toContain("Total commits:");
+    expect(text).toContain("since 2099-01-01");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_repo_health",

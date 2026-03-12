@@ -33,6 +33,21 @@ describe("git_related_changes (MCP)", () => {
     expect(text).toContain("src/utils.ts");
   });
 
+  it("高いmin_couplingで共変更なしメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_related_changes",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        min_coupling: 100,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No co-changed files found for src/index.ts");
+    expect(text).toContain("min coupling: 100");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_related_changes",

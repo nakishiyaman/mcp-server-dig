@@ -36,6 +36,36 @@ describe("git_review_prep (MCP)", () => {
     expect(text).toContain("feat: add feature module");
   });
 
+  it("変更が少ないPRのレビューブリーフィングを生成する", async () => {
+    const result = await client.callTool({
+      name: "git_review_prep",
+      arguments: {
+        repo_path: getRepoDir(),
+        base_ref: "HEAD~1",
+        head_ref: "HEAD",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("PR Review Briefing");
+    expect(text).toContain("Commits (");
+    expect(text).toContain("Changed files (");
+  });
+
+  it("同一ref間で変更なしメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_review_prep",
+      arguments: {
+        repo_path: getRepoDir(),
+        base_ref: "HEAD",
+        head_ref: "HEAD",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No changes found between");
+  });
+
   it("不正なrefでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_review_prep",
@@ -104,6 +134,22 @@ describe("git_why (MCP)", () => {
 
     expect(text).toContain("Why does this code exist?");
     expect(text).toContain("L3-4");
+  });
+
+  it("max_commitsでコミット数を制限する", async () => {
+    const result = await client.callTool({
+      name: "git_why",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        max_commits: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Why does this code exist?");
+    // With max_commits=1, there should be "... and N more commit(s)" message
+    expect(text).toContain("more commit(s)");
   });
 
   it("存在しないリポジトリでエラーを返す", async () => {

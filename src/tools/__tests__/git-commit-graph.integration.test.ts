@@ -45,6 +45,19 @@ describe("git_commit_graph (MCP)", () => {
     expect(text).toMatch(/Merge commits:\s+[1-9]/);
   });
 
+  it("未来の日付でコミットなしメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_commit_graph",
+      arguments: {
+        repo_path: getRepoDir(),
+        since: "2099-01-01",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No commits found since");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_commit_graph",

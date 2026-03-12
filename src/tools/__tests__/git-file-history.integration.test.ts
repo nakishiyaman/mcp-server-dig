@@ -61,6 +61,32 @@ describe("git_file_history (MCP)", () => {
     expect(text).toContain("src/index.ts");
   });
 
+  it("sinceパラメータで期間を絞り込む", async () => {
+    const result = await client.callTool({
+      name: "git_file_history",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        since: "2099-01-01",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No commits found for src/index.ts");
+  });
+
+  it("存在しないファイルでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_file_history",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "../../../etc/passwd",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_file_history",

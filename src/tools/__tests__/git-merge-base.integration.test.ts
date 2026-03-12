@@ -37,6 +37,22 @@ describe("git_merge_base (MCP)", () => {
     expect(text).toContain("feat: add feature module");
   });
 
+  it("同一refで共通祖先を表示する", async () => {
+    const result = await client.callTool({
+      name: "git_merge_base",
+      arguments: {
+        repo_path: getRepoDir(),
+        ref1: "HEAD",
+        ref2: "HEAD",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Merge base:");
+    // Same ref should have no commits on either side
+    expect(text).toContain("(no commits)");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_merge_base",

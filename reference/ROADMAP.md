@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12
+最終更新: 2026-03-12 (v0.17.0)
 
 ## v0.4.0 — 品質改善
 
@@ -368,6 +368,42 @@
 - `src/analysis/knowledge-map.test.ts`（10件）: 分析アルゴリズムの単体テスト
 - `executor.integration.test.ts`: execGit自体のテスト
 - `analysis-layer.integration.test.ts`: 分析関数の統合テスト
+
+## v0.17.0 — ブランチカバレッジ向上
+
+### Phase 1: 高インパクトツール（branches 64% → 71%+）
+- [x] `git_diff_context`: stat_only分岐、同一コミット差分なし分岐、stat_only+file_path
+- [x] `git_file_history`: sinceパラメータ空結果分岐、パス検証エラー分岐
+- [x] `git_repo_health`: sinceパラメータで空結果系分岐
+- [x] `git_review_prep`: HEAD~1..HEAD（少変更PR）、HEAD..HEAD（変更なし）
+
+### Phase 2: 中インパクトツール
+- [x] `git_commit_graph`: 未来日付でコミットなし分岐
+- [x] `git_tag_list`: マッチなしpatternでタグなし分岐
+- [x] `git_why`: max_commits=1で「... and N more commit(s)」分岐
+- [x] `git_bisect_guide`: 同一refで0コミット分岐
+
+### Phase 3: 低コスト高カバレッジ
+- [x] `git_contributor_patterns`: path_pattern付き空結果
+- [x] `git_related_changes`: 高min_couplingで共変更なし
+- [x] `git_stale_files`: path_pattern付きスコープ表示
+- [x] `git_merge_base`: 同一refで(no commits)分岐
+
+### Phase 4: リソース
+- [x] `repo-summary`: 生成関数の統合テスト
+
+### Phase 5: thresholds引き上げ + ドキュメント
+- [x] `vitest.config.ts` のbranches thresholdを50% → 65%に引き上げ
+- [x] `reference/ROADMAP.md` にv0.17.0セクション追加
+- [x] `CLAUDE.md` バージョン更新
+
+### カバレッジ結果
+| 指標 | v0.16.0 | v0.17.0 |
+|------|---------|---------|
+| Statements | 84% | 90% |
+| Branches | 64% | 71% |
+| Functions | 89% | 92% |
+| Lines | 85% | 92% |
 
 ## スコープ外
 

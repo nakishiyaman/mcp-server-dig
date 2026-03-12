@@ -63,6 +63,65 @@ describe("git_diff_context (MCP)", () => {
     expect(text).toContain("iteration");
   });
 
+  it("stat_onlyモードでdiff statのみ表示する", async () => {
+    const repoDir = getRepoDir();
+    const logOutput = await git(repoDir, "log", "--format=%H", "--max-count=3");
+    const hashes = logOutput.trim().split("\n");
+    const newest = hashes[0];
+    const oldest = hashes[hashes.length - 1];
+
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: repoDir,
+        commit: newest,
+        compare_to: oldest,
+        stat_only: true,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("file(s) changed");
+    expect(text).not.toContain("diff --git");
+  });
+
+  it("同一コミット間のdiffで差分なしメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: getRepoDir(),
+        commit: "HEAD",
+        compare_to: "HEAD",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No differences between");
+  });
+
+  it("stat_only + file_pathで特定ファイルのstatのみ表示する", async () => {
+    const repoDir = getRepoDir();
+    const logOutput = await git(repoDir, "log", "--format=%H", "--max-count=3");
+    const hashes = logOutput.trim().split("\n");
+    const newest = hashes[0];
+    const oldest = hashes[hashes.length - 1];
+
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: repoDir,
+        commit: newest,
+        compare_to: oldest,
+        file_path: "src/index.ts",
+        stat_only: true,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("file(s) changed");
+    expect(text).toContain("src/index.ts");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_diff_context",
