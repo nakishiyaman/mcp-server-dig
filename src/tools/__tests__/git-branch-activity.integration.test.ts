@@ -103,4 +103,23 @@ describe("git_branch_activity (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_branch_activity",
+      arguments: {
+        repo_path: getRepoDir(),
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("summary");
+    expect(data.summary).toHaveProperty("total");
+    expect(data).toHaveProperty("branches");
+    expect(data.branches.length).toBeGreaterThan(0);
+    expect(data.branches[0]).toHaveProperty("name");
+    expect(data.branches[0]).toHaveProperty("activity");
+  });
 });

@@ -62,4 +62,21 @@ describe("git_blame_context (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_blame_context",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("file", "src/index.ts");
+    expect(data).toHaveProperty("blocks");
+    expect(data.blocks.length).toBeGreaterThan(0);
+  });
 });

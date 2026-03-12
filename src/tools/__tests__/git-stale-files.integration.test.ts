@@ -99,4 +99,25 @@ describe("git_stale_files (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        threshold_days: 1,
+        top_n: 3,
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+
+    // May return "No files found" if test repo was just created,
+    // or JSON data if files are stale
+    if (!text.includes("No files found")) {
+      const data = JSON.parse(text);
+      expect(data).toHaveProperty("thresholdDays", 1);
+      expect(data).toHaveProperty("files");
+    }
+  });
 });

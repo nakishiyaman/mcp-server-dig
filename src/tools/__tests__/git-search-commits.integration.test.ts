@@ -60,4 +60,22 @@ describe("git_search_commits (MCP)", () => {
 
     expect(text).toContain("No commits found");
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_search_commits",
+      arguments: {
+        repo_path: getRepoDir(),
+        query: "initial",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("commits");
+    expect(data.commits.length).toBeGreaterThan(0);
+    expect(data.commits[0]).toHaveProperty("hash");
+    expect(data.commits[0]).toHaveProperty("subject");
+  });
 });

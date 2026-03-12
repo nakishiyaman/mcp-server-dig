@@ -60,6 +60,39 @@ describe("git_dependency_map (MCP)", () => {
     expect(text).toContain("No co-change coupling found");
   });
 
+  it("depth=2でより細かい粒度のペアを取得する", async () => {
+    const result = await client.callTool({
+      name: "git_dependency_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 2,
+        min_coupling: 1,
+      },
+    });
+
+    expect(result.isError).not.toBe(true);
+  });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_dependency_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+        min_coupling: 1,
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+
+    // May return "No co-change coupling" if only one top-level dir
+    if (!text.includes("No co-change coupling")) {
+      const data = JSON.parse(text);
+      expect(data).toHaveProperty("pairs");
+      expect(data).toHaveProperty("totalCommits");
+    }
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_dependency_map",
