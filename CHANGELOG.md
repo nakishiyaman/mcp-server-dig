@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.15.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.14.0...v0.15.0) (2026-03-12)
+
+
+### Features
+
+* v0.15.0 — git_rename_history・git_commit_graphツール追加、テストカバレッジ基盤導入 ([8be450e](https://github.com/nakishiyaman/mcp-server-dig/commit/8be450e65c0be9e494afbdd0550ea718407b45a5))
+* v0.15.0 — git_rename_history・git_commit_graphツール追加、テストカバレッジ基盤導入 ([7f8a4cb](https://github.com/nakishiyaman/mcp-server-dig/commit/7f8a4cb3346c45566af5f515369b6c4d708e4b76))
+
 ## [0.14.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.13.0...v0.14.0) (2026-03-12)
 
 
