@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.16.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.15.0...v0.16.0) (2026-03-12)
+
+
+### Features
+
+* v0.16.0 — MCP統合テスト移行、カバレッジ33%→84% ([5cec30e](https://github.com/nakishiyaman/mcp-server-dig/commit/5cec30ef0453407d4cdf489c0f86c76a3b8d7e0c))
+* v0.16.0 — MCP統合テスト移行、カバレッジ33%→84% ([d18f78c](https://github.com/nakishiyaman/mcp-server-dig/commit/d18f78c15305e994cdf2cb73b282116ae9c37ee6))
+
 ## [0.15.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.14.0...v0.15.0) (2026-03-12)
 
 
