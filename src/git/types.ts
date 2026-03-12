@@ -82,3 +82,10 @@ export interface RenameEntry {
   oldPath: string;
   newPath: string;
 }
+
+export interface CommitFrequencyBucket {
+  period: string;
+  commits: number;
+  authors: number;
+  files: number;
+}
