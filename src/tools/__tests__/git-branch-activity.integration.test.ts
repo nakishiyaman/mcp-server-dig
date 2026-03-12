@@ -122,4 +122,57 @@ describe("git_branch_activity (MCP)", () => {
     expect(data.branches[0]).toHaveProperty("name");
     expect(data.branches[0]).toHaveProperty("activity");
   });
+
+  it("include_remote=trueでリモートブランチも含む", async () => {
+    const result = await client.callTool({
+      name: "git_branch_activity",
+      arguments: {
+        repo_path: getRepoDir(),
+        include_remote: true,
+      },
+    });
+    const text = getToolText(result);
+
+    // Local-only repo has no remote branches, but the tool should still work
+    expect(text).toContain("Branch activity analysis");
+    expect(text).toContain("Total branches:");
+  });
+
+  it("全ブランチがactiveの場合にstale/abandonedセクションが表示されない", async () => {
+    const result = await client.callTool({
+      name: "git_branch_activity",
+      arguments: {
+        repo_path: getRepoDir(),
+        stale_days: 99999,
+        abandoned_days: 99999,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Active:");
+    expect(text).not.toContain("Stale:");
+    expect(text).not.toContain("Abandoned:");
+  });
+
+  it("stale_daysとabandoned_daysの分類ロジックが動作する", async () => {
+    // Use stale_days=1 to test the classification branches
+    const result = await client.callTool({
+      name: "git_branch_activity",
+      arguments: {
+        repo_path: getRepoDir(),
+        stale_days: 1,
+        abandoned_days: 2,
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("staleDays", 1);
+    expect(data).toHaveProperty("abandonedDays", 2);
+    // Every branch should have an activity classification
+    for (const branch of data.branches) {
+      expect(["active", "stale", "abandoned"]).toContain(branch.activity);
+    }
+  });
 });

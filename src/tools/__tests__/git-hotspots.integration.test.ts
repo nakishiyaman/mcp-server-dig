@@ -72,4 +72,17 @@ describe("git_hotspots (MCP)", () => {
     expect(data.hotspots[0]).toHaveProperty("filePath");
     expect(data.hotspots[0]).toHaveProperty("changeCount");
   });
+
+  it("未来のsinceで空結果を返す", async () => {
+    const result = await client.callTool({
+      name: "git_hotspots",
+      arguments: {
+        repo_path: getRepoDir(),
+        since: "2099-01-01",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No file changes found");
+  });
 });

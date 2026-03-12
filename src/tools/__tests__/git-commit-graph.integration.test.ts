@@ -96,4 +96,24 @@ describe("git_commit_graph (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_commit_graph",
+      arguments: {
+        repo_path: getRepoDir(),
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("totalCommits");
+    expect(data).toHaveProperty("mergeCommits");
+    expect(data).toHaveProperty("mergeRatio");
+    expect(data).toHaveProperty("weeksAnalyzed");
+    expect(data).toHaveProperty("mergesPerWeek");
+    expect(data).toHaveProperty("topMergeSources");
+    expect(data).toHaveProperty("integrationStyle");
+  });
 });

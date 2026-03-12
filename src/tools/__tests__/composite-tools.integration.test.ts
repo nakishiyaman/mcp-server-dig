@@ -191,4 +191,39 @@ describe("git_repo_health (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_repo_health",
+      arguments: {
+        repo_path: getRepoDir(),
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("trackedFiles");
+    expect(data).toHaveProperty("totalCommits");
+    expect(data).toHaveProperty("contributors");
+    expect(data).toHaveProperty("staleFiles");
+    expect(data).toHaveProperty("hotspots");
+    expect(data).toHaveProperty("churn");
+  });
+
+  it("未来のsinceで空のhotspotsとchurnを返す", async () => {
+    const result = await client.callTool({
+      name: "git_repo_health",
+      arguments: {
+        repo_path: getRepoDir(),
+        since: "2099-01-01",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data.totalCommits).toBe(0);
+    expect(data.hotspots).toHaveLength(0);
+  });
 });

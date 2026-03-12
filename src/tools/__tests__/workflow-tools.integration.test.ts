@@ -90,6 +90,27 @@ describe("git_review_prep (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_review_prep",
+      arguments: {
+        repo_path: getRepoDir(),
+        base_ref: "main",
+        head_ref: "feature-branch",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("baseRef", "main");
+    expect(data).toHaveProperty("headRef", "feature-branch");
+    expect(data).toHaveProperty("changedFiles");
+    expect(data).toHaveProperty("diffStat");
+    expect(data).toHaveProperty("commits");
+    expect(data.changedFiles).toContain("src/feature.ts");
+  });
 });
 
 // ─── git_why ─────────────────────────────────────────────

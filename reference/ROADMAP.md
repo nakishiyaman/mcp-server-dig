@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12 (v0.20.0)
+最終更新: 2026-03-12 (v0.21.0)
 
 ## v0.4.0 — 品質改善
 
@@ -475,6 +475,46 @@
 | Branches | 79% | 80% |
 | Functions | 93% | 93% |
 | Lines | 94% | 94% |
+
+## v0.21.0 — 新ツール3本 + ブランチカバレッジ82%+
+
+### Phase 1: ブランチカバレッジ向上（80% → 83%+）
+- [x] 11ファイルのエッジケーステスト追加（~22件）
+- [x] カスタムテストリポジトリ追加（古いコミット日付、単一著者、非標準マージ）
+- [x] branches threshold 78% → 82%
+
+### Phase 2: `git_release_notes` ツール
+- [x] Conventional Commits解析（type/scope/breaking change検出）
+- [x] group_by: type/scope/none、コントリビューター一覧
+- [x] 統合テスト8件
+
+### Phase 3: `git_code_ownership_changes` ツール
+- [x] 日付境界での前期/後期所有権比較
+- [x] `getDirectoryAtDepth` / `computeBusFactor` 再利用（knowledge-map.ts）
+- [x] 所有者交代・バス係数変化・新規/離脱コントリビューター検出
+- [x] 統合テスト7件
+
+### Phase 4: `git_impact_analysis` ツール
+- [x] blast radius分析（co-change + contributor + dependency map統合）
+- [x] `ToolContext` キャッシュ活用（cachedAnalyzeContributors）
+- [x] blast radius分類: low (<3), medium (3-10), high (10+)
+- [x] 統合テスト8件
+
+### Phase 5: ドキュメント更新
+- [x] `src/index.ts` — 3ツール登録（データ取得21→22, 複合分析2→4）
+- [x] `src/resources/tool-guide.ts` — 3ツール追加、ツール数更新
+- [x] `CLAUDE.md` — v0.21.0、ツール数25→28
+- [x] `README.md` / `README.ja.md` — 新ツールドキュメント
+- [x] `reference/ROADMAP.md` — v0.21.0セクション追加
+- [x] `vitest.config.ts` — branches threshold 78% → 82%
+
+### カバレッジ結果
+| 指標 | v0.20.0 | v0.21.0 |
+|------|---------|---------|
+| Statements | 93% | 94%+ |
+| Branches | 80% | 83%+ |
+| Functions | 93% | 93%+ |
+| Lines | 94% | 94%+ |
 
 ## スコープ外
 
