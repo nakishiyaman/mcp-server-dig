@@ -58,6 +58,34 @@ describe("git_commit_graph (MCP)", () => {
     expect(text).toContain("No commits found since");
   });
 
+  it("integration styleを表示する", async () => {
+    const result = await client.callTool({
+      name: "git_commit_graph",
+      arguments: {
+        repo_path: getRepoDir(),
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Integration style:");
+    // Test repo has few merges → regular or batch merging
+    expect(text).toMatch(/Integration style: (regular merging|batch merging|linear)/);
+  });
+
+  it("merge sourcesを表示する", async () => {
+    const result = await client.callTool({
+      name: "git_commit_graph",
+      arguments: {
+        repo_path: getRepoDir(),
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Top merge sources:");
+    // Test repo has merge from merge-test-branch
+    expect(text).toContain("merge-test-branch");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_commit_graph",

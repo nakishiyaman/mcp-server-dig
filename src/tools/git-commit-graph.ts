@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
+import { classifyIntegrationStyle } from "../analysis/risk-classifiers.js";
 import { errorResponse, successResponse } from "./response.js";
 
 interface MergeAnalysis {
@@ -11,16 +12,6 @@ interface MergeAnalysis {
   mergesPerWeek: number;
   topMergeSources: Array<{ source: string; count: number }>;
   integrationStyle: string;
-}
-
-function classifyIntegrationStyle(
-  mergeRatio: number,
-  mergesPerWeek: number,
-): string {
-  if (mergeRatio === 0) return "linear (no merges)";
-  if (mergesPerWeek >= 5 && mergeRatio >= 0.2) return "continuous integration";
-  if (mergesPerWeek >= 1) return "regular merging";
-  return "batch merging";
 }
 
 function parseMergeSources(

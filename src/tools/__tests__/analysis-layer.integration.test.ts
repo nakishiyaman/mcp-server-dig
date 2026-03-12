@@ -34,7 +34,7 @@ describe("analyzeContributors", () => {
     const { stats, totalCommits } = await analyzeContributors(getRepoDir());
 
     expect(totalCommits).toBeGreaterThanOrEqual(57);
-    expect(stats).toHaveLength(2);
+    expect(stats).toHaveLength(6);
 
     const alice = stats.find((s) => s.name === "Alice");
     expect(alice).toBeDefined();
