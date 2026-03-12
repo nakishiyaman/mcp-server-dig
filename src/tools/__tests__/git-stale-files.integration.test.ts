@@ -131,8 +131,6 @@ describe("git_stale_files (MCP)", () => {
         top_n: 100,
       },
     });
-    const text = getToolText(result);
-
     // Files created during test setup should be stale at threshold 1 day
     // if more than 1 day has passed since test repo creation
     expect(result.isError).not.toBe(true);
