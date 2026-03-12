@@ -70,4 +70,42 @@ describe("git_tag_list (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("sort=oldestで古い順にタグを返す", async () => {
+    const result = await client.callTool({
+      name: "git_tag_list",
+      arguments: {
+        repo_path: getRepoDir(),
+        sort: "oldest",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("oldest first");
+    expect(text).toContain("v0.1.0");
+    expect(text).toContain("v0.2.0");
+    // v0.1.0 should appear before v0.2.0
+    const idx1 = text.indexOf("v0.1.0");
+    const idx2 = text.indexOf("v0.2.0");
+    expect(idx1).toBeLessThan(idx2);
+  });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_tag_list",
+      arguments: {
+        repo_path: getRepoDir(),
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("sort", "newest");
+    expect(data).toHaveProperty("totalTags", 2);
+    expect(data).toHaveProperty("tags");
+    expect(data.tags[0]).toHaveProperty("name");
+    expect(data.tags[0]).toHaveProperty("date");
+    expect(data.tags[0]).toHaveProperty("subject");
+  });
 });

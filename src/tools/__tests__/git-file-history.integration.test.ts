@@ -116,4 +116,24 @@ describe("git_file_history (MCP)", () => {
     expect(data).toHaveProperty("commits");
     expect(data.commits.length).toBeLessThanOrEqual(2);
   });
+
+  it("JSON出力にstat情報が含まれる", async () => {
+    const result = await client.callTool({
+      name: "git_file_history",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        max_commits: 1,
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data.commits[0]).toHaveProperty("stat");
+    expect(data.commits[0]).toHaveProperty("hash");
+    expect(data.commits[0]).toHaveProperty("author");
+    expect(data.commits[0]).toHaveProperty("date");
+    expect(data.commits[0]).toHaveProperty("subject");
+  });
 });

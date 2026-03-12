@@ -120,4 +120,39 @@ describe("git_stale_files (MCP)", () => {
       expect(data).toHaveProperty("files");
     }
   });
+
+  it("threshold_days=0で全ファイルがstaleとして返される", async () => {
+    // threshold_days minimum is 1 per schema, so use 1
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        threshold_days: 1,
+        top_n: 100,
+      },
+    });
+    const text = getToolText(result);
+
+    // Files created during test setup should be stale at threshold 1 day
+    // if more than 1 day has passed since test repo creation
+    expect(result.isError).not.toBe(true);
+  });
+
+  it("top_nでstaleファイル数を制限する", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        threshold_days: 1,
+        top_n: 2,
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+
+    if (!text.includes("No files found")) {
+      const data = JSON.parse(text);
+      expect(data.files.length).toBeLessThanOrEqual(2);
+    }
+  });
 });

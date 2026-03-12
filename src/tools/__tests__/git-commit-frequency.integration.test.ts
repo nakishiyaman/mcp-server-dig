@@ -106,4 +106,36 @@ describe("git_commit_frequency (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("path_patternで特定パスに限定する", async () => {
+    const result = await client.callTool({
+      name: "git_commit_frequency",
+      arguments: {
+        repo_path: getRepoDir(),
+        path_pattern: "src/index.ts",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Commit frequency");
+    expect(text).toContain("Scope: src/index.ts");
+  });
+
+  it("週次の粒度で正しい期間キーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_commit_frequency",
+      arguments: {
+        repo_path: getRepoDir(),
+        granularity: "weekly",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data.granularity).toBe("weekly");
+    expect(data.periods.length).toBeGreaterThan(0);
+    // Weekly period keys are YYYY-MM-DD (Monday)
+    expect(data.periods[0].period).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
 });

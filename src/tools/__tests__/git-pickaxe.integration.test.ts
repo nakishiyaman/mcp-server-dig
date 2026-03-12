@@ -59,4 +59,52 @@ describe("git_pickaxe (MCP)", () => {
 
     expect(text).toContain("No commits found");
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_pickaxe",
+      arguments: {
+        repo_path: getRepoDir(),
+        search_term: "const z",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("searchTerm", "const z");
+    expect(data).toHaveProperty("isRegex", false);
+    expect(data).toHaveProperty("totalCommits");
+    expect(data).toHaveProperty("commits");
+    expect(data.commits.length).toBeGreaterThan(0);
+    expect(data.commits[0]).toHaveProperty("hash");
+    expect(data.commits[0]).toHaveProperty("author");
+  });
+
+  it("path_patternで検索範囲を限定する", async () => {
+    const result = await client.callTool({
+      name: "git_pickaxe",
+      arguments: {
+        repo_path: getRepoDir(),
+        search_term: "const x",
+        path_pattern: "src/index.ts",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Found");
+    expect(text).toContain("commit");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_pickaxe",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        search_term: "test",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+  });
 });

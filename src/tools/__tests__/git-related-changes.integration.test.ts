@@ -59,4 +59,38 @@ describe("git_related_changes (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_related_changes",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("file", "src/index.ts");
+    expect(data).toHaveProperty("totalCommits");
+    expect(data).toHaveProperty("totalRelated");
+    expect(data).toHaveProperty("relatedFiles");
+    expect(data.totalRelated).toBeGreaterThan(0);
+  });
+
+  it("min_coupling=1で全共変更ファイルを返す", async () => {
+    const result = await client.callTool({
+      name: "git_related_changes",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        min_coupling: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Co-change analysis for: src/index.ts");
+    expect(text).toContain("related file(s)");
+  });
 });

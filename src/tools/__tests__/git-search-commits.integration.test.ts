@@ -78,4 +78,16 @@ describe("git_search_commits (MCP)", () => {
     expect(data.commits[0]).toHaveProperty("hash");
     expect(data.commits[0]).toHaveProperty("subject");
   });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_search_commits",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        query: "test",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+  });
 });
