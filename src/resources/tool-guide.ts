@@ -26,10 +26,12 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | 誰がどのディレクトリを所有している？ | git_knowledge_map |
 | ディレクトリ間の依存関係を知りたい | git_dependency_map |
 | バグ導入コミットを特定したい | git_bisect_guide |
+| このファイルの以前の名前は？ | git_rename_history |
+| マージパターンを分析したい | git_commit_graph |
 
 ## カテゴリ別一覧
 
-### データ取得ツール（16個）
+### データ取得ツール（18個）
 - **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
 - **git_file_history** — ファイルのコミット履歴を時系列で表示
 - **git_commit_show** — 特定コミットの詳細（diff含む）を表示
@@ -46,6 +48,8 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_knowledge_map** — ディレクトリ別の知識所有者マップとバス係数を表示
 - **git_dependency_map** — ディレクトリ間の共変更ネットワークを可視化
 - **git_bisect_guide** — バグ導入コミット特定の事前分析（bisect自体は実行しない）
+- **git_rename_history** — ファイルのリネーム履歴を追跡（rename chainの再構築）
+- **git_commit_graph** — マージパターンとブランチ統合トポロジーを分析
 
 ### 組み合わせ分析ツール（2個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
@@ -57,7 +61,7 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### timeout_ms（全20ツール対応）
+### timeout_ms（全22ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
@@ -68,6 +72,7 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 1. git_why → 対象行の来歴を把握
 2. git_pickaxe → 関連する文字列の追加/削除履歴を追跡
 3. git_file_history → ファイル全体の変遷を確認
+4. git_rename_history → ファイルの移動・改名を追跡
 
 ### PRレビュー
 1. git_review_prep → 変更概要とリスクファイルを把握
@@ -117,7 +122,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "20ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "22ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

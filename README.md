@@ -208,6 +208,26 @@ Pre-bisect analysis for identifying bug-introducing commits. Shows commit count 
 | bad_ref | string | no | Known bad reference where the bug exists (default: HEAD) |
 | file_path | string | no | Optional file path to focus on |
 
+### git_rename_history
+
+Track the rename history of a file. Reconstructs the full rename chain showing how a file was renamed over time.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| file_path | string | yes | Relative path to the file within the repo |
+| max_entries | number | no | Maximum number of commits to scan (default: 50) |
+
+### git_commit_graph
+
+Analyze merge patterns and branch integration topology. Calculates merge ratio, merge frequency, merge sources, and classifies the integration style.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Analysis period (default: "6 months ago") |
+| max_commits | number | no | Maximum commits to analyze (default: 1000) |
+
 ### git_review_prep
 
 Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.
@@ -433,7 +453,7 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 20 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 22 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Structured Logging
 

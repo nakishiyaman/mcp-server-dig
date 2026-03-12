@@ -72,3 +72,13 @@ export interface TagInfo {
   date: string;
   subject: string;
 }
+
+export interface RenameEntry {
+  hash: string;
+  author: string;
+  email: string;
+  date: string;
+  subject: string;
+  oldPath: string;
+  newPath: string;
+}

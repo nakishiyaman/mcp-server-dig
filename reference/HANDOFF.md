@@ -3,25 +3,24 @@
 日時: 2026-03-12
 
 ### 完了したタスク
-- **v0.14.0 リリース完了（npm公開済み）**
-  - PR #65 マージ（CI全パス確認済み）
-  - Release PR #66 自動マージ → npm publish成功（mcp-server-dig@0.14.0）
-  - v0.14.0タグ作成済み
-- **ブランチ保護設定修正**
-  - 必須チェックから `ci (18)` を削除（Node 18廃止に伴う残存が原因でマージブロック発生）
-  - 必須チェックを `ci (20)`, `ci (22)` のみに更新
-  - git-workflow.mdにブランチ保護設定一覧と注意事項を記録（PR #67、CIパス待ち）
+- **v0.15.0 実装完了**
+  - Phase 1: `npm update` でlockfileリフレッシュ（transitive deps更新）
+  - Phase 2: `git_rename_history` ツール追加（型・パーサー・ツール・テスト7件）
+  - Phase 3: `git_commit_graph` ツール追加（マージ分析・テスト3件）
+  - Phase 4: テストカバレッジ基盤（@vitest/coverage-v8、thresholds設定）
+  - Phase 5: ドキュメント更新（tool-guide, README EN/JA, CLAUDE.md, ROADMAP）
+- **テスト**: 30ファイル、174テスト全パス（+10テスト増加）
+- **カバレッジ**: statements 32.8%, branches 33.4%, functions 38.4%, lines 32.9%
 
 ### 現在の状態
-- ブランチ: `fix/branch-protection-docs`（PR #67 オープン中）
+- ブランチ: `feat/v0.15.0-tools-and-coverage`（push済み、PR未作成）
 - 未コミット変更: `.claude/settings.local.json` のみ（ローカル設定、コミット不要）
-- ツール数: 20（データ取得16 + 組み合わせ分析2 + ワークフロー統合2）
+- ツール数: 22（データ取得18 + 組み合わせ分析2 + ワークフロー統合2）
 - Prompts: 8、Resources: 2
-- テスト: 164テスト全通過（28ファイル）
 
 ### 次にやるべきこと
-1. PR #67 のCIパス確認 → マージ
-2. v0.15.0 計画策定
+1. PR作成 → CIパス確認 → マージ
+2. release-pleaseによるRelease PR自動作成 → npm公開
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）

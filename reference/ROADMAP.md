@@ -284,6 +284,47 @@
 | zod 4 | **見送り** | MCP SDKの`zod-to-json-schema`がv3専用。SDK側の対応待ち |
 | @types/node 25 | **見送り** | サポート対象Node.jsバージョン（20/22）と不整合。@types/nodeメジャー版はターゲットNode.jsに合わせる慣例 |
 
+## v0.15.0 — 新ツール + テストカバレッジ基盤
+
+### Phase 1: 依存関係メンテナンス
+- [x] `npm update` でlockfileリフレッシュ（transitive deps更新）
+- [x] ビルド・テスト確認
+
+### Phase 2: `git_rename_history` ツール
+- [x] `RenameEntry` 型追加（src/git/types.ts）
+- [x] `parseRenameOutput()` パーサー追加（src/git/parsers.ts）
+- [x] パーサー単体テスト（5件）
+- [x] ツール実装（src/tools/git-rename-history.ts）
+- [x] テストリポジトリにrename操作追加（global-setup.ts）
+- [x] 統合テスト（2件）
+- [x] index.ts にツール登録
+
+### Phase 3: `git_commit_graph` ツール
+- [x] ツール実装（src/tools/git-commit-graph.ts）
+  - マージ比率、頻度/週、トップマージソース、統合スタイル分類
+- [x] テストリポジトリにmerge操作追加（global-setup.ts — `--no-ff` で明示的マージコミット作成）
+- [x] 統合テスト（3件）
+- [x] index.ts にツール登録
+
+### Phase 4: テストカバレッジ基盤
+- [x] `@vitest/coverage-v8` 導入
+- [x] vitest.config.ts にcoverage設定追加（v8 provider, text/lcov reporter）
+- [x] `test:coverage` スクリプト追加
+- [x] thresholds設定（statements: 28%, branches: 28%, functions: 33%, lines: 28%）
+
+### Phase 5: ドキュメント・仕上げ
+- [x] tool-guideリソース更新（22ツール対応）
+- [x] CLAUDE.md バージョン・ツール数更新
+- [x] README.md / README.ja.md 新ツールドキュメント追加
+- [x] ROADMAP v0.15.0セクション追加
+
+### v0.15.0候補の決着
+
+| 候補 | 判断 | 理由 |
+|------|------|------|
+| zod 4 | **見送り** | MCP SDKの`zod-to-json-schema`がv3専用。SDK側の対応待ち |
+| @types/node 25 | **見送り** | サポート対象Node.jsバージョン（20/22）と不整合 |
+
 ## スコープ外
 
 | 項目 | 理由 |

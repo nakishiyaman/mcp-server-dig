@@ -10,6 +10,7 @@ import {
   parseCombinedNumstat,
   parseStaleFiles,
   parseTagOutput,
+  parseRenameOutput,
 } from "./parsers.js";
 
 describe("parseLogOutput", () => {
@@ -516,6 +517,63 @@ describe("parseTagOutput", () => {
 
     const result = parseTagOutput(raw);
     expect(result).toHaveLength(1);
+  });
+});
+
+describe("parseRenameOutput", () => {
+  it("リネームエントリをパースする", () => {
+    const raw = [
+      "abc1234|Alice|alice@example.com|2026-01-15T10:00:00+09:00|refactor: rename utils",
+      "R100\tsrc/old-utils.ts\tsrc/utils.ts",
+    ].join("\n");
+
+    const result = parseRenameOutput(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual({
+      hash: "abc1234",
+      author: "Alice",
+      email: "alice@example.com",
+      date: "2026-01-15T10:00:00+09:00",
+      subject: "refactor: rename utils",
+      oldPath: "src/old-utils.ts",
+      newPath: "src/utils.ts",
+    });
+  });
+
+  it("複数のリネームをパースする", () => {
+    const raw = [
+      "abc1234|Alice|alice@example.com|2026-01-15T10:00:00+09:00|refactor: move to src",
+      "R100\tutils.ts\tsrc/utils.ts",
+      "def5678|Bob|bob@example.com|2026-01-10T09:00:00+09:00|refactor: rename helper",
+      "R095\thelper.ts\tutils.ts",
+    ].join("\n");
+
+    const result = parseRenameOutput(raw);
+    expect(result).toHaveLength(2);
+    expect(result[0].oldPath).toBe("utils.ts");
+    expect(result[0].newPath).toBe("src/utils.ts");
+    expect(result[1].oldPath).toBe("helper.ts");
+    expect(result[1].newPath).toBe("utils.ts");
+  });
+
+  it("コミットヘッダーなしのリネーム行をスキップする", () => {
+    const raw = "R100\torphan-old.ts\torphan-new.ts";
+    const result = parseRenameOutput(raw);
+    expect(result).toHaveLength(0);
+  });
+
+  it("空入力で空配列を返す", () => {
+    expect(parseRenameOutput("")).toEqual([]);
+  });
+
+  it("リネームでない行をスキップする", () => {
+    const raw = [
+      "abc1234|Alice|alice@example.com|2026-01-15T10:00:00+09:00|feat: add file",
+      "A\tsrc/new-file.ts",
+    ].join("\n");
+
+    const result = parseRenameOutput(raw);
+    expect(result).toHaveLength(0);
   });
 });
 

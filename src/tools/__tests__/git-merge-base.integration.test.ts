@@ -25,7 +25,7 @@ describe("git_merge_base (end-to-end)", () => {
       repoDir,
     );
     const mainCommits = parseLogOutput(mainOutput);
-    // 4 original post-merge-base + 50 bulk = 54
+    // original post-merge-base + rename + merge-test-branch + 50 bulk
     expect(mainCommits.length).toBeGreaterThanOrEqual(54);
     const mainSubjects = mainCommits.map((c) => c.subject);
     expect(mainSubjects).toContain("feat: add w variable");
