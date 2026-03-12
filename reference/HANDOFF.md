@@ -3,18 +3,18 @@
 日時: 2026-03-12
 
 ### 完了したタスク
-- **v0.15.0 実装完了**
-  - Phase 1: `npm update` でlockfileリフレッシュ（transitive deps更新）
-  - Phase 2: `git_rename_history` ツール追加（型・パーサー・ツール・テスト7件）
-  - Phase 3: `git_commit_graph` ツール追加（マージ分析・テスト3件）
-  - Phase 4: テストカバレッジ基盤（@vitest/coverage-v8、thresholds設定）
-  - Phase 5: ドキュメント更新（tool-guide, README EN/JA, CLAUDE.md, ROADMAP）
-- **テスト**: 30ファイル、174テスト全パス（+10テスト増加）
-- **カバレッジ**: statements 32.8%, branches 33.4%, functions 38.4%, lines 32.9%
+- **v0.16.0 実装完了 — テストカバレッジ向上（MCP統合テスト移行）**
+  - Phase 1: MCP統合テスト基盤（`mcp-test-helpers.ts`、InMemoryTransport + Client接続）
+  - Phase 2-3: 21テストファイルを`execGit()` + パーサー → `client.callTool()` に移行
+  - Phase 4: エッジケーステスト移行（blame, バイナリ, 非ASCII, truncation）
+  - Phase 5: thresholds 50%引き上げ、ROADMAP・CLAUDE.md更新
+  - `src/index.ts` のエントリポイントガード追加（テスト時のstdio接続防止）
+- **テスト**: 30ファイル、183テスト全パス
+- **カバレッジ**: statements 84%, branches 64%, functions 89%, lines 85%（v0.15.0: 33%→84%）
 
 ### 現在の状態
-- ブランチ: `feat/v0.15.0-tools-and-coverage`（push済み、PR未作成）
-- 未コミット変更: `.claude/settings.local.json` のみ（ローカル設定、コミット不要）
+- ブランチ: `feat/v0.16.0-mcp-integration-tests`（push済み、PR未作成）
+- 未コミット変更: なし
 - ツール数: 22（データ取得18 + 組み合わせ分析2 + ワークフロー統合2）
 - Prompts: 8、Resources: 2
 

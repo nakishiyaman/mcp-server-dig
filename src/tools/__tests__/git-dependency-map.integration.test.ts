@@ -1,52 +1,73 @@
-import { describe, it, expect } from "vitest";
-import { analyzeDependencyMap } from "../../analysis/dependency-map.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_dependency_map (end-to-end)", () => {
+describe("git_dependency_map (MCP)", () => {
+  let client: Client;
+
+  beforeAll(async () => {
+    client = await createTestMcpClient();
+  });
+
+  afterAll(async () => {
+    await closeMcpClient();
+  });
+
   it("ディレクトリ間の共変更を検出する", async () => {
-    // The test repo has all files under src/, so with depth=2 we might not
-    // get pairs. With depth=1, all files are in "src" so no pairs.
-    // Let's test that the function runs and returns valid structure.
-    const { pairs, totalCommits } = await analyzeDependencyMap(getRepoDir(), {
-      depth: 1,
-      minCoupling: 1,
+    const result = await client.callTool({
+      name: "git_dependency_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+        min_coupling: 1,
+      },
     });
+    const text = getToolText(result);
 
-    expect(totalCommits).toBeGreaterThan(0);
-    // With only "src" directory at depth 1, there are no pairs
-    expect(Array.isArray(pairs)).toBe(true);
+    // With only "src" at depth 1, there may not be pairs but the tool runs
+    expect(text).toContain("Dependency map");
   });
 
-  it("minCouplingでフィルタリングする", async () => {
-    const { pairs } = await analyzeDependencyMap(getRepoDir(), {
-      depth: 1,
-      minCoupling: 100,
+  it("minCoupling 100でフィルタリングする", async () => {
+    const result = await client.callTool({
+      name: "git_dependency_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+        min_coupling: 100,
+      },
     });
+    const text = getToolText(result);
 
-    expect(pairs).toEqual([]);
+    expect(text).toContain("No co-change coupling found");
   });
 
-  it("空の結果を返す場合がある", async () => {
-    const { pairs, totalCommits } = await analyzeDependencyMap(getRepoDir(), {
-      since: "2099-01-01",
+  it("将来のsinceで空結果を返す", async () => {
+    const result = await client.callTool({
+      name: "git_dependency_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        since: "2099-01-01",
+      },
     });
+    const text = getToolText(result);
 
-    expect(pairs).toEqual([]);
-    expect(totalCommits).toBe(0);
+    expect(text).toContain("No co-change coupling found");
   });
 
-  it("ペアのpercentageが正しく計算される", async () => {
-    const { pairs } = await analyzeDependencyMap(getRepoDir(), {
-      depth: 1,
-      minCoupling: 1,
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_dependency_map",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+      },
     });
 
-    for (const pair of pairs) {
-      expect(pair.percentage).toBeGreaterThanOrEqual(0);
-      expect(pair.percentage).toBeLessThanOrEqual(100);
-      expect(pair.source).toBeDefined();
-      expect(pair.target).toBeDefined();
-      expect(pair.coChangeCount).toBeGreaterThanOrEqual(1);
-    }
+    expect(result.isError).toBe(true);
   });
 });

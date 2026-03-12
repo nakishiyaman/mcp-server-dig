@@ -1,27 +1,61 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_commit_show (end-to-end)", () => {
-  it("shows commit metadata and stat", async () => {
-    const output = await execGit(
-      ["show", "--stat", "--format=%H|%an|%ae|%aI|%P%n%B", "HEAD~1"],
-      getRepoDir(),
-    );
+describe("git_commit_show (MCP)", () => {
+  let client: Client;
 
-    expect(output).toContain("Bob");
-    // HEAD~1 is "chore: bulk commit 48" (second-to-last bulk commit)
-    expect(output).toMatch(/chore: bulk commit \d+/);
-    expect(output).toContain("src/index.ts");
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("shows diff for a commit", async () => {
-    const output = await execGit(
-      ["show", "-U3", "--format=", "HEAD~1"],
-      getRepoDir(),
-    );
+  afterAll(async () => {
+    await closeMcpClient();
+  });
 
-    // Bulk commits modify src/index.ts with iteration comments
-    expect(output).toContain("iteration");
+  it("コミットのメタデータとstatを表示する", async () => {
+    const result = await client.callTool({
+      name: "git_commit_show",
+      arguments: {
+        repo_path: getRepoDir(),
+        commit: "HEAD~1",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Bob");
+    expect(text).toMatch(/chore: bulk commit \d+/);
+    expect(text).toContain("src/index.ts");
+  });
+
+  it("diffを表示する", async () => {
+    const result = await client.callTool({
+      name: "git_commit_show",
+      arguments: {
+        repo_path: getRepoDir(),
+        commit: "HEAD~1",
+        show_diff: true,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("iteration");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_commit_show",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        commit: "HEAD",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

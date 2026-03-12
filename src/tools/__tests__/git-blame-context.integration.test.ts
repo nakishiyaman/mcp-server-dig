@@ -1,35 +1,65 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseBlameOutput } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_blame_context (end-to-end)", () => {
-  it("returns blame blocks for a file", async () => {
-    const output = await execGit(
-      ["blame", "--porcelain", "--", "src/index.ts"],
-      getRepoDir(),
-    );
-    const blocks = parseBlameOutput(output);
+describe("git_blame_context (MCP)", () => {
+  let client: Client;
 
-    expect(blocks.length).toBeGreaterThanOrEqual(1);
-
-    // Line 1-2 should be from Alice (commit 2 modified them or they're from earlier)
-    // Line 3 should be from Bob
-    const bobBlock = blocks.find((b) => b.author === "Bob");
-    expect(bobBlock).toBeDefined();
-    expect(bobBlock!.lines).toContain("const z = 3;");
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("respects line range", async () => {
-    const output = await execGit(
-      ["blame", "--porcelain", "-L", "3,3", "--", "src/index.ts"],
-      getRepoDir(),
-    );
-    const blocks = parseBlameOutput(output);
+  afterAll(async () => {
+    await closeMcpClient();
+  });
 
-    expect(blocks).toHaveLength(1);
-    expect(blocks[0].author).toBe("Bob");
-    expect(blocks[0].startLine).toBe(3);
-    expect(blocks[0].endLine).toBe(3);
+  it("ファイルのblameブロックを返す", async () => {
+    const result = await client.callTool({
+      name: "git_blame_context",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Blame context for: src/index.ts");
+    expect(text).toContain("block(s)");
+    expect(text).toContain("Bob");
+    expect(text).toContain("const z = 3;");
+  });
+
+  it("行範囲を尊重する", async () => {
+    const result = await client.callTool({
+      name: "git_blame_context",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        start_line: 3,
+        end_line: 3,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("1 block(s)");
+    expect(text).toContain("Bob");
+    expect(text).toContain("[L3]");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_blame_context",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        file_path: "src/index.ts",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

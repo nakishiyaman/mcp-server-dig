@@ -104,15 +104,25 @@ export function createSandboxServer() {
   return createServer();
 }
 
-const server = createServer();
+// Only start the stdio server when run as the main entry point.
+// When imported as a module (e.g., in tests), skip server startup.
+const isMainModule =
+  process.argv[1] &&
+  import.meta.url.endsWith(process.argv[1].replace(/\\/g, "/"));
 
-async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  logger.info("mcp-server-dig running on stdio", { version });
+if (isMainModule) {
+  const server = createServer();
+
+  const main = async () => {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    logger.info("mcp-server-dig running on stdio", { version });
+  };
+
+  main().catch((error) => {
+    logger.error("Fatal error", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    process.exit(1);
+  });
 }
-
-main().catch((error) => {
-  logger.error("Fatal error", { error: error instanceof Error ? error.message : String(error) });
-  process.exit(1);
-});

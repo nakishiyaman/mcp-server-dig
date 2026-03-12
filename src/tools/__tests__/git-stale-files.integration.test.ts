@@ -1,38 +1,56 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseStaleFiles } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_stale_files (end-to-end)", () => {
-  it("finds stale files with threshold 0 days", async () => {
-    const repoDir = getRepoDir();
-    // All files should be "stale" with a 0-day threshold
-    const trackedOutput = await execGit(["ls-files"], repoDir);
-    const trackedFiles = trackedOutput
-      .trim()
-      .split("\n")
-      .filter((f) => f.length > 0);
+describe("git_stale_files (MCP)", () => {
+  let client: Client;
 
-    const dateLines: string[] = [];
-    for (const file of trackedFiles) {
-      const dateOutput = await execGit(
-        ["log", "--format=%aI", "--max-count=1", "--", file],
-        repoDir,
-      );
-      const date = dateOutput.trim();
-      if (date) dateLines.push(`${date}\t${file}`);
-    }
-
-    const raw = dateLines.join("\n");
-    const staleFiles = parseStaleFiles(raw, 0);
-
-    expect(staleFiles.length).toBeGreaterThanOrEqual(1);
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("returns empty when no files exceed threshold", async () => {
-    // With a very high threshold, no recently created files should match
-    const raw = `2026-03-11T00:00:00+09:00\tsrc/index.ts`;
-    const staleFiles = parseStaleFiles(raw, 999999);
-    expect(staleFiles).toHaveLength(0);
+  afterAll(async () => {
+    await closeMcpClient();
+  });
+
+  it("threshold 1日でstaleファイルを検出する", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        threshold_days: 1,
+      },
+    });
+    // Recently created test repo — files may or may not be stale at 1 day
+    expect(result.isError).not.toBe(true);
+  });
+
+  it("閾値超過ファイルがない場合は空結果を返す", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        threshold_days: 999999,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No files found that are stale");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

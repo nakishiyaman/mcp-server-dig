@@ -1,50 +1,77 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseDiffStatOutput } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
+import { git } from "./helpers.js";
 
-describe("git_diff_context (end-to-end)", () => {
-  it("shows diff stat between two commits", async () => {
+describe("git_diff_context (MCP)", () => {
+  let client: Client;
+
+  beforeAll(async () => {
+    client = await createTestMcpClient();
+  });
+
+  afterAll(async () => {
+    await closeMcpClient();
+  });
+
+  it("2コミット間のdiff statを表示する", async () => {
     const repoDir = getRepoDir();
-    const logOutput = await execGit(
-      ["log", "--format=%H", "--max-count=3"],
-      repoDir,
-    );
+    const logOutput = await git(repoDir, "log", "--format=%H", "--max-count=3");
     const hashes = logOutput.trim().split("\n");
     const newest = hashes[0];
     const oldest = hashes[hashes.length - 1];
 
-    const statOutput = await execGit(
-      ["diff", "--stat", oldest, newest],
-      repoDir,
-    );
-    const stat = parseDiffStatOutput(statOutput);
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: repoDir,
+        commit: oldest,
+        compare_to: newest,
+      },
+    });
+    const text = getToolText(result);
 
-    expect(stat.filesChanged).toBeGreaterThanOrEqual(1);
-    expect(stat.insertions).toBeGreaterThan(0);
+    expect(text).toContain("src/index.ts");
+    // Full diff (not stat_only) includes the diff header
+    expect(text).toContain("Diff:");
   });
 
-  it("shows full diff for a specific file", async () => {
+  it("特定ファイルのfull diffを表示する", async () => {
     const repoDir = getRepoDir();
-    const logOutput = await execGit(
-      ["log", "--format=%H", "--max-count=3"],
-      repoDir,
-    );
+    const logOutput = await git(repoDir, "log", "--format=%H", "--max-count=3");
     const hashes = logOutput.trim().split("\n");
+    const newest = hashes[0];
+    const oldest = hashes[hashes.length - 1];
 
-    const output = await execGit(
-      [
-        "diff",
-        "-U3",
-        hashes[hashes.length - 1],
-        hashes[0],
-        "--",
-        "src/index.ts",
-      ],
-      repoDir,
-    );
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: repoDir,
+        commit: oldest,
+        compare_to: newest,
+        file_path: "src/index.ts",
+        stat_only: false,
+      },
+    });
+    const text = getToolText(result);
 
-    expect(output).toContain("const y = 2;");
-    expect(output).toContain("const z = 3;");
+    expect(text).toContain("iteration");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        commit: "HEAD",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

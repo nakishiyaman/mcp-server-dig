@@ -1,92 +1,87 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
+import { git } from "./helpers.js";
 
-describe("git_bisect_guide (end-to-end)", () => {
-  it("範囲内のコミット数を取得する", async () => {
-    const repoDir = getRepoDir();
+describe("git_bisect_guide (MCP)", () => {
+  let client: Client;
 
-    // Get first and last commit
-    const firstCommit = (
-      await execGit(["rev-list", "--max-parents=0", "HEAD"], repoDir)
-    ).trim();
-
-    const countOutput = await execGit(
-      ["rev-list", "--count", `${firstCommit}..HEAD`],
-      repoDir,
-    );
-    const count = parseInt(countOutput.trim(), 10);
-    expect(count).toBeGreaterThan(0);
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("範囲内のコミット一覧を取得する", async () => {
-    const repoDir = getRepoDir();
+  afterAll(async () => {
+    await closeMcpClient();
+  });
 
+  it("コミット範囲のbisectガイドを生成する", async () => {
+    const repoDir = getRepoDir();
     const firstCommit = (
-      await execGit(["rev-list", "--max-parents=0", "HEAD"], repoDir)
+      await git(repoDir, "rev-list", "--max-parents=0", "HEAD")
     ).trim();
 
-    const logOutput = await execGit(
-      ["log", "--format=%H|%an|%ae|%aI|%s", `${firstCommit}..HEAD`],
-      repoDir,
-    );
-    const lines = logOutput
-      .trim()
-      .split("\n")
-      .filter((l) => l.length > 0);
-    expect(lines.length).toBeGreaterThan(0);
+    const result = await client.callTool({
+      name: "git_bisect_guide",
+      arguments: {
+        repo_path: repoDir,
+        good_ref: firstCommit,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Bisect guide");
+    expect(text).toContain("Commits in range:");
+    expect(text).toContain("Estimated bisect steps:");
   });
 
   it("ファイル指定で絞り込める", async () => {
     const repoDir = getRepoDir();
-
     const firstCommit = (
-      await execGit(["rev-list", "--max-parents=0", "HEAD"], repoDir)
+      await git(repoDir, "rev-list", "--max-parents=0", "HEAD")
     ).trim();
 
-    const logOutput = await execGit(
-      [
-        "log",
-        "--format=%H|%an|%ae|%aI|%s",
-        `${firstCommit}..HEAD`,
-        "--",
-        "src/index.ts",
-      ],
-      repoDir,
-    );
-    const lines = logOutput
-      .trim()
-      .split("\n")
-      .filter((l) => l.length > 0);
-    expect(lines.length).toBeGreaterThan(0);
-  });
+    const result = await client.callTool({
+      name: "git_bisect_guide",
+      arguments: {
+        repo_path: repoDir,
+        good_ref: firstCommit,
+        file_path: "src/index.ts",
+      },
+    });
+    const text = getToolText(result);
 
-  it("範囲内のホットスポットを取得する", async () => {
-    const repoDir = getRepoDir();
-
-    const firstCommit = (
-      await execGit(["rev-list", "--max-parents=0", "HEAD"], repoDir)
-    ).trim();
-
-    const output = await execGit(
-      ["log", "--format=", "--name-only", `${firstCommit}..HEAD`],
-      repoDir,
-    );
-    const lines = output
-      .trim()
-      .split("\n")
-      .filter((l) => l.length > 0);
-    expect(lines.length).toBeGreaterThan(0);
+    expect(text).toContain("Bisect guide");
+    expect(text).toContain("Commits modifying src/index.ts:");
   });
 
   it("タグ名をgood_refとして使える", async () => {
-    const repoDir = getRepoDir();
+    const result = await client.callTool({
+      name: "git_bisect_guide",
+      arguments: {
+        repo_path: getRepoDir(),
+        good_ref: "v0.1.0",
+      },
+    });
+    const text = getToolText(result);
 
-    const countOutput = await execGit(
-      ["rev-list", "--count", "v0.1.0..HEAD"],
-      repoDir,
-    );
-    const count = parseInt(countOutput.trim(), 10);
-    expect(count).toBeGreaterThan(0);
+    expect(text).toContain("Bisect guide");
+    expect(text).toContain("Commits in range:");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_bisect_guide",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        good_ref: "HEAD~1",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

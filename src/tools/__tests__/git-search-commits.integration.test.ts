@@ -1,56 +1,63 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseLogOutput } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_search_commits (end-to-end)", () => {
-  it("finds commits matching a keyword", async () => {
-    const output = await execGit(
-      [
-        "log",
-        "--grep=initial",
-        "--regexp-ignore-case",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=20",
-      ],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
+describe("git_search_commits (MCP)", () => {
+  let client: Client;
 
-    expect(commits).toHaveLength(1);
-    expect(commits[0].subject).toBe("feat: initial setup");
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("finds commits by author", async () => {
-    const output = await execGit(
-      [
-        "log",
-        "--grep=feat",
-        "--regexp-ignore-case",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=20",
-        "--author=Bob",
-      ],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
-
-    expect(commits.length).toBeGreaterThanOrEqual(2);
-    expect(commits.every((c) => c.author === "Bob")).toBe(true);
+  afterAll(async () => {
+    await closeMcpClient();
   });
 
-  it("returns empty for no matches", async () => {
-    const output = await execGit(
-      [
-        "log",
-        "--grep=nonexistent-keyword",
-        "--regexp-ignore-case",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=20",
-      ],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
-    expect(commits).toHaveLength(0);
+  it("キーワードに一致するコミットを検索する", async () => {
+    const result = await client.callTool({
+      name: "git_search_commits",
+      arguments: {
+        repo_path: getRepoDir(),
+        query: "initial",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("feat: initial setup");
+    expect(text).toContain("Found 1 commit(s)");
+  });
+
+  it("authorでフィルタリングする", async () => {
+    const result = await client.callTool({
+      name: "git_search_commits",
+      arguments: {
+        repo_path: getRepoDir(),
+        query: "feat",
+        author: "Bob",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Bob");
+    // Should not contain Alice's commits
+    expect(text).not.toContain("Alice");
+  });
+
+  it("マッチなしで空結果メッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_search_commits",
+      arguments: {
+        repo_path: getRepoDir(),
+        query: "nonexistent-keyword",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No commits found");
   });
 });

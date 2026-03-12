@@ -1,47 +1,58 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_commit_graph (end-to-end)", () => {
-  it("コミット統計を取得する", async () => {
-    const output = await execGit(
-      ["log", "--format=%H|%aI|%s", "--max-count=1000"],
-      getRepoDir(),
-    );
+describe("git_commit_graph (MCP)", () => {
+  let client: Client;
 
-    const lines = output
-      .trim()
-      .split("\n")
-      .filter((l) => l.length > 0);
-    expect(lines.length).toBeGreaterThan(0);
+  beforeAll(async () => {
+    client = await createTestMcpClient();
+  });
+
+  afterAll(async () => {
+    await closeMcpClient();
+  });
+
+  it("コミット統計を取得する", async () => {
+    const result = await client.callTool({
+      name: "git_commit_graph",
+      arguments: {
+        repo_path: getRepoDir(),
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Commit graph analysis");
+    expect(text).toContain("Total commits:");
   });
 
   it("マージコミットを検出する", async () => {
-    const output = await execGit(
-      ["log", "--merges", "--format=%H|%aI|%s", "--max-count=1000"],
-      getRepoDir(),
-    );
+    const result = await client.callTool({
+      name: "git_commit_graph",
+      arguments: {
+        repo_path: getRepoDir(),
+      },
+    });
+    const text = getToolText(result);
 
-    const lines = output
-      .trim()
-      .split("\n")
-      .filter((l) => l.length > 0);
-    // The test repo has at least one merge (feature-branch into main)
-    expect(lines.length).toBeGreaterThanOrEqual(1);
+    // The test repo has at least one merge (merge-test-branch)
+    expect(text).toContain("Merge commits:");
+    expect(text).toMatch(/Merge commits:\s+[1-9]/);
   });
 
-  it("マージソースを解析する", async () => {
-    const output = await execGit(
-      ["log", "--merges", "--format=%s", "--max-count=1000"],
-      getRepoDir(),
-    );
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_commit_graph",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+      },
+    });
 
-    const subjects = output
-      .trim()
-      .split("\n")
-      .filter((l) => l.length > 0);
-    // At least one merge subject should exist
-    expect(subjects.length).toBeGreaterThanOrEqual(1);
-    expect(subjects.some((s) => s.includes("Merge") || s.includes("merge"))).toBe(true);
+    expect(result.isError).toBe(true);
   });
 });
