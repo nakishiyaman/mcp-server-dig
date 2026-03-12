@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.13.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.12.0...v0.13.0) (2026-03-12)
+
+
+### Features
+
+* v0.13.0 ROADMAPクリーンアップ + git_whyキャッシュ適用 ([6322b80](https://github.com/nakishiyaman/mcp-server-dig/commit/6322b804ccad3568219635e18b8b61d135ec27f2))
+* v0.13.0 ROADMAPクリーンアップ + git_whyキャッシュ適用 ([5383ab3](https://github.com/nakishiyaman/mcp-server-dig/commit/5383ab3be085c28e5ddd1d5cde668cd53a10a897))
+
 ## [0.12.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.11.0...v0.12.0) (2026-03-12)
 
 
