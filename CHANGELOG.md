@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.13.0...v0.14.0) (2026-03-12)
+
+
+### Features
+
+* Node.js 18サポート廃止 + vitest 4アップグレード ([e213574](https://github.com/nakishiyaman/mcp-server-dig/commit/e2135748a251221a33d57b502b320126105c41eb))
+* v0.14.0 Node.js 18廃止 + vitest 4 ([cc0e1da](https://github.com/nakishiyaman/mcp-server-dig/commit/cc0e1da917546361c5b80261b23caed8c6c7936f))
+
 ## [0.13.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.12.0...v0.13.0) (2026-03-12)
 
 
