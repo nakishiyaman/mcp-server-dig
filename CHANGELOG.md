@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.19.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.18.0...v0.19.0) (2026-03-12)
+
+
+### Features
+
+* git_branch_activityとgit_author_timelineツール追加 ([1137730](https://github.com/nakishiyaman/mcp-server-dig/commit/11377308fa2672e932aaf6cacfa1d0fe2415be8d))
+
 ## [0.18.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.17.0...v0.18.0) (2026-03-12)
 
 
