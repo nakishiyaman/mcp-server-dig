@@ -40,7 +40,7 @@
 ## PRフロー
 
 1. `gh pr create` でPR作成
-2. CI全パス（Node 18/20/22マトリクス）を確認
+2. CI全パス（Node 20/22マトリクス）を確認
 3. マージ
 4. ローカルでmainに切り替え → `git pull`
 
@@ -50,7 +50,7 @@
 
 ```
 mainへのpush
-  → CI (ci.yml): lint → typecheck → test → build (Node 18/20/22)
+  → CI (ci.yml): lint → typecheck → test → build (Node 20/22)
   → Release Please (release-please.yml):
       1. release-pleaseジョブ:
          a. Release PR自動作成/更新 (token: RELEASE_PLEASE_TOKEN)

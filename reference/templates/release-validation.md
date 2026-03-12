@@ -15,7 +15,7 @@
 | A2 | lint | `npm run lint` | エラー0 | | | |
 | A3 | typecheck | `npm run typecheck` | エラー0 | | | |
 | A4 | build | `npm run build` | 成功 | | | |
-| A5 | CI green | PR CI確認 | Node 18/20/22 全パス | | | |
+| A5 | CI green | PR CI確認 | Node 20/22 全パス | | | |
 
 ## B. ツール別動作確認
 
