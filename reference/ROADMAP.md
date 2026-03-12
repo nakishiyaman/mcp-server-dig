@@ -221,12 +221,27 @@
 - [x] tool-guide リソース更新（timeout_ms、新連携パターン）
 - [x] ROADMAP更新
 
-## v0.12.0候補
+## v0.12.0 — timeout_ms完全展開 + 実行観測性
+
+### Phase 1: timeout_ms全20ツール展開
+- [x] 直接execGit呼び出し10ツールにtimeout_msパラメータ追加
+- [x] 分析関数経由4ツール + 分析関数2件にtimeoutMs追加
+- [x] 全パラメータはoptional（破壊的変更なし）
+
+### Phase 2: 実行タイミングログ
+- [x] execGitにperformance.now()計測 + logger.debugログ追加
+- [x] AnalysisCacheにhit/missログ追加
+- [x] startTimerユーティリティ（src/tools/timing.ts）+ テスト
+
+### Phase 3: ドキュメント・リソース更新
+- [x] tool-guideリソース更新（全20ツールtimeout_ms対応）
+- [x] ROADMAP更新
+- [x] README.md / README.ja.md 更新
+- [x] CLAUDE.md バージョン更新
+
+## v0.13.0候補
 
 - [ ] executor層キャッシュ（粒度検証後）
-- [ ] 全20ツールへのtimeout_ms展開（必要性評価後）
-- [ ] ログ出力のツール実行タイミング計測
-- [ ] MCP Sampling API活用（AIによる分析結果の自動要約）
 - [ ] JSON出力モード（構造化出力オプション）
 
 ## スコープ外

@@ -4,6 +4,8 @@
  * (e.g., analyzeHotspotsAndChurn, analyzeContributors).
  */
 
+import { logger } from "../logger.js";
+
 const DEFAULT_TTL_MS = 60_000;
 const DEFAULT_MAX_ENTRIES = 100;
 
@@ -37,17 +39,20 @@ export class AnalysisCache {
     const entry = this.store.get(key);
     if (!entry) {
       this.misses++;
+      logger.debug("cache miss", { key, reason: "not_found" });
       return undefined;
     }
 
     if (Date.now() > entry.expiresAt) {
       this.store.delete(key);
       this.misses++;
+      logger.debug("cache miss", { key, reason: "expired" });
       return undefined;
     }
 
     entry.lastAccessed = Date.now();
     this.hits++;
+    logger.debug("cache hit", { key });
     return entry.value as T;
   }
 

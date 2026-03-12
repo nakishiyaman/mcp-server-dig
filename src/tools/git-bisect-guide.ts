@@ -32,8 +32,17 @@ export function registerGitBisectGuide(server: McpServer): void {
         .describe(
           "Optional file path to focus on — shows only commits that modified this file",
         ),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, good_ref, bad_ref, file_path }) => {
+    async ({ repo_path, good_ref, bad_ref, file_path, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
         if (file_path) {
@@ -46,7 +55,7 @@ export function registerGitBisectGuide(server: McpServer): void {
           "--count",
           `${good_ref}..${bad_ref}`,
         ];
-        const countOutput = await execGit(countArgs, repo_path);
+        const countOutput = await execGit(countArgs, repo_path, timeout_ms);
         const commitCount = parseInt(countOutput.trim(), 10);
 
         if (commitCount === 0) {
@@ -64,7 +73,7 @@ export function registerGitBisectGuide(server: McpServer): void {
           `${good_ref}..${bad_ref}`,
         ];
         if (file_path) logArgs.push("--", file_path);
-        const logOutput = await execGit(logArgs, repo_path);
+        const logOutput = await execGit(logArgs, repo_path, timeout_ms);
         const commits = parseLogOutput(logOutput);
 
         // Get hotspots in range (file change frequency)
@@ -74,7 +83,7 @@ export function registerGitBisectGuide(server: McpServer): void {
           "--name-only",
           `${good_ref}..${bad_ref}`,
         ];
-        const hotspotsOutput = await execGit(hotspotsArgs, repo_path);
+        const hotspotsOutput = await execGit(hotspotsArgs, repo_path, timeout_ms);
         const fileCounts = new Map<string, number>();
         for (const line of hotspotsOutput.trim().split("\n")) {
           const path = line.trim();

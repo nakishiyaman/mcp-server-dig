@@ -15,8 +15,17 @@ export function registerGitBlameContext(server: McpServer): void {
         .describe("Relative path to the file within the repo"),
       start_line: z.number().int().min(1).optional().describe("Start of line range"),
       end_line: z.number().int().min(1).optional().describe("End of line range"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, file_path, start_line, end_line }) => {
+    async ({ repo_path, file_path, start_line, end_line, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -33,7 +42,7 @@ export function registerGitBlameContext(server: McpServer): void {
 
         args.push("--", file_path);
 
-        const output = await execGit(args, repo_path);
+        const output = await execGit(args, repo_path, timeout_ms);
         const blocks = parseBlameOutput(output);
 
         if (blocks.length === 0) {

@@ -26,8 +26,17 @@ export function registerGitTagList(server: McpServer): void {
         .optional()
         .default("newest")
         .describe("Sort order: newest first or oldest first (default: newest)"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, pattern, max_tags, sort }) => {
+    async ({ repo_path, pattern, max_tags, sort, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -41,7 +50,7 @@ export function registerGitTagList(server: McpServer): void {
 
         if (pattern) args.push(pattern);
 
-        const output = await execGit(args, repo_path);
+        const output = await execGit(args, repo_path, timeout_ms);
         let tags = parseTagOutput(output);
 
         if (tags.length === 0) {

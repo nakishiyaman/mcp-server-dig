@@ -24,8 +24,17 @@ export function registerGitFileHistory(server: McpServer): void {
         .string()
         .optional()
         .describe('Date filter, e.g. "2024-01-01" or "6 months ago"'),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, file_path, max_commits, since }) => {
+    async ({ repo_path, file_path, max_commits, since, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -43,7 +52,7 @@ export function registerGitFileHistory(server: McpServer): void {
 
         args.push("--", file_path);
 
-        const output = await execGit(args, repo_path);
+        const output = await execGit(args, repo_path, timeout_ms);
         const commits = parseLogOutput(output);
 
         if (commits.length === 0) {
@@ -57,6 +66,7 @@ export function registerGitFileHistory(server: McpServer): void {
               const stat = await execGit(
                 ["show", "--stat", "--format=", commit.hash, "--", file_path],
                 repo_path,
+                timeout_ms,
               );
               return { ...commit, stat: stat.trim() };
             } catch (e) {

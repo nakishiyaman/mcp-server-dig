@@ -21,8 +21,17 @@ export function registerGitCommitShow(server: McpServer): void {
         .describe(
           "Include the full diff output (default: false, shows stat only)",
         ),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, commit, show_diff }) => {
+    async ({ repo_path, commit, show_diff, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -30,6 +39,7 @@ export function registerGitCommitShow(server: McpServer): void {
         const metaOutput = await execGit(
           ["show", "--stat", "--format=%H|%an|%ae|%aI|%P%n%B", commit],
           repo_path,
+          timeout_ms,
         );
 
         const lines = metaOutput.split("\n");
@@ -73,6 +83,7 @@ export function registerGitCommitShow(server: McpServer): void {
           const diffOutput = await execGit(
             ["show", "-U3", "--format=", commit],
             repo_path,
+            timeout_ms,
           );
 
           if (diffOutput.length > MAX_DIFF_LENGTH) {

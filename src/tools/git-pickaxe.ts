@@ -36,6 +36,15 @@ export function registerGitPickaxe(server: McpServer): void {
         .string()
         .optional()
         .describe("Limit search to commits touching this path"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
     async ({
       repo_path,
@@ -45,6 +54,7 @@ export function registerGitPickaxe(server: McpServer): void {
       since,
       author,
       path_pattern,
+      timeout_ms,
     }) => {
       try {
         await validateGitRepo(repo_path);
@@ -61,7 +71,7 @@ export function registerGitPickaxe(server: McpServer): void {
         if (author) args.push(`--author=${author}`);
         if (path_pattern) args.push("--", path_pattern);
 
-        const output = await execGit(args, repo_path);
+        const output = await execGit(args, repo_path, timeout_ms);
         const commits = parseLogOutput(output);
 
         if (commits.length === 0) {

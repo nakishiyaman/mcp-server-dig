@@ -27,8 +27,17 @@ export function registerGitContributorPatterns(server: McpServer): void {
         .optional()
         .default(500)
         .describe("Maximum number of commits to analyze"),
+      timeout_ms: z
+        .number()
+        .int()
+        .min(1000)
+        .max(300000)
+        .optional()
+        .describe(
+          "Timeout in ms for git operations (default: 30000, max: 300000)",
+        ),
     },
-    async ({ repo_path, path_pattern, since, max_commits }) => {
+    async ({ repo_path, path_pattern, since, max_commits, timeout_ms }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -36,6 +45,7 @@ export function registerGitContributorPatterns(server: McpServer): void {
           pathPattern: path_pattern,
           since,
           maxCommits: max_commits,
+          timeoutMs: timeout_ms,
         });
 
         if (stats.length === 0) {

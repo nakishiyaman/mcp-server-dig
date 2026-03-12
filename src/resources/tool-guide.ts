@@ -57,7 +57,7 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### timeout_ms（対応ツール: git_repo_health, git_review_prep, git_file_risk_profile, git_why, git_code_churn, git_hotspots）
+### timeout_ms（全20ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
