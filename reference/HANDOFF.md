@@ -3,24 +3,25 @@
 日時: 2026-03-12
 
 ### 完了したタスク
-- **v0.17.0 ブランチカバレッジ向上（実装完了、未リリース）**
-  - Phase 1-4: 17テスト追加（11既存ファイルへの追記 + 1新規テストファイル）
-  - Phase 5: vitest branches threshold 50%→65%、ROADMAP・CLAUDE.md更新
-  - カバレッジ改善: statements 84%→90%, branches 64%→71%, functions 89%→92%, lines 85%→92%
+- **v0.18.0 全4フェーズ完了（マージ済み、release-please待ち）**
+  - Phase 1 (PR #76): GitHub Actions Node.js 24 対応準備
+  - Phase 2 (PR #77): 分類ロジック共通化（risk-classifiers.ts、37ユニットテスト）
+  - Phase 3 (PR #78): ブランチカバレッジ向上（15テスト追加、65%→78%）
+  - Phase 4 (PR #79): git_branch_activity + git_author_timeline 追加（12テスト）
+  - カバレッジ: statements 92%, branches 79%, functions 93%, lines 94%
 
 ### 現在の状態
-- ブランチ: `feat/v0.17.0-branch-coverage`（PR未作成）
-- 未コミット変更: あり（コミット・push予定）
-- 全200テストパス、ビルド成功確認済み
+- ブランチ: `main`（全フェーズマージ済み）
+- 264テスト全パス、ビルド成功
+- ツール数: 24（データ取得20 + 組み合わせ分析2 + ワークフロー統合2）
 
 ### 次にやるべきこと
-1. PR作成 → CIパス確認 → マージ
-2. release-please による v0.17.0 リリース
-3. v0.18.0 のスコープ検討
+1. release-please による v0.18.0 リリース（自動PR → auto-merge → npm publish）
+2. v0.19.0 のスコープ検討
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
 - zod 4 は MCP SDK の `zod-to-json-schema` が v3 専用のためブロック中
 - @types/node 25 はサポート対象Node.js（20/22）と不整合のため見送り
 - CIマトリクス変更時はブランチ保護の必須チェックも同時に更新すること
-- GitHub Actions で Node.js 20 アクション非推奨警告あり（2026-06-02以降 Node.js 24 強制）
+- GitHub Actions Node.js 24 対応準備済み（FORCE_JAVASCRIPT_ACTIONS_TO_NODE24設定済み）

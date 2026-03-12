@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12 (v0.17.0)
+最終更新: 2026-03-12 (v0.18.0)
 
 ## v0.4.0 — 品質改善
 
@@ -404,6 +404,37 @@
 | Branches | 64% | 71% |
 | Functions | 89% | 92% |
 | Lines | 85% | 92% |
+
+## v0.18.0 — ブランチカバレッジ80%+、新ツール2本、分類ロジック共通化、Node.js 24準備
+
+### Phase 1: GitHub Actions Node.js 24 対応準備
+- [x] CI/CDワークフローに `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"` 追加
+- [x] CI（Node 20/22）パス確認
+
+### Phase 2: 分類ロジック共通化リファクタリング
+- [x] `src/analysis/risk-classifiers.ts` に分類関数8個を抽出
+- [x] `git-file-risk-profile.ts` のローカル関数を共通モジュールからimport
+- [x] `git-commit-graph.ts` の `classifyIntegrationStyle` を共通モジュールからimport
+- [x] 37件のユニットテスト（境界値テスト完備）
+
+### Phase 3: ブランチカバレッジ向上
+- [x] テストリポジトリに4追加著者（Carol, Dave, Eve, Frank）
+- [x] 15件の統合テスト追加
+- [x] branches threshold 65%→78%
+
+### Phase 4: 新ツール追加
+- [x] `git_branch_activity` — ブランチ活性度分析（active/stale/abandoned）
+- [x] `git_author_timeline` — 著者活動タイムライン分析
+- [x] 12件の統合テスト（各ツール6件）
+- [x] ツールガイド・CLAUDE.md更新（22→24ツール）
+
+### カバレッジ結果
+| 指標 | v0.17.0 | v0.18.0 |
+|------|---------|---------|
+| Statements | 90% | 92% |
+| Branches | 71% | 79% |
+| Functions | 92% | 93% |
+| Lines | 92% | 94% |
 
 ## スコープ外
 
