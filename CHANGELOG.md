@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.20.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.19.0...v0.20.0) (2026-03-12)
+
+
+### Features
+
+* git_commit_frequencyツール実装 ([cf753df](https://github.com/nakishiyaman/mcp-server-dig/commit/cf753df73fa71e0603aa2defec3aedaf4d028d85))
+* JSON出力モード基盤実装 ([991d759](https://github.com/nakishiyaman/mcp-server-dig/commit/991d759259a4c283afc01a2c214e15f2fbe4c6cd))
+* v0.20.0 JSON出力モード + git_commit_frequency + カバレッジ80% ([bde6de5](https://github.com/nakishiyaman/mcp-server-dig/commit/bde6de52ca7c727e409749d2018cd2c5d813ebb1))
+* 全24ツールにJSON出力モード適用 ([2930273](https://github.com/nakishiyaman/mcp-server-dig/commit/29302737f7fe87dde870d5002c0f381f008a5543))
+
+
+### Bug Fixes
+
+* 未使用のsuccessResponseインポート削除（lint修正） ([a21e23c](https://github.com/nakishiyaman/mcp-server-dig/commit/a21e23c917c37eca783dadb93388c1fbb65e3531))
+
 ## [0.19.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.18.0...v0.19.0) (2026-03-12)
 
 
