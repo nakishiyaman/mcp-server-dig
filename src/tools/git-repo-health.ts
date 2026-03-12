@@ -7,7 +7,7 @@ import {
 } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { cachedAnalyzeHotspotsAndChurn, cachedAnalyzeContributors } from "../analysis/cached-analysis.js";
-import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema } from "./response.js";
 import type { ToolContext } from "../index.js";
 
 async function getTrackedFiles(repoPath: string): Promise<string[]> {

@@ -15,7 +15,7 @@ import {
   overallRisk,
   riskLabel,
 } from "../analysis/risk-classifiers.js";
-import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema } from "./response.js";
 import type { ToolContext } from "../index.js";
 
 function padLabel(label: string, width: number): string {

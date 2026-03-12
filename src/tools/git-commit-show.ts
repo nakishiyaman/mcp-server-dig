@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
-import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema } from "./response.js";
 
 const MAX_DIFF_LENGTH = 50_000;
 
