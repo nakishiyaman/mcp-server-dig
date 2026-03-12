@@ -1,48 +1,41 @@
 ## セッション引き継ぎ
 
-日時: 2026-03-11
+日時: 2026-03-12
 
 ### 完了したタスク
-- **v0.11.0 全5フェーズ実装完了**（feat/v0.11.0-phase1ブランチ、PR #56）
-  - Phase 1: エッジケーステスト拡充 + パーサー堅牢化
-    - テストデータ拡充（バイナリファイル、非ASCIIファイル名、50件バルクコミット）
-    - 統合テスト 3→14テストに拡充
-    - `parseDiffStatOutput` Bin行スキップ、`parseBlameOutput` 空commitHashガード
-  - Phase 2: タイムアウト柔軟化
-    - 6ツールに `timeout_ms` パラメータ追加（min 1000, max 300000）
-    - 全分析関数（combined-log-analysis, contributors, co-changes, churn, hotspots）に `timeoutMs` 伝播
-  - Phase 3: 結果キャッシュ層
-    - `AnalysisCache`（TTL 60秒、LRU eviction、最大100エントリ）
-    - `cachedAnalyzeHotspotsAndChurn` / `cachedAnalyzeContributors` ラッパー
-    - `ToolContext` 型定義、複合ツール3件（repo_health, file_risk_profile, review_prep）にcontext伝播
-  - Phase 4: 構造化ログ
-    - `Logger` クラス（JSON形式stderr、debug/info/warn/error）
-    - `DIG_LOG_LEVEL` 環境変数制御
-    - index.ts の console.error → logger 置換
-  - Phase 5: Prompt追加 + ドキュメント
-    - `technical-debt` Prompt（技術的負債分析ワークフロー）
-    - `onboard-area` Prompt（領域別オンボーディング）
-    - ADR-0004: 分析関数レベルキャッシュ設計判断
-    - tool-guide リソース更新、README/README.ja/ROADMAP/CLAUDE.md 更新
+- **v0.12.0 リリース完了**（npm `mcp-server-dig@0.12.0` 公開済み、GitHub Release v0.12.0 作成済み）
+  - Phase 1: timeout_ms全20ツール展開
+    - 直接execGit呼び出し10ツールにtimeout_msパラメータ追加
+    - 分析関数経由4ツール + knowledge-map.ts, dependency-map.tsにtimeoutMsオプション追加
+    - 全パラメータはoptional（破壊的変更なし）
+  - Phase 2: 実行タイミングログ
+    - execGitにperformance.now()計測 + logger.debugログ追加
+    - AnalysisCacheにhit/miss理由付きログ追加
+    - startTimerユーティリティ（src/tools/timing.ts）+ テスト3件追加
+  - Phase 3: ドキュメント・リソース更新
+    - tool-guide: 全20ツールtimeout_ms対応に更新
+    - README/README.ja: タイムアウト・ログ機能の説明更新
+    - ROADMAP: v0.12.0完了、v0.13.0候補追加
+    - CLAUDE.md: バージョン更新
 
 ### 現在の状態
-- ブランチ: `feat/v0.11.0-phase1`（PR #56 作成済み、CIチェック待ち）
+- ブランチ: `main`（v0.12.0リリース済み）
 - 未コミット変更: `.claude/settings.local.json` のみ（ローカル設定）
 - ツール数: 20（データ取得16 + 組み合わせ分析2 + ワークフロー統合2）
 - Prompts: 8、Resources: 2
-- テスト: 161テスト全通過（27ファイル）
+- テスト: 164テスト全通過（28ファイル）
 - build / lint / typecheck 全パス
 
 ### 次にやるべきこと
-1. **PR #56 マージ**: CI全パス確認後にマージ
-2. **v0.11.0 リリース**: release-please PRの自動作成 → auto-merge → npm publish
-3. **v0.12.0 計画**:
-   - ツール実行タイミングのログ計測（logger活用）
-   - キャッシュhit/miss ログ出力
-   - 全20ツールへのtimeout_ms展開検討
-   - MCP Sampling API活用の検討
+1. **v0.13.0 計画**:
+   - executor層キャッシュ（粒度検証後）
+   - JSON出力モード（構造化出力オプション）
+2. **release-please auto-merge タイミング問題の調査**:
+   - v0.12.0リリース時、Release PR作成直後のauto-merge有効化ステップでラベル検索がヒットしなかった
+   - 手動で`gh pr merge --auto --merge`を実行して解決
+   - ワークフローのタイミング調整が必要な可能性あり
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
+- release-pleaseのauto-mergeステップにタイミング問題あり（PR作成直後はラベル検索がヒットしないことがある）
 - キャッシュのTTL 60秒は保守的な値。実運用でチューニング可能
-- バルクコミット50件追加により既存テストの数値アサーションを柔軟化した（`toBeGreaterThanOrEqual`）
