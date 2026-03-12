@@ -19,6 +19,8 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 |------|-------------|
 | `git_file_risk_profile` | Multi-dimensional risk assessment for a single file |
 | `git_repo_health` | Repository-wide health summary |
+| `git_code_ownership_changes` | Compare code ownership before/after a date boundary — detects owner handoffs, bus factor changes, knowledge transfer patterns |
+| `git_impact_analysis` | Blast radius analysis for a file or directory — combines co-change networks, contributor overlap, and directory coupling |
 
 ### Data Retrieval
 
@@ -262,6 +264,43 @@ Analyze commit frequency over time periods. Groups commits into daily, weekly, o
 | max_commits | number | no | Maximum commits to analyze (default: 1000) |
 | path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
 
+### git_release_notes
+
+Generate release notes between two refs by aggregating commits using Conventional Commits format. Groups by type/scope, detects breaking changes, and lists contributors.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| from_ref | string | yes | Start ref (tag, branch, or commit) |
+| to_ref | string | no | End ref (default: HEAD) |
+| group_by | string | no | Grouping: `"type"` (default), `"scope"`, or `"none"` |
+| include_breaking | boolean | no | Include breaking changes section (default: true) |
+| max_commits | number | no | Maximum commits to analyze (default: 500) |
+
+### git_code_ownership_changes
+
+Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, new/departed contributors, and knowledge transfer patterns.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| period_boundary | string | yes | Date boundary for before/after comparison (e.g. `"2024-06-01"`, `"3 months ago"`) |
+| depth | number | no | Directory depth for aggregation (1-5, default: 1) |
+| path_pattern | string | no | Limit analysis to a specific directory |
+| max_commits | number | no | Maximum commits to analyze (default: 500) |
+
+### git_impact_analysis
+
+Analyze the blast radius of changes to a file or directory. Combines co-change networks, contributor overlap, and directory coupling to assess how far changes might ripple.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| target_path | string | yes | File or directory path to analyze impact for |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 500) |
+| min_coupling | number | no | Minimum co-change count to include (default: 2) |
+
 ### git_review_prep
 
 Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.
@@ -487,11 +526,11 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 25 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 28 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Output Format
 
-All 25 tools accept an optional `output_format` parameter:
+All 28 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 

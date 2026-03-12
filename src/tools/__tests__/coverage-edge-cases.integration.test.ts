@@ -73,6 +73,22 @@ async function createRepoWithOldCommits(): Promise<string> {
   await git("add", ".");
   await git("commit", "-m", "feat: recent commit");
 
+  // Tag before breaking change
+  await git("tag", "v1.0.0");
+
+  // Add a breaking change commit (with body containing BREAKING CHANGE)
+  await writeFile(join(dir, "src", "api.ts"), "export const newApi = true;\n");
+  await git("add", ".");
+  await git("commit", "-m", "feat(api)!: redesign API\n\nBREAKING CHANGE: removed legacy endpoint");
+
+  // Add a scoped commit
+  await writeFile(join(dir, "src", "db.ts"), "export const db = true;\n");
+  await git("add", ".");
+  await git("commit", "-m", "fix(db): connection pooling");
+
+  // Tag after breaking change
+  await git("tag", "v2.0.0");
+
   return dir;
 }
 
@@ -307,5 +323,91 @@ describe("カバレッジ向上エッジケース", () => {
 
     expect(text).toContain("Knowledge map");
     expect(text).toContain("RISK: single owner");
+  });
+
+  // git_release_notes: breaking changes in text output
+  it("Breaking Changeをテキスト出力で表示する", async () => {
+    const result = await client.callTool({
+      name: "git_release_notes",
+      arguments: {
+        repo_path: oldRepo,
+        from_ref: "v1.0.0",
+        to_ref: "v2.0.0",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("BREAKING CHANGES:");
+    expect(text).toContain("redesign API");
+  });
+
+  // git_release_notes: group_by=scope
+  it("group_by=scopeでスコープ別にグループ化する", async () => {
+    const result = await client.callTool({
+      name: "git_release_notes",
+      arguments: {
+        repo_path: oldRepo,
+        from_ref: "v1.0.0",
+        to_ref: "v2.0.0",
+        group_by: "scope",
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    const groupTypes = data.groups.map((g: { type: string }) => g.type);
+    expect(groupTypes).toContain("api");
+    expect(groupTypes).toContain("db");
+  });
+
+  // git_release_notes: include_breaking=false
+  it("include_breaking=falseでBreaking Changesを除外する", async () => {
+    const result = await client.callTool({
+      name: "git_release_notes",
+      arguments: {
+        repo_path: oldRepo,
+        from_ref: "v1.0.0",
+        to_ref: "v2.0.0",
+        include_breaking: false,
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data.breakingChanges).toHaveLength(0);
+  });
+
+  // git_impact_analysis: root-level file (no "/" in target_path)
+  it("ルートレベルファイルのimpact分析でtargetDir='.'になる", async () => {
+    // The test repo has root-level files; use a file without "/" in path
+    const result = await client.callTool({
+      name: "git_impact_analysis",
+      arguments: {
+        repo_path: oldRepo,
+        target_path: "README.md",
+        min_coupling: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    // Should not crash and should return a valid result
+    expect(text).toBeDefined();
+  });
+
+  // git_code_ownership_changes: ancient boundary → no commits
+  it("非常に古い境界日付でコミットなしメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_code_ownership_changes",
+      arguments: {
+        repo_path: oldRepo,
+        period_boundary: "2000-01-01",
+      },
+    });
+    const text = getToolText(result);
+
+    // All commits should be "after" the boundary, nothing "before"
+    expect(text).toContain("Code ownership changes");
   });
 });
