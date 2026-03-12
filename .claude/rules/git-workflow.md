@@ -54,7 +54,7 @@ mainへのpush
   → Release Please (release-please.yml):
       1. release-pleaseジョブ:
          a. Release PR自動作成/更新 (token: RELEASE_PLEASE_TOKEN)
-         b. PRにauto-mergeを自動有効化 (gh pr merge --auto --merge)
+         b. PRにauto-mergeを自動有効化 (outputs.prからPR番号取得 → gh pr merge --auto --merge)
       2. publishジョブ: release_created == true の場合のみ
          - npm publish --access public (OIDC Trusted Publishing)
 
