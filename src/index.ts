@@ -76,7 +76,7 @@ function createServer() {
 
   // Workflow integration tools (with cache context)
   registerGitReviewPrep(server, context);
-  registerGitWhy(server);
+  registerGitWhy(server, context);
 
   // Prompts
   registerInvestigateCode(server);

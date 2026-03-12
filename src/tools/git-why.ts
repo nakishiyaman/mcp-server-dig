@@ -7,10 +7,12 @@ import {
 } from "../git/executor.js";
 import { parseBlameOutput } from "../git/parsers.js";
 import { analyzeContributors } from "../analysis/contributors.js";
+import { cachedAnalyzeContributors } from "../analysis/cached-analysis.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
 import { errorResponse, successResponse } from "./response.js";
+import type { ToolContext } from "../index.js";
 
-export function registerGitWhy(server: McpServer): void {
+export function registerGitWhy(server: McpServer, context?: ToolContext): void {
   server.tool(
     "git_why",
     "Explain why code exists by combining blame, commit context, contributor patterns, and co-change analysis into a narrative. Answers the question 'Why does this code look this way?' for a file or line range.",
@@ -103,7 +105,9 @@ export function registerGitWhy(server: McpServer): void {
                 return { hash, filesInCommit };
               }),
             ),
-            analyzeContributors(repo_path, { pathPattern: file_path, timeoutMs: timeout_ms }),
+            context
+              ? cachedAnalyzeContributors(context.cache, repo_path, { pathPattern: file_path, timeoutMs: timeout_ms })
+              : analyzeContributors(repo_path, { pathPattern: file_path, timeoutMs: timeout_ms }),
             analyzeCoChanges(repo_path, file_path, { minCoupling: 2, timeoutMs: timeout_ms }),
           ]);
 
