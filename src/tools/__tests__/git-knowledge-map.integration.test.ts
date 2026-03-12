@@ -60,6 +60,36 @@ describe("git_knowledge_map (MCP)", () => {
     expect(text).toContain("No directory knowledge data");
   });
 
+  it("busFactor=1でRISK: single ownerを表示する", async () => {
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    // Bob has 50+ bulk commits dominating src/ → bus factor = 1
+    expect(text).toContain("bus factor: 1");
+    expect(text).toContain("RISK: single owner");
+  });
+
+  it("contributors>5でtruncationメッセージを表示する", async () => {
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    // src/ has 6 contributors (Alice, Bob, Carol, Dave, Eve, Frank)
+    // The tool shows top 5 and truncates the rest
+    expect(text).toContain("more contributors");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_knowledge_map",

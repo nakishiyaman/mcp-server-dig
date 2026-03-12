@@ -152,6 +152,53 @@ describe("git_why (MCP)", () => {
     expect(text).toContain("more commit(s)");
   });
 
+  it("start_lineのみで行範囲を指定する", async () => {
+    const result = await client.callTool({
+      name: "git_why",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        start_line: 2,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Why does this code exist?");
+    expect(text).toContain("L2+");
+  });
+
+  it("end_lineのみで行範囲を指定する", async () => {
+    const result = await client.callTool({
+      name: "git_why",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        end_line: 2,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Why does this code exist?");
+    // end_line only → no line label suffix since start_line is undefined
+    expect(text).not.toContain("L2+");
+  });
+
+  it("co-changeがない単独ファイルの分析を返す", async () => {
+    const result = await client.callTool({
+      name: "git_why",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/merged-feature.ts",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Why does this code exist?");
+    expect(text).toContain("File context:");
+    // merged-feature.ts was only changed once, so no co-changes with minCoupling=2
+    expect(text).not.toContain("Co-changed with:");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_why",
