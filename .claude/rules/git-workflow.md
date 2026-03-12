@@ -73,6 +73,19 @@ Release PR
 | release-please re-runでは `release_created` が false | release-pleaseの既知動作 | `workflow_dispatch` で手動publish可能 |
 | npm publish には provenance が必要 | Trusted Publishing (OIDC) | `id-token: write` パーミッション設定済み |
 
+### ブランチ保護設定（main）
+
+| 設定 | 値 | 理由 |
+|------|-----|------|
+| Require PR before merging | ON | main直push防止 |
+| Required approvals | 0（無効） | 個人プロジェクトのため不要 |
+| Require status checks | ON (strict) | CI必須 |
+| Required checks | `ci (20)`, `ci (22)` | CIマトリクスと一致させること |
+| Include administrators | ON | 管理者もCI通過必須 |
+| Allow force pushes | OFF | 履歴改変防止 |
+
+**注意**: CIマトリクスを変更した場合、必須チェックも同時に更新すること（v0.14.0でNode 18廃止時に`ci (18)`が残りマージブロックが発生した前例あり）
+
 ### Secrets・設定
 
 | 名前 | 種類 | 用途 | 更新頻度 |
