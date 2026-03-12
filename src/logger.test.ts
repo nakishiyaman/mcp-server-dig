@@ -62,4 +62,20 @@ describe("Logger", () => {
     const output = JSON.parse(stderrSpy.mock.calls[0][0] as string);
     expect(output.context).toBeUndefined();
   });
+
+  it("DIG_LOG_LEVEL環境変数で有効なレベルを設定できる", () => {
+    const original = process.env.DIG_LOG_LEVEL;
+    try {
+      process.env.DIG_LOG_LEVEL = "debug";
+      const logger = new Logger();
+      logger.debug("env-test");
+      expect(stderrSpy).toHaveBeenCalledOnce();
+    } finally {
+      if (original === undefined) {
+        delete process.env.DIG_LOG_LEVEL;
+      } else {
+        process.env.DIG_LOG_LEVEL = original;
+      }
+    }
+  });
 });

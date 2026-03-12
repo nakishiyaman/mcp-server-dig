@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatResponse, outputFormatSchema } from "./response.js";
+import { formatResponse, outputFormatSchema, errorResponse } from "./response.js";
 
 describe("outputFormatSchema", () => {
   it("デフォルトはtextを返す", () => {
@@ -45,5 +45,19 @@ describe("formatResponse", () => {
   it("textモードで50,000文字を超える場合truncateされる", () => {
     const result = formatResponse({}, () => "y".repeat(60_000), "text");
     expect(result.content[0].text).toContain("[Output truncated at 50000 characters]");
+  });
+});
+
+describe("errorResponse", () => {
+  it("Errorオブジェクトからメッセージを抽出する", () => {
+    const result = errorResponse(new Error("something failed"));
+    expect(result.content[0].text).toBe("Error: something failed");
+    expect(result.isError).toBe(true);
+  });
+
+  it("非Errorオブジェクトを文字列に変換する", () => {
+    const result = errorResponse("string error");
+    expect(result.content[0].text).toBe("Error: string error");
+    expect(result.isError).toBe(true);
   });
 });
