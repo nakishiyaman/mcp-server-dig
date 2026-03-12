@@ -339,7 +339,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 
 ### Prerequisites
 
-- Node.js >= 18
+- Node.js >= 20
 - Git
 
 ### Install

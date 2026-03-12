@@ -3,7 +3,6 @@
  * Creates a temporary git repository with known commits once,
  * shared across all test files via vitest provide/inject.
  */
-import type { GlobalSetupContext } from "vitest/node";
 import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -19,7 +18,11 @@ async function git(...args: string[]): Promise<string> {
   return stdout;
 }
 
-export async function setup({ provide }: GlobalSetupContext) {
+export async function setup({
+  provide,
+}: {
+  provide: (key: string, value: unknown) => void;
+}) {
   repoDir = await mkdtemp(join(tmpdir(), "mcp-dig-test-"));
 
   await git("init", "-b", "main");

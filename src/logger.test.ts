@@ -40,7 +40,7 @@ describe("Logger", () => {
 
     expect(stderrSpy).toHaveBeenCalledTimes(2);
     const levels = stderrSpy.mock.calls.map(
-      (call) => JSON.parse(call[0] as string).level,
+      (call: [string, ...unknown[]]) => JSON.parse(call[0] as string).level,
     );
     expect(levels).toEqual(["warn", "error"]);
   });
