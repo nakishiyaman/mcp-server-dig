@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.17.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.16.0...v0.17.0) (2026-03-12)
+
+
+### Features
+
+* v0.17.0 ブランチカバレッジ向上 ([0bda961](https://github.com/nakishiyaman/mcp-server-dig/commit/0bda961dbfa51f144066d829cff986bc0177c7f9))
+* v0.17.0 ブランチカバレッジ向上（17テスト追加） ([d7cb61f](https://github.com/nakishiyaman/mcp-server-dig/commit/d7cb61faa88d73c16f39e6bab90e373c78404057))
+
 ## [0.16.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.15.0...v0.16.0) (2026-03-12)
 
 
