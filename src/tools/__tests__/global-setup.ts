@@ -121,6 +121,28 @@ export async function setup({
   await git("checkout", "main");
   await git("merge", "merge-test-branch", "--no-ff", "--no-edit");
 
+  // Additional authors for knowledge-map contributor truncation testing
+  const extraAuthors = [
+    { name: "Carol", email: "carol@example.com" },
+    { name: "Dave", email: "dave@example.com" },
+    { name: "Eve", email: "eve@example.com" },
+    { name: "Frank", email: "frank@example.com" },
+  ];
+  for (const author of extraAuthors) {
+    await git("config", "user.name", author.name);
+    await git("config", "user.email", author.email);
+    await writeFile(
+      join(repoDir, "src", `contrib-${author.name.toLowerCase()}.ts`),
+      `export const author = "${author.name}";\n`,
+    );
+    await git("add", ".");
+    await git("commit", "-m", `feat: add ${author.name}'s contribution`);
+  }
+
+  // Switch back to Bob for bulk commits
+  await git("config", "user.name", "Bob");
+  await git("config", "user.email", "bob@example.com");
+
   // Commits (Bob): bulk commits for truncation testing
   for (let i = 0; i < 50; i++) {
     await writeFile(

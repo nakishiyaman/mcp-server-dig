@@ -61,6 +61,34 @@ describe("git_stale_files (MCP)", () => {
     }
   });
 
+  it("path_patternなしで全ファイルを対象にする", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        threshold_days: 999999,
+      },
+    });
+    const text = getToolText(result);
+
+    // No stale files with extreme threshold
+    expect(text).toContain("No files found that are stale");
+    expect(text).not.toContain("Scope:");
+  });
+
+  it("存在しないパスでtrackedFiles空の結果を返す", async () => {
+    const result = await client.callTool({
+      name: "git_stale_files",
+      arguments: {
+        repo_path: getRepoDir(),
+        path_pattern: "nonexistent-directory/",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No tracked files found");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_stale_files",
