@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.11.0...v0.12.0) (2026-03-12)
+
+
+### Features
+
+* v0.12.0 — timeout_ms全20ツール展開 + 実行観測性 ([77605b2](https://github.com/nakishiyaman/mcp-server-dig/commit/77605b2681aff55dacbdc17db149115020a73d35))
+* v0.12.0 — timeout_ms全20ツール展開 + 実行観測性 ([c42b6f1](https://github.com/nakishiyaman/mcp-server-dig/commit/c42b6f11e58475995e1eb48ca5f6b121c0bbddba))
+
 ## [0.11.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.10.0...v0.11.0) (2026-03-11)
 
 
