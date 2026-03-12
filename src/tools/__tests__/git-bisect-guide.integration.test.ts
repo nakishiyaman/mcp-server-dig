@@ -73,6 +73,20 @@ describe("git_bisect_guide (MCP)", () => {
     expect(text).toContain("Commits in range:");
   });
 
+  it("同一refで0コミットメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_bisect_guide",
+      arguments: {
+        repo_path: getRepoDir(),
+        good_ref: "HEAD",
+        bad_ref: "HEAD",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No commits found between");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_bisect_guide",

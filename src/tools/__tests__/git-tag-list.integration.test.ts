@@ -47,6 +47,19 @@ describe("git_tag_list (MCP)", () => {
     expect(text).toContain("1 tag(s)");
   });
 
+  it("マッチしないpatternでタグなしメッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_tag_list",
+      arguments: {
+        repo_path: getRepoDir(),
+        pattern: "nonexistent-*",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain('No tags found matching "nonexistent-*"');
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_tag_list",
