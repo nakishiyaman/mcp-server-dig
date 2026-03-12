@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-12 (v0.21.0)
+最終更新: 2026-03-12 (v0.22.0)
 
 ## v0.4.0 — 品質改善
 
@@ -515,6 +515,46 @@
 | Branches | 80% | 83%+ |
 | Functions | 93% | 93%+ |
 | Lines | 94% | 94%+ |
+
+## v0.22.0 — ブランチカバレッジ85%+
+
+### Phase 1: 高インパクトテスト追加
+- [x] `branch-coverage-v022.integration.test.ts` 新規作成（43テスト）
+- [x] カスタムテストリポジトリ6種作成（dominant author, unrelated histories, no tags, high coupling, master branch, large diff）
+- [x] git_impact_analysis: high blast radius + >20 co-changed truncation
+- [x] git_review_prep: 変更なしケース + missing files検出
+- [x] git_branch_activity: symbolic-refフォールバック + masterデフォルト + ブランチなし
+- [x] git_author_timeline: dominant contributor + 単一著者警告 + 空結果（since+path_pattern）
+
+### Phase 2: 中・低インパクトテスト追加
+- [x] git_search_commits: since/path_pattern条件分岐
+- [x] git_blame_context: start_lineのみ / end_lineのみ指定
+- [x] git_why: start_lineのみ / end_lineのみ / JSON出力
+- [x] git_merge_base: 共通祖先なし（orphanブランチ）
+- [x] git_commit_show: diff表示
+- [x] git_commit_graph: マージなしリポジトリ + JSON出力
+- [x] git_knowledge_map: 単一所有者ディレクトリ
+- [x] git_contributor_patterns: 空結果
+- [x] git_tag_list: パターン不一致
+- [x] git_code_churn: 空結果
+- [x] git_commit_frequency: weekly/daily粒度
+- [x] git_diff_context: 大きなdiff
+- [x] git_code_ownership_changes: ソート分岐
+
+### Phase 3: ユニットテスト追加
+- [x] response.test.ts: 非ErrorオブジェクトのerrorResponse
+- [x] logger.test.ts: DIG_LOG_LEVEL環境変数テスト
+
+### Phase 4: thresholds引き上げ
+- [x] `vitest.config.ts` branches threshold 82% → 85%
+
+### カバレッジ結果
+| 指標 | v0.21.0 | v0.22.0 |
+|------|---------|---------|
+| Statements | 95% | 96% |
+| Branches | 82% | 85% |
+| Functions | 94% | 95% |
+| Lines | 95% | 97% |
 
 ## スコープ外
 
