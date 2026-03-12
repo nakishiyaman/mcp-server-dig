@@ -1,42 +1,60 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseTagOutput } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_tag_list (end-to-end)", () => {
-  it("lists tags sorted by newest first", async () => {
-    const output = await execGit(
-      [
-        "tag",
-        "-l",
-        "--sort=-creatordate",
-        "--format=%(refname:short)|%(creatordate:iso-strict)|%(subject)",
-      ],
-      getRepoDir(),
-    );
-    const tags = parseTagOutput(output);
+describe("git_tag_list (MCP)", () => {
+  let client: Client;
 
-    expect(tags).toHaveLength(2);
-    const tagNames = tags.map((t) => t.name);
-    expect(tagNames).toContain("v0.1.0");
-    expect(tagNames).toContain("v0.2.0");
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("filters tags by pattern", async () => {
-    const output = await execGit(
-      [
-        "tag",
-        "-l",
-        "--sort=-creatordate",
-        "--format=%(refname:short)|%(creatordate:iso-strict)|%(subject)",
-        "v0.1*",
-      ],
-      getRepoDir(),
-    );
-    const tags = parseTagOutput(output);
+  afterAll(async () => {
+    await closeMcpClient();
+  });
 
-    expect(tags).toHaveLength(1);
-    expect(tags[0].name).toBe("v0.1.0");
-    expect(tags[0].subject).toBe("Initial release");
+  it("タグ一覧を新しい順に返す", async () => {
+    const result = await client.callTool({
+      name: "git_tag_list",
+      arguments: {
+        repo_path: getRepoDir(),
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("v0.1.0");
+    expect(text).toContain("v0.2.0");
+    expect(text).toContain("2 tag(s)");
+  });
+
+  it("パターンでタグをフィルタリングする", async () => {
+    const result = await client.callTool({
+      name: "git_tag_list",
+      arguments: {
+        repo_path: getRepoDir(),
+        pattern: "v0.1*",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("v0.1.0");
+    expect(text).toContain("Initial release");
+    expect(text).toContain("1 tag(s)");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_tag_list",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

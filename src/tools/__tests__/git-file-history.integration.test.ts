@@ -1,63 +1,75 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseLogOutput } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_file_history (end-to-end)", () => {
-  it("returns commit history for a file", async () => {
-    const output = await execGit(
-      [
-        "log",
-        "--follow",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=20",
-        "--",
-        "src/index.ts",
-      ],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
+describe("git_file_history (MCP)", () => {
+  let client: Client;
 
-    expect(commits.length).toBeGreaterThanOrEqual(3);
-    // Latest commits are bulk commits for truncation testing
-    expect(commits[0].subject).toMatch(/^chore: bulk commit \d+$/);
-    // With max-count=20, older original commits may be outside the window
-    expect(commits.length).toBe(20);
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("respects max_commits", async () => {
-    const output = await execGit(
-      [
-        "log",
-        "--follow",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=1",
-        "--",
-        "src/index.ts",
-      ],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
-    expect(commits).toHaveLength(1);
+  afterAll(async () => {
+    await closeMcpClient();
   });
 
-  it("returns diff stats for a commit", async () => {
-    const logOutput = await execGit(
-      [
-        "log",
-        "--follow",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=1",
-        "--",
-        "src/index.ts",
-      ],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(logOutput);
-    const stat = await execGit(
-      ["show", "--stat", "--format=", commits[0].hash, "--", "src/index.ts"],
-      getRepoDir(),
-    );
-    expect(stat).toContain("src/index.ts");
+  it("ファイルのコミット履歴を返す", async () => {
+    const result = await client.callTool({
+      name: "git_file_history",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("File history for: src/index.ts");
+    expect(text).toContain("Showing 20 commit(s)");
+    expect(text).toContain("chore: bulk commit");
+  });
+
+  it("max_commitsを尊重する", async () => {
+    const result = await client.callTool({
+      name: "git_file_history",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        max_commits: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Showing 1 commit(s)");
+  });
+
+  it("各コミットにdiff statが含まれる", async () => {
+    const result = await client.callTool({
+      name: "git_file_history",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        max_commits: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("src/index.ts");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_file_history",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        file_path: "src/index.ts",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

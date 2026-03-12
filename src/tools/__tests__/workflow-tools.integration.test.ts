@@ -1,121 +1,120 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseLogOutput, parseBlameOutput, parseDiffStatOutput } from "../../git/parsers.js";
-import { analyzeContributors } from "../../analysis/contributors.js";
-import { analyzeCoChanges } from "../../analysis/co-changes.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
 // ─── git_review_prep ─────────────────────────────────────
 
-describe("git_review_prep (end-to-end)", () => {
-  it("main...feature-branchのPRレビューブリーフィングを生成する", async () => {
-    const repoDir = getRepoDir();
-    // Get changed files between main and feature-branch
-    const nameOnlyOutput = await execGit(
-      ["diff", "--name-only", "main...feature-branch"],
-      repoDir,
-    );
-    const changedFiles = nameOnlyOutput
-      .trim()
-      .split("\n")
-      .filter((f) => f.length > 0);
+describe("git_review_prep (MCP)", () => {
+  let client: Client;
 
-    expect(changedFiles).toContain("src/feature.ts");
-
-    // Get commits in the range
-    const commitOutput = await execGit(
-      [
-        "log",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=500",
-        "main...feature-branch",
-      ],
-      repoDir,
-    );
-    const commits = parseLogOutput(commitOutput);
-    expect(commits.length).toBeGreaterThanOrEqual(1);
-    const subjects = commits.map((c) => c.subject);
-    expect(subjects).toContain("feat: add feature module");
-
-    // Diff stat should show changes
-    const diffStatOutput = await execGit(
-      ["diff", "--stat", "main...feature-branch"],
-      repoDir,
-    );
-    const diffStat = parseDiffStatOutput(diffStatOutput);
-    expect(diffStat.filesChanged).toBeGreaterThanOrEqual(1);
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("変更がない場合は早期リターンする", async () => {
-    // main...main should have no changes
-    const nameOnlyOutput = await execGit(
-      ["diff", "--name-only", "main...main"],
-      getRepoDir(),
-    );
-    const changedFiles = nameOnlyOutput
-      .trim()
-      .split("\n")
-      .filter((f) => f.length > 0);
+  afterAll(async () => {
+    await closeMcpClient();
+  });
 
-    expect(changedFiles).toHaveLength(0);
+  it("main...feature-branchのPRレビューブリーフィングを生成する", async () => {
+    const result = await client.callTool({
+      name: "git_review_prep",
+      arguments: {
+        repo_path: getRepoDir(),
+        base_ref: "main",
+        head_ref: "feature-branch",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("PR Review Briefing");
+    expect(text).toContain("src/feature.ts");
+    expect(text).toContain("feat: add feature module");
   });
 
   it("不正なrefでエラーを返す", async () => {
-    await expect(
-      execGit(["rev-parse", "--verify", "nonexistent-ref"], getRepoDir()),
-    ).rejects.toThrow();
+    const result = await client.callTool({
+      name: "git_review_prep",
+      arguments: {
+        repo_path: getRepoDir(),
+        base_ref: "nonexistent-ref",
+        head_ref: "another-nonexistent",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_review_prep",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        base_ref: "main",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });
 
 // ─── git_why ─────────────────────────────────────────────
 
-describe("git_why (end-to-end)", () => {
+describe("git_why (MCP)", () => {
+  let client: Client;
+
+  beforeAll(async () => {
+    client = await createTestMcpClient();
+  });
+
+  afterAll(async () => {
+    await closeMcpClient();
+  });
+
   it("ファイルのblame情報とコンテキストを統合する", async () => {
-    const repoDir = getRepoDir();
-    // Get blame data
-    const blameOutput = await execGit(
-      ["blame", "--porcelain", "--", "src/index.ts"],
-      repoDir,
-    );
-    const blocks = parseBlameOutput(blameOutput);
+    const result = await client.callTool({
+      name: "git_why",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+      },
+    });
+    const text = getToolText(result);
 
-    expect(blocks.length).toBeGreaterThanOrEqual(1);
-
-    // Extract unique commits
-    const uniqueHashes = [...new Set(blocks.map((b) => b.commitHash))];
-    expect(uniqueHashes.length).toBeGreaterThanOrEqual(1);
-
-    // Each commit should have associated files
-    for (const hash of uniqueHashes.slice(0, 3)) {
-      const filesOutput = await execGit(
-        ["show", "--name-only", "--format=", hash],
-        repoDir,
-      );
-      const filesInCommit = filesOutput
-        .trim()
-        .split("\n")
-        .filter((f) => f.length > 0);
-      expect(filesInCommit.length).toBeGreaterThan(0);
-    }
-
-    // Contributors and co-changes should return data
-    const [contributorData, coChangeData] = await Promise.all([
-      analyzeContributors(repoDir, { pathPattern: "src/index.ts" }),
-      analyzeCoChanges(repoDir, "src/index.ts", { minCoupling: 1 }),
-    ]);
-
-    expect(contributorData.stats.length).toBeGreaterThan(0);
-    expect(coChangeData.results.length).toBeGreaterThan(0);
+    expect(text).toContain("Why does this code exist?");
+    expect(text).toContain("commit(s)");
+    expect(text).toContain("author(s)");
   });
 
   it("行範囲指定でblameを取得する", async () => {
-    const blameOutput = await execGit(
-      ["blame", "--porcelain", "-L", "3,4", "--", "src/index.ts"],
-      getRepoDir(),
-    );
-    const blocks = parseBlameOutput(blameOutput);
+    const result = await client.callTool({
+      name: "git_why",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        start_line: 3,
+        end_line: 4,
+      },
+    });
+    const text = getToolText(result);
 
-    expect(blocks.length).toBeGreaterThanOrEqual(1);
-    expect(blocks[0].startLine).toBeGreaterThanOrEqual(3);
+    expect(text).toContain("Why does this code exist?");
+    expect(text).toContain("L3-4");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_why",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        file_path: "src/index.ts",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

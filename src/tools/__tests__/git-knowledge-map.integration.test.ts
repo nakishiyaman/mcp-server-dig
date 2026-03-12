@@ -1,52 +1,73 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { analyzeKnowledgeMap } from "../../analysis/knowledge-map.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_knowledge_map (end-to-end)", () => {
-  it("ディレクトリ別の知識所有者を取得する", async () => {
-    const results = await analyzeKnowledgeMap(getRepoDir(), { depth: 1 });
+describe("git_knowledge_map (MCP)", () => {
+  let client: Client;
 
-    expect(results.length).toBeGreaterThanOrEqual(1);
-    const srcDir = results.find((r) => r.directory === "src");
-    expect(srcDir).toBeDefined();
-    expect(srcDir!.totalCommits).toBeGreaterThan(0);
-    expect(srcDir!.contributors.length).toBeGreaterThanOrEqual(1);
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("バス係数を計算する", async () => {
-    const results = await analyzeKnowledgeMap(getRepoDir(), { depth: 1 });
+  afterAll(async () => {
+    await closeMcpClient();
+  });
 
-    const srcDir = results.find((r) => r.directory === "src");
-    expect(srcDir).toBeDefined();
-    expect(srcDir!.busFactor).toBeGreaterThanOrEqual(1);
+  it("ディレクトリ別の知識所有者を取得する", async () => {
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Knowledge map");
+    expect(text).toContain("src");
+    expect(text).toContain("alice@example.com");
+    expect(text).toContain("bob@example.com");
   });
 
   it("depth=2でより深い階層を分析する", async () => {
-    const results = await analyzeKnowledgeMap(getRepoDir(), { depth: 2 });
-
-    expect(results.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("貢献者にAliceとBobが含まれる", async () => {
-    const results = await analyzeKnowledgeMap(getRepoDir(), { depth: 1 });
-
-    const srcDir = results.find((r) => r.directory === "src");
-    expect(srcDir).toBeDefined();
-    const emails = srcDir!.contributors.map((c) => c.email);
-    expect(emails).toContain("alice@example.com");
-    expect(emails).toContain("bob@example.com");
-  });
-
-  it("空リポジトリでは空配列を返す", async () => {
-    const results = await analyzeKnowledgeMap(getRepoDir(), {
-      since: "2099-01-01",
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 2,
+      },
     });
-    expect(results).toEqual([]);
+    const text = getToolText(result);
+
+    expect(text).toContain("Knowledge map");
   });
 
-  it("git rev-parseでリポジトリ検証できる", async () => {
-    const output = await execGit(["rev-parse", "--git-dir"], getRepoDir());
-    expect(output.trim()).toBe(".git");
+  it("将来のsinceで空結果を返す", async () => {
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        since: "2099-01-01",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No directory knowledge data");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

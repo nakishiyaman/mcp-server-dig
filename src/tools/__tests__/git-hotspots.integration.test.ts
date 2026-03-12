@@ -1,40 +1,58 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseFileFrequency } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_hotspots (end-to-end)", () => {
-  it("identifies frequently changed files", async () => {
-    const output = await execGit(
-      ["log", "--format=", "--name-only", "--max-count=500"],
-      getRepoDir(),
-    );
-    const hotspots = parseFileFrequency(output, 20);
+describe("git_hotspots (MCP)", () => {
+  let client: Client;
 
-    expect(hotspots.length).toBeGreaterThanOrEqual(1);
-
-    // index.ts was changed in all 3 commits, should be top
-    const indexTs = hotspots.find((h) => h.filePath === "src/index.ts");
-    expect(indexTs).toBeDefined();
-    // 4 original + 50 bulk = 54 changes
-    expect(indexTs!.changeCount).toBeGreaterThanOrEqual(54);
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("filters by path pattern", async () => {
-    const output = await execGit(
-      [
-        "log",
-        "--format=",
-        "--name-only",
-        "--max-count=500",
-        "--",
-        "src/utils.ts",
-      ],
-      getRepoDir(),
-    );
-    const hotspots = parseFileFrequency(output, 20);
+  afterAll(async () => {
+    await closeMcpClient();
+  });
 
-    expect(hotspots).toHaveLength(1);
-    expect(hotspots[0].filePath).toBe("src/utils.ts");
+  it("変更頻度の高いファイルを検出する", async () => {
+    const result = await client.callTool({
+      name: "git_hotspots",
+      arguments: {
+        repo_path: getRepoDir(),
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Change hotspots");
+    // index.ts is the top hotspot (4 original + 50 bulk = 54+ changes)
+    expect(text).toContain("src/index.ts");
+  });
+
+  it("path_patternでフィルタリングする", async () => {
+    const result = await client.callTool({
+      name: "git_hotspots",
+      arguments: {
+        repo_path: getRepoDir(),
+        path_pattern: "src/utils.ts",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("src/utils.ts");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_hotspots",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

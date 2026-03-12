@@ -1,41 +1,62 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseLogOutput } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_pickaxe (end-to-end)", () => {
-  it("finds commits that introduced a string", async () => {
-    const output = await execGit(
-      ["log", "-Sconst z", "--format=%H|%an|%ae|%aI|%s", "--max-count=20"],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
+describe("git_pickaxe (MCP)", () => {
+  let client: Client;
 
-    expect(commits.length).toBeGreaterThanOrEqual(1);
-    expect(commits[0].subject).toBe("feat: add z variable");
+  beforeAll(async () => {
+    client = await createTestMcpClient();
   });
 
-  it("finds commits with regex search", async () => {
-    const output = await execGit(
-      ["log", "-Gconst [wz]", "--format=%H|%an|%ae|%aI|%s", "--max-count=20"],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
-
-    expect(commits.length).toBeGreaterThanOrEqual(2);
+  afterAll(async () => {
+    await closeMcpClient();
   });
 
-  it("returns empty for no matches", async () => {
-    const output = await execGit(
-      [
-        "log",
-        "-Snonexistent_string_xyz",
-        "--format=%H|%an|%ae|%aI|%s",
-        "--max-count=20",
-      ],
-      getRepoDir(),
-    );
-    const commits = parseLogOutput(output);
-    expect(commits).toHaveLength(0);
+  it("文字列を導入したコミットを検出する", async () => {
+    const result = await client.callTool({
+      name: "git_pickaxe",
+      arguments: {
+        repo_path: getRepoDir(),
+        search_term: "const z",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("feat: add z variable");
+  });
+
+  it("正規表現で検索する", async () => {
+    const result = await client.callTool({
+      name: "git_pickaxe",
+      arguments: {
+        repo_path: getRepoDir(),
+        search_term: "const [wz]",
+        is_regex: true,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Found");
+    // Should find at least 2 commits (z and w)
+    expect(text).toMatch(/Found [2-9]\d* commit/);
+  });
+
+  it("マッチなしで空結果メッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_pickaxe",
+      arguments: {
+        repo_path: getRepoDir(),
+        search_term: "nonexistent_string_xyz",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("No commits found");
   });
 });

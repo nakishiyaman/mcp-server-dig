@@ -1,44 +1,47 @@
-import { describe, it, expect } from "vitest";
-import { execGit } from "../../git/executor.js";
-import { parseNameOnlyLog } from "../../git/parsers.js";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import {
+  createTestMcpClient,
+  closeMcpClient,
+  getToolText,
+} from "./mcp-test-helpers.js";
 import { getRepoDir } from "./helpers.js";
 
-describe("git_related_changes (end-to-end)", () => {
-  it("finds co-changed files", async () => {
-    const repoDir = getRepoDir();
-    // Get commits that touch index.ts
-    const logOutput = await execGit(
-      [
-        "log",
-        "--format=COMMIT:%H",
-        "--name-only",
-        "--max-count=100",
-        "--",
-        "src/index.ts",
-      ],
-      repoDir,
-    );
-    const commitFiles = parseNameOnlyLog(logOutput);
-    // 4 original + 50 bulk commits touch src/index.ts = 54
-    expect(commitFiles.size).toBeGreaterThanOrEqual(54);
+describe("git_related_changes (MCP)", () => {
+  let client: Client;
 
-    // Build co-change map (same logic as the tool)
-    const coChangeMap = new Map<string, number>();
-    for (const [hash] of commitFiles) {
-      const allFiles = await execGit(
-        ["show", "--name-only", "--format=", hash],
-        repoDir,
-      );
-      const files = allFiles
-        .trim()
-        .split("\n")
-        .filter((f) => f.length > 0 && f !== "src/index.ts");
-      for (const f of files) {
-        coChangeMap.set(f, (coChangeMap.get(f) ?? 0) + 1);
-      }
-    }
+  beforeAll(async () => {
+    client = await createTestMcpClient();
+  });
 
-    // utils.ts was changed in 2 of the 3 commits that touched index.ts
-    expect(coChangeMap.get("src/utils.ts")).toBe(2);
+  afterAll(async () => {
+    await closeMcpClient();
+  });
+
+  it("共変更ファイルを検出する", async () => {
+    const result = await client.callTool({
+      name: "git_related_changes",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("src/index.ts");
+    // utils.ts was changed in 2 commits that also touched index.ts
+    expect(text).toContain("src/utils.ts");
+  });
+
+  it("存在しないリポジトリでエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_related_changes",
+      arguments: {
+        repo_path: "/nonexistent/repo",
+        file_path: "src/index.ts",
+      },
+    });
+
+    expect(result.isError).toBe(true);
   });
 });

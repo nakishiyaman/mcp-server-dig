@@ -325,6 +325,50 @@
 | zod 4 | **見送り** | MCP SDKの`zod-to-json-schema`がv3専用。SDK側の対応待ち |
 | @types/node 25 | **見送り** | サポート対象Node.jsバージョン（20/22）と不整合 |
 
+## v0.16.0 — テストカバレッジ向上（MCP統合テスト移行）
+
+### Phase 1: MCP統合テスト基盤
+- [x] `src/tools/__tests__/mcp-test-helpers.ts` 作成
+  - `createTestMcpClient()`: InMemoryTransport + Client + Server接続
+  - `closeMcpClient()`: クリーンアップ
+  - `getToolText()` / `isToolError()`: レスポンスユーティリティ
+- [x] `src/index.ts` のエントリポイントガード（テスト時のstdio接続を防止）
+
+### Phase 2: データ取得ツールの移行（13ファイル）
+- [x] `execGit()` + パーサー呼び出し → `client.callTool()` に書き換え
+- [x] アサーション: `content[0].text` の `toContain` マッチ
+- [x] エラーケース追加: 不正パスで `isError: true`
+- [x] 対象: git_file_history, git_blame_context, git_related_changes, git_contributor_patterns, git_search_commits, git_commit_show, git_diff_context, git_hotspots, git_pickaxe, git_code_churn, git_stale_files, git_merge_base, git_tag_list
+
+### Phase 3: 追加ツール群の移行（8ファイル）
+- [x] git_knowledge_map, git_dependency_map, git_bisect_guide, git_rename_history, git_commit_graph
+- [x] composite-tools: git_file_risk_profile, git_repo_health
+- [x] workflow-tools: git_review_prep, git_why
+
+### Phase 4: エッジケース・エラー系テスト
+- [x] edge-cases.integration.test.ts の移行（blame, バイナリ, 非ASCII, truncation）
+- [x] MCPプロトコル経由でのエラーケース検証
+
+### Phase 5: thresholds引き上げ + ドキュメント
+- [x] `vitest.config.ts` のthresholdsを50%に引き上げ
+- [x] ROADMAP.md に v0.16.0 セクション追加
+- [x] CLAUDE.md バージョン更新
+
+### カバレッジ結果
+| 指標 | v0.15.0 | v0.16.0 |
+|------|---------|---------|
+| Statements | 33% | 84% |
+| Branches | 28% | 64% |
+| Functions | 33% | 89% |
+| Lines | 28% | 85% |
+
+### 移行しなかったもの
+- `src/git/parsers.test.ts`（48件）: パーサーアルゴリズムの単体テスト
+- `src/analysis/cache.test.ts`（12件）: キャッシュ動作の単体テスト
+- `src/analysis/knowledge-map.test.ts`（10件）: 分析アルゴリズムの単体テスト
+- `executor.integration.test.ts`: execGit自体のテスト
+- `analysis-layer.integration.test.ts`: 分析関数の統合テスト
+
 ## スコープ外
 
 | 項目 | 理由 |
