@@ -3,24 +3,21 @@
 日時: 2026-03-12
 
 ### 完了したタスク
-- **v0.15.0 実装完了**
-  - Phase 1: `npm update` でlockfileリフレッシュ（transitive deps更新）
-  - Phase 2: `git_rename_history` ツール追加（型・パーサー・ツール・テスト7件）
-  - Phase 3: `git_commit_graph` ツール追加（マージ分析・テスト3件）
-  - Phase 4: テストカバレッジ基盤（@vitest/coverage-v8、thresholds設定）
-  - Phase 5: ドキュメント更新（tool-guide, README EN/JA, CLAUDE.md, ROADMAP）
-- **テスト**: 30ファイル、174テスト全パス（+10テスト増加）
-- **カバレッジ**: statements 32.8%, branches 33.4%, functions 38.4%, lines 32.9%
+- **v0.15.0 リリース完了**
+  - PR #68 作成 → CI全パス（Node 20/22） → マージ
+  - release-please Release PR #69 → auto-merge → GitHub Release v0.15.0 作成
+  - npm公開: `mcp-server-dig@0.15.0`
 
 ### 現在の状態
-- ブランチ: `feat/v0.15.0-tools-and-coverage`（push済み、PR未作成）
+- ブランチ: `main`（リモートと同期済み）
 - 未コミット変更: `.claude/settings.local.json` のみ（ローカル設定、コミット不要）
 - ツール数: 22（データ取得18 + 組み合わせ分析2 + ワークフロー統合2）
 - Prompts: 8、Resources: 2
+- 最新リリース: v0.15.0
 
 ### 次にやるべきこと
-1. PR作成 → CIパス確認 → マージ
-2. release-pleaseによるRelease PR自動作成 → npm公開
+1. v0.16.0の計画策定（ROADMAPに新セクション追加）
+   - 候補: テストカバレッジ向上、新ツール追加、パフォーマンス改善等
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
