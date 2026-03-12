@@ -38,6 +38,7 @@ import { registerGitBranchActivity } from "./tools/git-branch-activity.js";
 import { registerGitAuthorTimeline } from "./tools/git-author-timeline.js";
 import { registerGitCommitFrequency } from "./tools/git-commit-frequency.js";
 import { registerGitReleaseNotes } from "./tools/git-release-notes.js";
+import { registerGitCodeOwnershipChanges } from "./tools/git-code-ownership-changes.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -85,6 +86,7 @@ function createServer() {
   // Composite analysis tools (with cache context)
   registerGitFileRiskProfile(server, context);
   registerGitRepoHealth(server, context);
+  registerGitCodeOwnershipChanges(server);
 
   // Workflow integration tools (with cache context)
   registerGitReviewPrep(server, context);
