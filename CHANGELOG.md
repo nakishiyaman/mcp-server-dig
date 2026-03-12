@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.21.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.20.0...v0.21.0) (2026-03-12)
+
+
+### Features
+
+* git_code_ownership_changesツール実装（Phase 3） ([6747cde](https://github.com/nakishiyaman/mcp-server-dig/commit/6747cde7e330288727baf125cb9395e4793ecd29))
+* git_impact_analysisツール実装（Phase 4） ([13efd88](https://github.com/nakishiyaman/mcp-server-dig/commit/13efd886ee35d3759bea8c2af03f9d64c445c69d))
+* git_release_notesツール実装（Phase 2） ([0b1eb6d](https://github.com/nakishiyaman/mcp-server-dig/commit/0b1eb6d785e3052286da3d735a83b87da0d45b94))
+* v0.21.0 新ツール3本 + ブランチカバレッジ82% ([ce2d366](https://github.com/nakishiyaman/mcp-server-dig/commit/ce2d36660c9fdd33fa5b777b8ffd34535265b17d))
+
+
+### Bug Fixes
+
+* テストの未使用変数を削除（lint修正） ([b34d453](https://github.com/nakishiyaman/mcp-server-dig/commit/b34d453ea1104af3d1f736c63a9b0d5f78c6cd1d))
+
 ## [0.20.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.19.0...v0.20.0) (2026-03-12)
 
 
