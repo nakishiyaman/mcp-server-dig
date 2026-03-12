@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateGitRepo } from "../git/executor.js";
 import { analyzeKnowledgeMap } from "../analysis/knowledge-map.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitKnowledgeMap(server: McpServer): void {
   server.tool(
@@ -41,8 +41,9 @@ export function registerGitKnowledgeMap(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, depth, since, max_commits, path_pattern, timeout_ms }) => {
+    async ({ repo_path, depth, since, max_commits, path_pattern, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -90,7 +91,20 @@ export function registerGitKnowledgeMap(server: McpServer): void {
           lines.push("");
         }
 
-        return successResponse(lines.join("\n"));
+        const data = {
+          depth,
+          pathPattern: path_pattern ?? null,
+          maxCommits: max_commits,
+          totalDirectories: results.length,
+          directories: results.map(r => ({
+            directory: r.directory,
+            busFactor: r.busFactor,
+            totalCommits: r.totalCommits,
+            contributors: r.contributors,
+          })),
+        };
+
+        return formatResponse(data, () => lines.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

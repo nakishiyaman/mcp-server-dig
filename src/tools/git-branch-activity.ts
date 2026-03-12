@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 interface BranchInfo {
   name: string;
@@ -57,8 +57,9 @@ export function registerGitBranchActivity(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, include_remote, stale_days, abandoned_days, timeout_ms }) => {
+    async ({ repo_path, include_remote, stale_days, abandoned_days, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -231,7 +232,29 @@ export function registerGitBranchActivity(server: McpServer): void {
           }
         }
 
-        return successResponse(lines.join("\n"));
+        const cleanup = mergedStaleOrAbandoned;
+        const data = {
+          includeRemote: include_remote,
+          staleDays: stale_days,
+          abandonedDays: abandoned_days,
+          summary: {
+            total: branches.length,
+            active: active.length,
+            stale: stale.length,
+            abandoned: abandoned.length,
+            cleanupCandidates: cleanup.length,
+          },
+          branches: branches.map(b => ({
+            name: b.name,
+            lastCommitDate: b.lastCommitDate,
+            daysSinceLastCommit: b.daysSinceLastCommit,
+            commitCount: b.commitCount,
+            isMerged: b.isMerged,
+            activity: b.activity,
+          })),
+        };
+
+        return formatResponse(data, () => lines.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

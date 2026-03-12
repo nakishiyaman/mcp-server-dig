@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { classifyIntegrationStyle } from "../analysis/risk-classifiers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 interface MergeAnalysis {
   totalCommits: number;
@@ -64,8 +64,9 @@ export function registerGitCommitGraph(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, since, max_commits, timeout_ms }) => {
+    async ({ repo_path, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -177,7 +178,7 @@ export function registerGitCommitGraph(server: McpServer): void {
           ...sourceLines,
         ].join("\n");
 
-        return successResponse(text);
+        return formatResponse(analysis, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

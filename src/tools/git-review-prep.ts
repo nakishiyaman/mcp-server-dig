@@ -6,7 +6,7 @@ import { analyzeHotspotsAndChurn } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
 import { cachedAnalyzeHotspotsAndChurn } from "../analysis/cached-analysis.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 import type { ToolContext } from "../index.js";
 
 const MAX_RISK_FILES = 10;
@@ -41,8 +41,9 @@ export function registerGitReviewPrep(server: McpServer, context?: ToolContext):
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, base_ref, head_ref, max_commits, timeout_ms }) => {
+    async ({ repo_path, base_ref, head_ref, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -256,7 +257,27 @@ export function registerGitReviewPrep(server: McpServer, context?: ToolContext):
           }
         }
 
-        return successResponse(lines.join("\n"));
+        const data = {
+          baseRef: base_ref,
+          headRef: head_ref,
+          changedFiles,
+          diffStat: {
+            insertions: diffStat.insertions,
+            deletions: diffStat.deletions,
+            files: diffStat.files,
+          },
+          commits: commits.map((c) => ({
+            hash: c.hash,
+            author: c.author,
+            date: c.date,
+            subject: c.subject,
+          })),
+          riskFiles,
+          suggestedReviewers,
+          missingFiles: uniqueMissingFiles,
+        };
+
+        return formatResponse(data, () => lines.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

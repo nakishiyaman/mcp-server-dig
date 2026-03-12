@@ -67,4 +67,14 @@ describe("analyzeFileStaleness", () => {
     expect(result.lastModified).toMatch(/^\d{4}-\d{2}-\d{2}/);
     expect(result.daysSinceLastChange).toBeGreaterThanOrEqual(0);
   });
+
+  it("存在しないファイルでunknownと-1を返す", async () => {
+    const result = await analyzeFileStaleness(
+      getRepoDir(),
+      "nonexistent-file-that-does-not-exist.xyz",
+    );
+
+    expect(result.lastModified).toBe("unknown");
+    expect(result.daysSinceLastChange).toBe(-1);
+  });
 });

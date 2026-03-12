@@ -55,4 +55,21 @@ describe("git_hotspots (MCP)", () => {
 
     expect(result.isError).toBe(true);
   });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_hotspots",
+      arguments: {
+        repo_path: getRepoDir(),
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("hotspots");
+    expect(data.hotspots.length).toBeGreaterThan(0);
+    expect(data.hotspots[0]).toHaveProperty("filePath");
+    expect(data.hotspots[0]).toHaveProperty("changeCount");
+  });
 });

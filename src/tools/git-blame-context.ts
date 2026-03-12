@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateFilePath, validateGitRepo } from "../git/executor.js";
 import { parseBlameOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitBlameContext(server: McpServer): void {
   server.tool(
@@ -24,8 +24,9 @@ export function registerGitBlameContext(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, file_path, start_line, end_line, timeout_ms }) => {
+    async ({ repo_path, file_path, start_line, end_line, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -60,6 +61,22 @@ export function registerGitBlameContext(server: McpServer): void {
           return `${header}\n${code}`;
         });
 
+        const data = {
+          file: file_path,
+          totalBlocks: blocks.length,
+          totalAuthors: new Set(blocks.map((b) => b.author)).size,
+          blocks: blocks.map((b) => ({
+            commitHash: b.commitHash,
+            author: b.author,
+            email: b.email,
+            date: b.date,
+            summary: b.summary,
+            startLine: b.startLine,
+            endLine: b.endLine,
+            lines: b.lines,
+          })),
+        };
+
         const text = [
           `Blame context for: ${file_path}`,
           `${blocks.length} block(s) from ${new Set(blocks.map((b) => b.author)).size} author(s)`,
@@ -67,7 +84,7 @@ export function registerGitBlameContext(server: McpServer): void {
           ...sections,
         ].join("\n");
 
-        return successResponse(text);
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

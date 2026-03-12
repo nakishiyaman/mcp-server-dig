@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateFilePath, validateGitRepo } from "../git/executor.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitRelatedChanges(server: McpServer): void {
   server.tool(
@@ -36,8 +36,9 @@ export function registerGitRelatedChanges(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, file_path, max_commits, min_coupling, timeout_ms }) => {
+    async ({ repo_path, file_path, max_commits, min_coupling, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -73,7 +74,19 @@ export function registerGitRelatedChanges(server: McpServer): void {
         }
         parts.push("", ...lines);
 
-        return successResponse(parts.join("\n"));
+        const data = {
+          file: file_path,
+          totalCommits,
+          totalRelated: results.length,
+          skipped: skipped.length,
+          relatedFiles: results.map((r) => ({
+            filePath: r.filePath,
+            coChangeCount: r.coChangeCount,
+            percentage: r.percentage,
+          })),
+        };
+
+        return formatResponse(data, () => parts.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

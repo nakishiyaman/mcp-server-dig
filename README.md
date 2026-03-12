@@ -228,6 +228,40 @@ Analyze merge patterns and branch integration topology. Calculates merge ratio, 
 | since | string | no | Analysis period (default: "6 months ago") |
 | max_commits | number | no | Maximum commits to analyze (default: 1000) |
 
+### git_branch_activity
+
+Analyze branch activity levels, classifying branches as active, stale, or abandoned based on recent commit activity.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| include_remote | boolean | no | Include remote branches (default: false) |
+| stale_days | number | no | Days without commits to consider stale (default: 30) |
+| abandoned_days | number | no | Days without commits to consider abandoned (default: 90) |
+
+### git_author_timeline
+
+Analyze author activity periods and team composition changes over time.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"1 year ago"` |
+| path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
+| max_commits | number | no | Maximum commits to analyze (default: 1000) |
+
+### git_commit_frequency
+
+Analyze commit frequency over time periods. Groups commits into daily, weekly, or monthly buckets to identify development patterns.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| granularity | string | no | Time granularity: `"daily"`, `"weekly"` (default), or `"monthly"` |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 1000) |
+| path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
+
 ### git_review_prep
 
 Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.
@@ -453,7 +487,13 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 22 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 25 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+
+### Output Format
+
+All 25 tools accept an optional `output_format` parameter:
+- `"text"` (default) — human-readable formatted output
+- `"json"` — structured JSON for programmatic consumption
 
 ### Structured Logging
 

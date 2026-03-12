@@ -6,7 +6,7 @@ import {
   validateFilePath,
 } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitBisectGuide(server: McpServer): void {
   server.tool(
@@ -41,8 +41,9 @@ export function registerGitBisectGuide(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, good_ref, bad_ref, file_path, timeout_ms }) => {
+    async ({ repo_path, good_ref, bad_ref, file_path, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         if (file_path) {
@@ -131,7 +132,24 @@ export function registerGitBisectGuide(server: McpServer): void {
           }
         }
 
-        return successResponse(lines.join("\n"));
+        const topHotspots = hotspots.map(([file, count]) => ({ file, count }));
+
+        const data = {
+          goodRef: good_ref,
+          badRef: bad_ref,
+          filePath: file_path ?? null,
+          commitCount,
+          bisectSteps,
+          hotspots: topHotspots,
+          commits: commits.map((c) => ({
+            hash: c.hash,
+            date: c.date,
+            author: c.author,
+            subject: c.subject,
+          })),
+        };
+
+        return formatResponse(data, () => lines.join("\n"), output_format);
       } catch (error) {
         return errorResponse(error);
       }

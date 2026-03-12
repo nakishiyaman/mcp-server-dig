@@ -30,10 +30,11 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | マージパターンを分析したい | git_commit_graph |
 | ブランチの活性度を知りたい | git_branch_activity |
 | 著者の活動期間を知りたい | git_author_timeline |
+| 時間帯別のコミット頻度を知りたい | git_commit_frequency |
 
 ## カテゴリ別一覧
 
-### データ取得ツール（20個）
+### データ取得ツール（21個）
 - **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
 - **git_file_history** — ファイルのコミット履歴を時系列で表示
 - **git_commit_show** — 特定コミットの詳細（diff含む）を表示
@@ -54,6 +55,7 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_commit_graph** — マージパターンとブランチ統合トポロジーを分析
 - **git_branch_activity** — ブランチの活性度分析（active/stale/abandoned分類）
 - **git_author_timeline** — 著者活動タイムラインと所有権分析
+- **git_commit_frequency** — 時間帯別コミット頻度分析（日次/週次/月次）
 
 ### 組み合わせ分析ツール（2個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
@@ -65,7 +67,11 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### timeout_ms（全24ツール対応）
+### output_format（全25ツール対応）
+- \`output_format: "text"\` — デフォルト。人間が読みやすいテキスト形式
+- \`output_format: "json"\` — 構造化JSON形式。プログラムからの利用に最適
+
+### timeout_ms（全25ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
@@ -126,7 +132,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "24ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "25ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

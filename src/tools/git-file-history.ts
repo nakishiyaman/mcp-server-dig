@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateFilePath, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitFileHistory(server: McpServer): void {
   server.tool(
@@ -33,8 +33,9 @@ export function registerGitFileHistory(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, file_path, max_commits, since, timeout_ms }) => {
+    async ({ repo_path, file_path, max_commits, since, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -76,22 +77,34 @@ export function registerGitFileHistory(server: McpServer): void {
           }),
         );
 
-        const lines = enriched.map((c) => {
-          let entry = `${c.hash.slice(0, 8)} | ${c.date.slice(0, 10)} | ${c.author} | ${c.subject}`;
-          if (c.stat) {
-            entry += `\n  ${c.stat}`;
-          }
-          return entry;
-        });
+        const data = {
+          file: file_path,
+          totalCommits: commits.length,
+          commits: enriched.map((c) => ({
+            hash: c.hash,
+            date: c.date,
+            author: c.author,
+            email: c.email,
+            subject: c.subject,
+            stat: c.stat,
+          })),
+        };
 
-        const text = [
-          `File history for: ${file_path}`,
-          `Showing ${commits.length} commit(s)`,
-          "",
-          ...lines,
-        ].join("\n");
-
-        return successResponse(text);
+        return formatResponse(data, () => {
+          const textLines = enriched.map((c) => {
+            let entry = `${c.hash.slice(0, 8)} | ${c.date.slice(0, 10)} | ${c.author} | ${c.subject}`;
+            if (c.stat) {
+              entry += `\n  ${c.stat}`;
+            }
+            return entry;
+          });
+          return [
+            `File history for: ${file_path}`,
+            `Showing ${commits.length} commit(s)`,
+            "",
+            ...textLines,
+          ].join("\n");
+        }, output_format);
       } catch (error) {
         return errorResponse(error);
       }

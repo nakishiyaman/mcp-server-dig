@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateFilePath, validateGitRepo } from "../git/executor.js";
 import { parseRenameOutput } from "../git/parsers.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitRenameHistory(server: McpServer): void {
   server.tool(
@@ -29,8 +29,9 @@ export function registerGitRenameHistory(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, file_path, max_entries, timeout_ms }) => {
+    async ({ repo_path, file_path, max_entries, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
@@ -68,7 +69,8 @@ export function registerGitRenameHistory(server: McpServer): void {
           ...lines,
         ].join("\n");
 
-        return successResponse(text);
+        const data = { file: file_path, totalRenames: renames.length, renames: renames.map(r => ({ hash: r.hash, date: r.date, author: r.author, email: r.email, subject: r.subject, oldPath: r.oldPath, newPath: r.newPath })) };
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }

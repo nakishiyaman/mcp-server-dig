@@ -90,6 +90,40 @@ describe("git_knowledge_map (MCP)", () => {
     expect(text).toContain("more contributors");
   });
 
+  it("path_patternでスコープを絞り込む", async () => {
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+        path_pattern: "src/",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Scope: src/");
+    expect(text).toContain("Knowledge map");
+  });
+
+  it("JSON出力フォーマットで構造化データを返す", async () => {
+    const result = await client.callTool({
+      name: "git_knowledge_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+        output_format: "json",
+      },
+    });
+    const text = getToolText(result);
+    const data = JSON.parse(text);
+
+    expect(data).toHaveProperty("directories");
+    expect(data.directories.length).toBeGreaterThan(0);
+    expect(data.directories[0]).toHaveProperty("directory");
+    expect(data.directories[0]).toHaveProperty("busFactor");
+    expect(data.directories[0]).toHaveProperty("contributors");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_knowledge_map",

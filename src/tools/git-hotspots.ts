@@ -2,7 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateGitRepo } from "../git/executor.js";
 import { analyzeHotspots } from "../analysis/hotspots.js";
-import { errorResponse, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitHotspots(server: McpServer): void {
   server.tool(
@@ -41,8 +41,9 @@ export function registerGitHotspots(server: McpServer): void {
         .describe(
           "Timeout in ms for git operations (default: 30000, max: 300000)",
         ),
+      output_format: outputFormatSchema,
     },
-    async ({ repo_path, path_pattern, since, max_commits, top_n, timeout_ms }) => {
+    async ({ repo_path, path_pattern, since, max_commits, top_n, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
 
@@ -71,7 +72,18 @@ export function registerGitHotspots(server: McpServer): void {
           ...lines,
         ].join("\n");
 
-        return successResponse(text);
+        const data = {
+          pathPattern: path_pattern ?? null,
+          maxCommits: max_commits,
+          totalHotspots: hotspots.length,
+          hotspots: hotspots.map(h => ({
+            filePath: h.filePath,
+            changeCount: h.changeCount,
+            percentage: h.percentage,
+          })),
+        };
+
+        return formatResponse(data, () => text, output_format);
       } catch (error) {
         return errorResponse(error);
       }
