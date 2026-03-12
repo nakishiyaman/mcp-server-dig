@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.18.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.17.0...v0.18.0) (2026-03-12)
+
+
+### Features
+
+* ブランチカバレッジ65%→78%に向上 ([3e10c6e](https://github.com/nakishiyaman/mcp-server-dig/commit/3e10c6eefe2a7554aac16b1faae8e412d4e3e5ae))
+* ブランチカバレッジ65%→78%に向上（15テスト追加） ([0cc2444](https://github.com/nakishiyaman/mcp-server-dig/commit/0cc2444d7b6ac5a3c431f86611f48a00c8790eb7))
+
 ## [0.17.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.16.0...v0.17.0) (2026-03-12)
 
 
