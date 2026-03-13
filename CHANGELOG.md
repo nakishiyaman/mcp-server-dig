@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.23.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.22.0...v0.23.0) (2026-03-13)
+
+
+### Features
+
+* v0.24.0 Node.js 20廃止・新ツール2本・ブランチカバレッジ維持 ([bbad31a](https://github.com/nakishiyaman/mcp-server-dig/commit/bbad31a5498a04117096b935d0f1066afa02cccb))
+* v0.24.0 Node.js 20廃止・新ツール2本・ブランチカバレッジ維持 ([2f9d047](https://github.com/nakishiyaman/mcp-server-dig/commit/2f9d047fdcbef000ca19b6f6023d38455eaadc5b))
+
+
+### Bug Fixes
+
+* branch-coverage-v024テストの未使用import除去 ([310121e](https://github.com/nakishiyaman/mcp-server-dig/commit/310121e4c4365582ae0d4a3e8a2c9746ad8364a4))
+
 ## [0.22.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.21.0...v0.22.0) (2026-03-13)
 
 
