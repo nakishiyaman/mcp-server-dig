@@ -564,7 +564,7 @@
 
 ### Phase 2: Node.js 24 CI
 - [x] `.github/workflows/ci.yml` matrix `[20, 22]` → `[20, 22, 24]`
-- [ ] ブランチ保護に `ci (24)` 追加（手動設定必要）
+- [x] ブランチ保護に `ci (24)` 追加
 
 ### Phase 3: 新ツール3本
 - [x] `git_contributor_network` — コントリビューター共同作業グラフ
