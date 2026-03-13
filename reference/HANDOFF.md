@@ -3,30 +3,27 @@
 日時: 2026-03-13
 
 ### 完了したタスク
-- **v0.23.0 全5フェーズ実装完了**
-  - Phase 1: vitest ^4.1.0 + @vitest/coverage-v8 ^4.1.0 更新、ソースマップ除外（`!build/**/*.js.map`）
-  - Phase 2: CI matrixにNode.js 24追加
-  - Phase 3: 新ツール3本実装（git_contributor_network, git_conflict_history, git_survival_analysis）
-  - Phase 4: ブランチカバレッジ85%維持（targeted tests 43件 + parser test 1件追加）
-  - Phase 5: tool-guide, CLAUDE.md, README.md, README.ja.md, ROADMAP.md更新
-- **PR #92 作成済み**: https://github.com/nakishiyaman/mcp-server-dig/pull/92
-  - ブランチ: `feat/v0.23.0-maintenance-and-tools`
-  - 19ファイル変更（+2394/-812）
-  - 457テスト全パス、ブランチカバレッジ85.01%
+- **v0.23.0 リリース完了**
+  - PR #92 マージ（CI全パス: Node 20/22/24）
+  - ブランチ保護に `ci (24)` 追加（GitHub API経由）
+  - Release PR #93 自動マージ → GitHub Release v0.22.0 作成 → npm公開成功
+  - `git-workflow.md` のCI記述を Node 20/22/24 に更新
+  - ROADMAP.md のブランチ保護タスクを完了に更新
 
 ### 現在の状態
-- ブランチ: `feat/v0.23.0-maintenance-and-tools`（PR #92 CIパス待ち）
-- 未コミット変更: なし（`.claude/settings.local.json`のみ — ローカル設定）
+- ブランチ: `main`（最新、リリース済み）
+- npm: `mcp-server-dig@0.22.0` 公開済み
 - ツール数: 31（データ取得25 + 組み合わせ分析4 + ワークフロー統合2）
 - カバレッジ: statements 96%, branches 85%, functions 94%, lines 97%
+- 未コミット変更: `git-workflow.md`, `ROADMAP.md`, `HANDOFF.md` の更新
+
+### 注意点
+- release-pleaseがバージョンを `0.22.0` として公開（v0.22.0のtestコミット + v0.23.0のfeatコミットが合算）
+- 実装内容はv0.23.0相当だが、npmバージョンは0.22.0
+- Node.js 20 EOLは2026-04-30 → 次バージョンで廃止検討
+- RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
+- GitHub Actions Node.js 20 deprecation警告あり（2026-06-02からNode 24強制）→ FORCE_JAVASCRIPT_ACTIONS_TO_NODE24は既に設定済み
 
 ### 次にやるべきこと
-1. PR #92 のCI確認（Node 20/22/24マトリクス）→ マージ
-2. マージ後、ブランチ保護設定に `ci (24)` を必須チェックとして追加（手動）
-3. release-pleaseによるリリースPR確認 → npm公開
-
-### ブロッカー/注意点
-- Node.js 24がCIに追加されたが、ブランチ保護の必須チェックに`ci (24)`はまだ未追加（マージ後に手動追加）
-- Node.js 20 EOLは2026-04-30 → 次バージョンで廃止検討
-- RELEASE_PLEASE_TOKEN は年次更新が必要（2027-03頃）
-- v0.22.0のリリースはtestコミットのみのため保留中（v0.23.0のfeatコミットで合算リリースされる見込み）
+1. ドキュメント更新のコミット・push（git-workflow.md, ROADMAP.md, HANDOFF.md）
+2. 次バージョンの計画策定
