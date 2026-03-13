@@ -313,6 +313,27 @@ Analyze code churn trends over time. Shows additions, deletions, net change, and
 | max_commits | number | no | Maximum commits to analyze (default: 1000) |
 | path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
 
+### git_code_age
+
+Analyze the age distribution of code lines in a file using blame data. Groups lines into age brackets (< 1 month, 1-3 months, 3-6 months, 6-12 months, > 1 year) to visualize how old different parts of a file are.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| file_path | string | yes | Relative path to the file within the repo |
+
+### git_commit_message_quality
+
+Analyze commit message quality metrics including Conventional Commits compliance rate, average subject length, long subject violations (>72 chars), issue reference rate, and type distribution.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 200) |
+| path_pattern | string | no | Limit analysis to commits touching this path |
+| author | string | no | Filter by author name or email |
+
 ### git_code_ownership_changes
 
 Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, new/departed contributors, and knowledge transfer patterns.
@@ -468,7 +489,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 
 ### Prerequisites
 
-- Node.js >= 20
+- Node.js >= 22
 - Git
 
 ### Install
@@ -562,11 +583,11 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 31 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 33 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Output Format
 
-All 31 tools accept an optional `output_format` parameter:
+All 33 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 

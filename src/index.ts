@@ -43,6 +43,8 @@ import { registerGitImpactAnalysis } from "./tools/git-impact-analysis.js";
 import { registerGitContributorNetwork } from "./tools/git-contributor-network.js";
 import { registerGitConflictHistory } from "./tools/git-conflict-history.js";
 import { registerGitSurvivalAnalysis } from "./tools/git-survival-analysis.js";
+import { registerGitCodeAge } from "./tools/git-code-age.js";
+import { registerGitCommitMessageQuality } from "./tools/git-commit-message-quality.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -63,7 +65,7 @@ function createServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (25)
+  // Data retrieval tools (27)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -89,6 +91,8 @@ function createServer() {
   registerGitContributorNetwork(server);
   registerGitConflictHistory(server);
   registerGitSurvivalAnalysis(server);
+  registerGitCodeAge(server);
+  registerGitCommitMessageQuality(server);
 
   // Composite analysis tools (with cache context)
   registerGitFileRiskProfile(server, context);
