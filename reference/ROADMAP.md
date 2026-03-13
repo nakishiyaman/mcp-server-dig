@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-13 (v0.24.0実装完了)
+最終更新: 2026-03-13 (v0.23.0リリース完了 — npm公開済み)
 
 ## v0.4.0 — 品質改善
 
@@ -634,7 +634,7 @@
 | Lines | 97% | 96% |
 
 ### ブランチ保護（手動）
-- [ ] GitHub Settings → Required checks から `ci (20)` を削除
+- [x] GitHub Settings → Required checks から `ci (20)` を削除
 
 ## スコープ外
 

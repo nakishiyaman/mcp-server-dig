@@ -119,6 +119,38 @@ Tesseraの主要ワークフロー（CLAUDE.md, AGENTS.md, .claude/rules/, .clau
 | **カスタムスキル（Tessera固有）** | block-lock, yjs-crdt, tiptap-extensions はTessera固有ドメイン |
 | **sequential-thinking MCP** | 当プロジェクトの複雑度では不要。必要時に .mcp.json に追加 |
 
+## 第3回評価（Insights分析 2026-03-13）
+
+Claude Code Insightsレポート（178セッション分析）に基づく推奨プラクティスの適合性評価。
+
+### 採用（AGENTS.md・CLAUDE.mdに組み込み済み）
+
+| # | 推奨 | 出典 | 対処する摩擦 |
+|---|------|------|-------------|
+| 33 | 計画で止まらない（ステータス確認後は即実装） | Usage Pattern | 5+セッションが計画のみで終了（Excessive Planning摩擦） |
+| 34 | 状態を推測しない（実際に確認してから判断） | CLAUDE.md Addition | NPM_TOKEN誤検知、release-please履歴の不正確な報告 |
+| 35 | コミット前にtypecheck+lint実行 | CLAUDE.md Addition | 19件のBuggy Code摩擦（unused import、型エラー等） |
+| 36 | 複雑な変更はスパイクテストで検証 | Usage Pattern | 8件のWrong Approach摩擦（PDF解析、循環依存等） |
+| 37 | サブエージェントのスコープ制限 | Usage Pattern | Agent Timeout摩擦（2エージェント同時タイムアウト） |
+
+### 既に導入済み（重複のため新規アクション不要）
+
+| 推奨 | 既存の対応 |
+|------|-----------|
+| Hooks（pre-commit lint+typecheck） | PostToolUse/PreToolUse/Stopフック設定済み (#4,#8,#9,#10) |
+| Custom Skills（handoff, status） | `/handoff`, `/progress`, `/lint`, `/test` コマンド設定済み (#11,#12,#14,#15) |
+| セッション終了時handoff作成 | `/handoff`コマンド + AGENTS.mdセッション管理 (#11) |
+| テスト・リント完了前実行 | Stopフック + 品質ゲート (#7,#10) |
+
+### 見送り
+
+| 推奨 | 理由 |
+|------|------|
+| Headless Mode（CI内Claude実行） | release-pleaseで自動化済み。CI内Claude実行は過剰 |
+| 自律リリースパイプライン | release-please + auto-mergeで十分自動化済み |
+| 並列TDDエージェント | 現行TDD規律で品質維持できている。worktree制約もある |
+| 自己修復CI | 現行フック体制で摩擦は十分軽減。過剰な仕組み |
+
 ## Tessera参照元
 
 検討の元になったTesseraの設定ファイル一覧（将来の導入時にコピー元として参照）:
