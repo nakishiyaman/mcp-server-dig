@@ -52,6 +52,7 @@ export function registerGitDependencyMap(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({
       repo_path,
       depth,

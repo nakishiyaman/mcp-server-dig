@@ -591,9 +591,47 @@ All 33 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 
+### Tool Annotations
+
+All 33 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
+
+### Streamable HTTP Transport
+
+By default, dig runs on stdio. To use Streamable HTTP transport:
+
+```bash
+# Via CLI flag
+mcp-server-dig --http
+
+# Via environment variable
+DIG_TRANSPORT=http mcp-server-dig
+```
+
+HTTP mode listens on `http://127.0.0.1:3000/mcp`. Change the port with `DIG_PORT`:
+
+```json
+{
+  "mcpServers": {
+    "dig": {
+      "command": "mcp-server-dig",
+      "args": ["--http"],
+      "env": {
+        "DIG_PORT": "8080"
+      }
+    }
+  }
+}
+```
+
+### Auto-completion
+
+Prompt arguments and resource URI paths support MCP completion protocol for interactive clients.
+
 ### Structured Logging
 
-Set `DIG_LOG_LEVEL` environment variable to control log verbosity on stderr:
+Logging uses the MCP Logging Protocol when connected to a client, with stderr fallback.
+
+Set `DIG_LOG_LEVEL` environment variable to control log verbosity:
 
 ```json
 {
@@ -608,7 +646,7 @@ Set `DIG_LOG_LEVEL` environment variable to control log verbosity on stderr:
 }
 ```
 
-Available levels: `debug`, `info` (default), `warn`, `error`. Output format: JSON lines on stderr.
+Available levels: `debug`, `info` (default), `warn`, `error`.
 
 When `DIG_LOG_LEVEL=debug`, every git command execution logs its duration, and the analysis cache logs hit/miss events. This enables performance profiling and bottleneck identification.
 

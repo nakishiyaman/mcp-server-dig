@@ -40,6 +40,7 @@ export function registerGitSearchCommits(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, query, max_commits, since, author, path_pattern, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

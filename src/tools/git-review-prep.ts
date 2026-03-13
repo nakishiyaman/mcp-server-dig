@@ -43,6 +43,7 @@ export function registerGitReviewPrep(server: McpServer, context?: ToolContext):
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, base_ref, head_ref, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

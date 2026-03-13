@@ -1,6 +1,14 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-13 (v0.23.0リリース完了 — npm公開済み)
+最終更新: 2026-03-13 (v0.24.0開発中)
+
+## v0.24.0 — MCP SDK新機能フル活用
+
+- [x] Phase 1: Tool Annotations（全33ツールに `readOnlyHint: true, openWorldHint: false`）
+- [x] Phase 2: MCP Logging Protocol移行（`server.sendLoggingMessage()` + stderrフォールバック）
+- [x] Phase 3: Streamable HTTP Transport対応（`--http`フラグ / `DIG_TRANSPORT=http`）
+- [x] Phase 4: Completion（プロンプト引数・リソースURIの自動補完）
+- [x] Phase 5: ドキュメント・リリース準備
 
 ## v0.4.0 — 品質改善
 

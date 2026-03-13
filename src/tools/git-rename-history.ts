@@ -31,6 +31,7 @@ export function registerGitRenameHistory(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, file_path, max_entries, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

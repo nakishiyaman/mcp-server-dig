@@ -43,6 +43,7 @@ export function registerGitBisectGuide(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, good_ref, bad_ref, file_path, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

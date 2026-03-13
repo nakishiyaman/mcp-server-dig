@@ -3,32 +3,28 @@
 日時: 2026-03-13
 
 ### 完了したタスク
-- **Claude Code Insights分析に基づく推奨プラクティス評価・導入**
-  - 178セッション分のInsightsレポートから14件の推奨事項を抽出
-  - 5件を採用しAGENTS.md・CLAUDE.mdに組み込み:
-    1. 計画で止まらない（ステータス確認後は即実装）
-    2. 状態を推測しない（実際に確認してから判断）
-    3. コミット前にtypecheck+lint実行
-    4. 複雑な変更はスパイクテストで検証
-    5. サブエージェントのスコープ制限
-  - 4件は既に導入済みと確認（Hooks, Custom Skills, handoff, 品質ゲート）
-  - 4件は見送り（Headless Mode, 自律パイプライン, 並列TDD, 自己修復CI）
-  - `docs/recommended-practices.md` に第3回評価として全記録を追加
+- **v0.24.0: MCP SDK新機能フル活用 — 全5フェーズ実装完了**
+  - Phase 1: Tool Annotations（全33ツールに `readOnlyHint: true, openWorldHint: false`）
+  - Phase 2: MCP Logging Protocol移行（`server.sendLoggingMessage()` + stderrフォールバック、`warn` → `warning` マッピング）
+  - Phase 3: Streamable HTTP Transport対応（`--http`フラグ / `DIG_TRANSPORT=http` / `DIG_PORT`）
+  - Phase 4: Completion（リソースURIのpath自動補完）
+  - Phase 5: ドキュメント更新（ADR-0003 Superseded、README両言語、tool-guide、ROADMAP、CLAUDE.md）
 
 ### 現在の状態
-- ブランチ: `docs/v0.23.0-post-release-handoff`
-- 未コミット変更: なし
-- npm: `mcp-server-dig@0.23.0`（公開済み）
+- ブランチ: `feat/v0.24.0-mcp-sdk-features`
+- 未コミット変更: なし（コミット・push済み）
+- npm: `mcp-server-dig@0.23.0`（公開済み）/ v0.24.0開発中
 - ツール数: 33（データ取得27 + 組み合わせ分析4 + ワークフロー統合2）
 - Prompts: 8, Resources: 2
-- カバレッジ: statements 96%, branches 85%, functions 94%, lines 96%
-- テスト: 528件
+- テスト: 546件（全PASS）
+- 新規ファイル: `src/transports.ts`, `src/completions.ts` + テスト
 
 ### 次にやるべきこと
-1. 現ブランチのPR作成・マージ（docs変更のみ）
-2. 次バージョンの計画策定
+1. PR作成・CIパス確認・マージ
+2. release-pleaseによるv0.24.0リリースPR自動作成を確認
+3. npm公開確認
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
-- ROADMAPの開発コードネーム「v0.24.0」とnpmバージョン「0.23.0」にずれあり
-- GitHub Actions Node.js 20 deprecation警告あり（2026-06-02からNode 24強制）→ FORCE_JAVASCRIPT_ACTIONS_TO_NODE24は既に設定済み
+- `server.tool()` APIはSDK内でdeprecated扱い（動作に問題なし）。将来的に `registerTool()` への移行を検討
+- Streamable HTTP Transportは `127.0.0.1` にバインド（外部公開には追加設定が必要）
