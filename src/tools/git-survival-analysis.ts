@@ -55,10 +55,11 @@ function formatPeriodKey(dateStr: string, granularity: string): string {
 }
 
 export function registerGitSurvivalAnalysis(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_survival_analysis",
-    "Analyze code churn trends over time. Shows additions, deletions, net change, and churn rate per period. Useful for identifying periods of heavy refactoring, growth phases, or code instability.",
     {
+      description: "Analyze code churn trends over time. Shows additions, deletions, net change, and churn rate per period. Useful for identifying periods of heavy refactoring, growth phases, or code instability.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       granularity: z
         .enum(["daily", "weekly", "monthly"])
@@ -93,7 +94,8 @@ export function registerGitSurvivalAnalysis(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({
       repo_path,
       granularity,

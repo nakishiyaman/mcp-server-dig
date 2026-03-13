@@ -5,10 +5,11 @@ import { parseTagOutput } from "../git/parsers.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitTagList(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_tag_list",
-    "List tags in the repository sorted by creation date. Shows tag name, date, and associated message. Useful for understanding release history and versioning patterns.",
     {
+      description: "List tags in the repository sorted by creation date. Shows tag name, date, and associated message. Useful for understanding release history and versioning patterns.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       pattern: z
         .string()
@@ -37,7 +38,8 @@ export function registerGitTagList(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, pattern, max_tags, sort, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

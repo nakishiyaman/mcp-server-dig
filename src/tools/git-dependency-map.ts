@@ -5,10 +5,11 @@ import { analyzeDependencyMap } from "../analysis/dependency-map.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitDependencyMap(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_dependency_map",
-    "Visualize co-change coupling between directories/modules. Identifies implicit dependencies by analyzing which directories frequently change together in the same commits.",
     {
+      description: "Visualize co-change coupling between directories/modules. Identifies implicit dependencies by analyzing which directories frequently change together in the same commits.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       depth: z
         .number()
@@ -52,7 +53,8 @@ export function registerGitDependencyMap(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({
       repo_path,
       depth,

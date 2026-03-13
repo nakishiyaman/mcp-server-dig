@@ -5,10 +5,11 @@ import { analyzeChurn } from "../analysis/churn.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitCodeChurn(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_code_churn",
-    "Analyze code churn (lines added + deleted) per file over a range of commits. High churn files may indicate unstable code, frequent refactoring, or areas needing architectural attention. Complements git_hotspots by measuring change volume, not just frequency.",
     {
+      description: "Analyze code churn (lines added + deleted) per file over a range of commits. High churn files may indicate unstable code, frequent refactoring, or areas needing architectural attention. Complements git_hotspots by measuring change volume, not just frequency.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       path_pattern: z
         .string()
@@ -43,7 +44,8 @@ export function registerGitCodeChurn(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, path_pattern, since, max_commits, top_n, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

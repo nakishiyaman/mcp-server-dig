@@ -7,10 +7,11 @@ import { errorResponse, formatResponse, outputFormatSchema, successResponse } fr
 const MAX_DIFF_LENGTH = 50_000;
 
 export function registerGitDiffContext(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_diff_context",
-    "Show the diff between two commits, branches, or tags. Useful for understanding what changed between releases, branches, or any two points in history.",
     {
+      description: "Show the diff between two commits, branches, or tags. Useful for understanding what changed between releases, branches, or any two points in history.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       commit: z.string().describe("Target commit, branch, or tag"),
       compare_to: z
@@ -44,7 +45,8 @@ export function registerGitDiffContext(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({
       repo_path,
       commit,

@@ -9,10 +9,11 @@ import { parseLogOutput } from "../git/parsers.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitBisectGuide(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_bisect_guide",
-    "Provide pre-bisect analysis for identifying bug-introducing commits. Shows commit count, estimated bisect steps (log2), hotspots within range, and file-specific commits. Does NOT run git bisect itself.",
     {
+      description: "Provide pre-bisect analysis for identifying bug-introducing commits. Shows commit count, estimated bisect steps (log2), hotspots within range, and file-specific commits. Does NOT run git bisect itself.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       good_ref: z
         .string()
@@ -43,7 +44,8 @@ export function registerGitBisectGuide(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, good_ref, bad_ref, file_path, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

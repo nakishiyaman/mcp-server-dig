@@ -12,10 +12,11 @@ import type { ToolContext } from "../index.js";
 const MAX_RISK_FILES = 10;
 
 export function registerGitReviewPrep(server: McpServer, context?: ToolContext): void {
-  server.tool(
+  server.registerTool(
     "git_review_prep",
-    "Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.",
     {
+      description: "Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       base_ref: z
         .string()
@@ -43,7 +44,8 @@ export function registerGitReviewPrep(server: McpServer, context?: ToolContext):
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, base_ref, head_ref, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

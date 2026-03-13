@@ -5,10 +5,11 @@ import { parseLogOutput } from "../git/parsers.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitSearchCommits(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_search_commits",
-    "Search commit messages by keyword. Useful for finding when a feature was introduced, a bug was fixed, or locating commits related to a ticket number.",
     {
+      description: "Search commit messages by keyword. Useful for finding when a feature was introduced, a bug was fixed, or locating commits related to a ticket number.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       query: z
         .string()
@@ -40,7 +41,8 @@ export function registerGitSearchCommits(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, query, max_commits, since, author, path_pattern, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

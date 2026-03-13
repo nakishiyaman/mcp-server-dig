@@ -44,10 +44,11 @@ const AGE_ORDER = [
 ];
 
 export function registerGitCodeAge(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_code_age",
-    "Analyze code age distribution in a file. Groups lines by age brackets (< 1 month, 1-3 months, 3-6 months, 6-12 months, > 1 year) based on git blame timestamps. Useful for identifying how much of a file is freshly written vs. long-lived legacy code.",
     {
+      description: "Analyze code age distribution in a file. Groups lines by age brackets (< 1 month, 1-3 months, 3-6 months, 6-12 months, > 1 year) based on git blame timestamps. Useful for identifying how much of a file is freshly written vs. long-lived legacy code.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       file_path: z
         .string()
@@ -63,7 +64,8 @@ export function registerGitCodeAge(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, file_path, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

@@ -48,10 +48,11 @@ function classifyBlastRadius(coChangedCount: number): "low" | "medium" | "high" 
 }
 
 export function registerGitImpactAnalysis(server: McpServer, context?: ToolContext): void {
-  server.tool(
+  server.registerTool(
     "git_impact_analysis",
-    "Analyze the blast radius of changes to a file or directory. Combines co-change networks, contributor overlap, and directory coupling to assess how far changes might ripple.",
     {
+      description: "Analyze the blast radius of changes to a file or directory. Combines co-change networks, contributor overlap, and directory coupling to assess how far changes might ripple.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       target_path: z
         .string()
@@ -85,7 +86,8 @@ export function registerGitImpactAnalysis(server: McpServer, context?: ToolConte
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, target_path, since, max_commits, min_coupling, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

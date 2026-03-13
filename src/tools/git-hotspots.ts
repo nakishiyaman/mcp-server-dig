@@ -5,10 +5,11 @@ import { analyzeHotspots } from "../analysis/hotspots.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitHotspots(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_hotspots",
-    "Identify the most frequently changed files in the repository. Files with high change frequency often indicate areas of technical debt, active development, or bug-prone code.",
     {
+      description: "Identify the most frequently changed files in the repository. Files with high change frequency often indicate areas of technical debt, active development, or bug-prone code.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       path_pattern: z
         .string()
@@ -43,7 +44,8 @@ export function registerGitHotspots(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, path_pattern, since, max_commits, top_n, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

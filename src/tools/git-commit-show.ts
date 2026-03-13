@@ -6,10 +6,11 @@ import { errorResponse, formatResponse, outputFormatSchema } from "./response.js
 const MAX_DIFF_LENGTH = 50_000;
 
 export function registerGitCommitShow(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_commit_show",
-    "Show detailed information about a specific commit: full message, changed files, and optionally the diff. Useful for drilling into a commit found via git_search_commits.",
     {
+      description: "Show detailed information about a specific commit: full message, changed files, and optionally the diff. Useful for drilling into a commit found via git_search_commits.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       commit: z
         .string()
@@ -32,7 +33,8 @@ export function registerGitCommitShow(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, commit, show_diff, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

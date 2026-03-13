@@ -13,10 +13,11 @@ import { errorResponse, formatResponse, outputFormatSchema, successResponse } fr
 import type { ToolContext } from "../index.js";
 
 export function registerGitWhy(server: McpServer, context?: ToolContext): void {
-  server.tool(
+  server.registerTool(
     "git_why",
-    "Explain why code exists by combining blame, commit context, contributor patterns, and co-change analysis into a narrative. Answers the question 'Why does this code look this way?' for a file or line range.",
     {
+      description: "Explain why code exists by combining blame, commit context, contributor patterns, and co-change analysis into a narrative. Answers the question 'Why does this code look this way?' for a file or line range.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       file_path: z
         .string()
@@ -53,7 +54,8 @@ export function registerGitWhy(server: McpServer, context?: ToolContext): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, file_path, start_line, end_line, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
