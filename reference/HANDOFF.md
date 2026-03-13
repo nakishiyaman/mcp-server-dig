@@ -3,21 +3,14 @@
 日時: 2026-03-13
 
 ### 完了したタスク
-- **Claude Code Insights分析に基づく推奨プラクティス評価・導入**
-  - 178セッション分のInsightsレポートから14件の推奨事項を抽出
-  - 5件を採用しAGENTS.md・CLAUDE.mdに組み込み:
-    1. 計画で止まらない（ステータス確認後は即実装）
-    2. 状態を推測しない（実際に確認してから判断）
-    3. コミット前にtypecheck+lint実行
-    4. 複雑な変更はスパイクテストで検証
-    5. サブエージェントのスコープ制限
-  - 4件は既に導入済みと確認（Hooks, Custom Skills, handoff, 品質ゲート）
-  - 4件は見送り（Headless Mode, 自律パイプライン, 並列TDD, 自己修復CI）
-  - `docs/recommended-practices.md` に第3回評価として全記録を追加
+- **PR #98 作成・マージ**: `docs/v0.23.0-post-release-handoff` ブランチ
+  - v0.23.0リリース後の引き継ぎ記録
+  - Insights分析に基づく推奨プラクティス5件のAGENTS.md・CLAUDE.md追加
+  - `docs/recommended-practices.md` 第3回評価記録
+  - CI全パス（Node 22/24）確認後マージ
 
 ### 現在の状態
-- ブランチ: `docs/v0.23.0-post-release-handoff`
-- 未コミット変更: なし
+- ブランチ: `main`（最新: a8edf0c）
 - npm: `mcp-server-dig@0.23.0`（公開済み）
 - ツール数: 33（データ取得27 + 組み合わせ分析4 + ワークフロー統合2）
 - Prompts: 8, Resources: 2
@@ -25,10 +18,11 @@
 - テスト: 528件
 
 ### 次にやるべきこと
-1. 現ブランチのPR作成・マージ（docs変更のみ）
-2. 次バージョンの計画策定
+1. v0.24.0の実装状況確認 — ROADMAPでは完了済みだがnpmは0.23.0。v0.24.0コードがどのブランチにあるか確認が必要
+2. v0.24.0のリリース（mainにマージ済みならrelease-pleaseがPR作成）、未マージなら該当ブランチを特定してマージ
+3. 次バージョン（v0.25.0）の計画策定
 
 ### ブロッカー/注意点
+- ROADMAPの開発コードネーム「v0.24.0」とnpmバージョン「0.23.0」にずれあり — v0.24.0の実装コードの所在を確認する必要がある
 - RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
-- ROADMAPの開発コードネーム「v0.24.0」とnpmバージョン「0.23.0」にずれあり
 - GitHub Actions Node.js 20 deprecation警告あり（2026-06-02からNode 24強制）→ FORCE_JAVASCRIPT_ACTIONS_TO_NODE24は既に設定済み
