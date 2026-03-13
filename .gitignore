@@ -5,3 +5,4 @@ build/
 .smithery/
 .mcpregistry_*
 coverage/
+.claude/settings.local.json
