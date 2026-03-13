@@ -277,6 +277,42 @@ Generate release notes between two refs by aggregating commits using Conventiona
 | include_breaking | boolean | no | Include breaking changes section (default: true) |
 | max_commits | number | no | Maximum commits to analyze (default: 500) |
 
+### git_contributor_network
+
+Analyze contributor collaboration network. Shows which developers work on the same files, revealing team collaboration patterns and knowledge silos.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 500) |
+| path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
+| min_shared_files | number | no | Minimum shared files to show a collaboration link (default: 1) |
+
+### git_conflict_history
+
+Detect files that frequently appear in merge commits. High-frequency merge files indicate conflict-prone areas that may need refactoring.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_merges | number | no | Maximum merge commits to analyze (default: 200) |
+| top_n | number | no | Number of top files to return (default: 20) |
+| path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
+
+### git_survival_analysis
+
+Analyze code churn trends over time. Shows additions, deletions, net change, and churn rate per period. Useful for identifying refactoring phases and code instability.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| granularity | string | no | Time granularity: `"daily"`, `"weekly"` (default), or `"monthly"` |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 1000) |
+| path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
+
 ### git_code_ownership_changes
 
 Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, new/departed contributors, and knowledge transfer patterns.
@@ -526,11 +562,11 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 28 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 31 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Output Format
 
-All 28 tools accept an optional `output_format` parameter:
+All 31 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 

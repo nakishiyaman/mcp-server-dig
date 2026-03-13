@@ -4,7 +4,7 @@ import { getToolGuideContent } from "./tool-guide.js";
 describe("tool-guide resource", () => {
   const content = getToolGuideContent();
 
-  it("全25ツール名が含まれる", () => {
+  it("全31ツール名が含まれる", () => {
     const toolNames = [
       "git_blame_context",
       "git_file_history",
@@ -27,6 +27,12 @@ describe("tool-guide resource", () => {
       "git_branch_activity",
       "git_author_timeline",
       "git_commit_frequency",
+      "git_release_notes",
+      "git_code_ownership_changes",
+      "git_impact_analysis",
+      "git_contributor_network",
+      "git_conflict_history",
+      "git_survival_analysis",
       "git_file_risk_profile",
       "git_repo_health",
       "git_review_prep",
@@ -39,7 +45,7 @@ describe("tool-guide resource", () => {
   });
 
   it("カテゴリ別一覧セクションが含まれる", () => {
-    expect(content).toContain("データ取得ツール（22個）");
+    expect(content).toContain("データ取得ツール（25個）");
     expect(content).toContain("組み合わせ分析ツール（4個）");
     expect(content).toContain("ワークフロー統合ツール（2個）");
   });
