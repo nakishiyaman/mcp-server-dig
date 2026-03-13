@@ -30,6 +30,7 @@ export function registerGitMergeBase(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, ref1, ref2, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

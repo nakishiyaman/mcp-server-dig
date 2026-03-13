@@ -64,6 +64,7 @@ export function registerGitRepoHealth(server: McpServer, context?: ToolContext):
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, since, max_commits, stale_threshold_days, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

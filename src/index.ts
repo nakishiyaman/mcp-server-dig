@@ -2,9 +2,9 @@
 
 import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { AnalysisCache } from "./analysis/cache.js";
 import { logger } from "./logger.js";
+import { resolveTransportMode, resolveHttpPort, startTransport } from "./transports.js";
 
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json") as { version: string };
@@ -56,7 +56,7 @@ import { registerOnboardArea } from "./prompts/onboard-area.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
-function createServer() {
+export function createDigServer() {
   const server = new McpServer({
     name: "dig",
     version,
@@ -118,30 +118,29 @@ function createServer() {
   registerToolGuide(server);
   registerRepoSummary(server);
 
+  // Enable MCP logging protocol
+  logger.setServer(server);
+
   return server;
 }
 
 // Exported for Smithery registry scanning
 export function createSandboxServer() {
-  return createServer();
+  return createDigServer();
 }
 
-// Only start the stdio server when run as the main entry point.
+// Only start the server when run as the main entry point.
 // When imported as a module (e.g., in tests), skip server startup.
 const isMainModule =
   process.argv[1] &&
   import.meta.url.endsWith(process.argv[1].replace(/\\/g, "/"));
 
 if (isMainModule) {
-  const server = createServer();
+  const server = createDigServer();
+  const mode = resolveTransportMode(process.argv, process.env);
+  const port = resolveHttpPort(process.env);
 
-  const main = async () => {
-    const transport = new StdioServerTransport();
-    await server.connect(transport);
-    logger.info("mcp-server-dig running on stdio", { version });
-  };
-
-  main().catch((error) => {
+  startTransport(server, mode, port).catch((error) => {
     logger.error("Fatal error", {
       error: error instanceof Error ? error.message : String(error),
     });

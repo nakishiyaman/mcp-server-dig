@@ -83,6 +83,7 @@ export function registerGitCommitFrequency(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, granularity, since, max_commits, path_pattern, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

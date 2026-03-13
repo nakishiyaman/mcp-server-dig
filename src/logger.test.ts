@@ -78,4 +78,79 @@ describe("Logger", () => {
       }
     }
   });
+
+  describe("MCP Logging Protocol", () => {
+    it("server設定時にsendLoggingMessageを呼び出す", () => {
+      const logger = new Logger("info");
+      const mockServer = {
+        sendLoggingMessage: vi.fn().mockResolvedValue(undefined),
+      };
+      logger.setServer(mockServer as never);
+
+      logger.info("mcp log test");
+
+      expect(mockServer.sendLoggingMessage).toHaveBeenCalledWith({
+        level: "info",
+        data: "mcp log test",
+      });
+      expect(stderrSpy).not.toHaveBeenCalled();
+    });
+
+    it("warnレベルをMCPのwarningにマッピングする", () => {
+      const logger = new Logger("info");
+      const mockServer = {
+        sendLoggingMessage: vi.fn().mockResolvedValue(undefined),
+      };
+      logger.setServer(mockServer as never);
+
+      logger.warn("warning test");
+
+      expect(mockServer.sendLoggingMessage).toHaveBeenCalledWith({
+        level: "warning",
+        data: "warning test",
+      });
+    });
+
+    it("context付きの場合はdataをオブジェクトで送信する", () => {
+      const logger = new Logger("info");
+      const mockServer = {
+        sendLoggingMessage: vi.fn().mockResolvedValue(undefined),
+      };
+      logger.setServer(mockServer as never);
+
+      logger.info("with context", { tool: "git_blame" });
+
+      expect(mockServer.sendLoggingMessage).toHaveBeenCalledWith({
+        level: "info",
+        data: { msg: "with context", context: { tool: "git_blame" } },
+      });
+    });
+
+    it("sendLoggingMessage失敗時にstderrにフォールバックする", async () => {
+      const logger = new Logger("info");
+      const mockServer = {
+        sendLoggingMessage: vi.fn().mockRejectedValue(new Error("not connected")),
+      };
+      logger.setServer(mockServer as never);
+
+      logger.error("fallback test");
+
+      // Wait for the promise rejection to be handled
+      await vi.waitFor(() => {
+        expect(stderrSpy).toHaveBeenCalledOnce();
+      });
+      const output = JSON.parse(stderrSpy.mock.calls[0][0] as string);
+      expect(output.level).toBe("error");
+      expect(output.msg).toBe("fallback test");
+    });
+
+    it("server未設定時はstderrに出力する", () => {
+      const logger = new Logger("info");
+      logger.info("no server");
+
+      expect(stderrSpy).toHaveBeenCalledOnce();
+      const output = JSON.parse(stderrSpy.mock.calls[0][0] as string);
+      expect(output.msg).toBe("no server");
+    });
+  });
 });

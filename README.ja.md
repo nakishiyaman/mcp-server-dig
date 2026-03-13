@@ -591,9 +591,47 @@ Windsurf の MCP 設定に追加してください：
 - `"text"`（デフォルト）— 人間が読みやすいテキスト形式
 - `"json"` — プログラムからの利用に適した構造化JSON形式
 
+### Tool Annotations
+
+全33ツールにMCP Tool Annotations（`readOnlyHint: true`, `openWorldHint: false`）を宣言。digの全ツールが読み取り専用のgit分析操作であることをクライアントに通知します。
+
+### Streamable HTTP Transport
+
+デフォルトはstdioトランスポート。Streamable HTTPを使用するには:
+
+```bash
+# CLIフラグ
+mcp-server-dig --http
+
+# 環境変数
+DIG_TRANSPORT=http mcp-server-dig
+```
+
+HTTPモードでは `http://127.0.0.1:3000/mcp` でリッスンします。ポートは `DIG_PORT` で変更可能:
+
+```json
+{
+  "mcpServers": {
+    "dig": {
+      "command": "mcp-server-dig",
+      "args": ["--http"],
+      "env": {
+        "DIG_PORT": "8080"
+      }
+    }
+  }
+}
+```
+
+### 自動補完
+
+プロンプト引数とリソースURIパスがMCP補完プロトコルに対応。対話的なクライアントで補完候補を提示します。
+
 ### 構造化ログ
 
-`DIG_LOG_LEVEL` 環境変数でstderr出力のログレベルを制御できます:
+MCP Logging Protocolに対応。クライアント接続時はMCPプロトコル経由でログを送信し、未接続時はstderrにフォールバックします。
+
+`DIG_LOG_LEVEL` 環境変数でログレベルを制御できます:
 
 ```json
 {
@@ -608,7 +646,7 @@ Windsurf の MCP 設定に追加してください：
 }
 ```
 
-利用可能なレベル: `debug`, `info`（デフォルト）, `warn`, `error`。出力形式: stderrへのJSON lines。
+利用可能なレベル: `debug`, `info`（デフォルト）, `warn`, `error`。
 
 `DIG_LOG_LEVEL=debug` 設定時は、全gitコマンドの実行時間と分析キャッシュのhit/missイベントがログ出力されます。パフォーマンスのプロファイリングやボトルネック特定に活用できます。
 

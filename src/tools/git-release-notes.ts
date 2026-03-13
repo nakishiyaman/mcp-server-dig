@@ -171,6 +171,7 @@ export function registerGitReleaseNotes(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, from_ref, to_ref, group_by, include_breaking, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

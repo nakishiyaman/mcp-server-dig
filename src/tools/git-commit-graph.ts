@@ -66,6 +66,7 @@ export function registerGitCommitGraph(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

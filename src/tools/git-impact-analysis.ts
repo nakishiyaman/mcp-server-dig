@@ -85,6 +85,7 @@ export function registerGitImpactAnalysis(server: McpServer, context?: ToolConte
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, target_path, since, max_commits, min_coupling, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

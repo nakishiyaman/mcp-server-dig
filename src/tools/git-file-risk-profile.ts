@@ -53,6 +53,7 @@ export function registerGitFileRiskProfile(server: McpServer, context?: ToolCont
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, file_path, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

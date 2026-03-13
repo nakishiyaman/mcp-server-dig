@@ -41,6 +41,7 @@ export function registerGitStaleFiles(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, threshold_days, path_pattern, top_n, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

@@ -60,6 +60,7 @@ export function registerGitConflictHistory(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({
       repo_path,
       since,

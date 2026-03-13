@@ -53,6 +53,7 @@ export function registerGitWhy(server: McpServer, context?: ToolContext): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, file_path, start_line, end_line, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

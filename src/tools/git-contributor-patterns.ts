@@ -38,6 +38,7 @@ export function registerGitContributorPatterns(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, path_pattern, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

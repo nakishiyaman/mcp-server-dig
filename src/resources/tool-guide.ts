@@ -92,6 +92,17 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
 
+## Tool Annotations
+
+全33ツールにMCP Tool Annotationsが設定されています:
+- \`readOnlyHint: true\` — 全ツールが読み取り専用（gitリポジトリを変更しない）
+- \`openWorldHint: false\` — 全ツールがローカルgitリポジトリのみを対象とする
+
+## トランスポート
+
+- **stdio**（デフォルト）— 標準入出力。Claude Desktop、Claude Code等のクライアント向け
+- **Streamable HTTP** — \`--http\`フラグまたは\`DIG_TRANSPORT=http\`で有効化。\`http://127.0.0.1:3000/mcp\`でリッスン（\`DIG_PORT\`でポート変更可）
+
 ## 連携パターン
 
 ### コード考古学（なぜこのコードがあるのか調査）

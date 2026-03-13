@@ -59,6 +59,7 @@ export function registerGitBranchActivity(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
+    { readOnlyHint: true, openWorldHint: false },
     async ({ repo_path, include_remote, stale_days, abandoned_days, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
