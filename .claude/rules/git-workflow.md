@@ -40,7 +40,7 @@
 ## PRフロー
 
 1. `gh pr create` でPR作成
-2. CI全パス（Node 20/22マトリクス）を確認
+2. CI全パス（Node 22/24マトリクス）を確認
 3. マージ
 4. ローカルでmainに切り替え → `git pull`
 
@@ -50,7 +50,7 @@
 
 ```
 mainへのpush
-  → CI (ci.yml): lint → typecheck → test → build (Node 20/22/24)
+  → CI (ci.yml): lint → typecheck → test → build (Node 22/24)
   → Release Please (release-please.yml):
       1. release-pleaseジョブ:
          a. Release PR自動作成/更新 (token: RELEASE_PLEASE_TOKEN)
@@ -80,7 +80,7 @@ Release PR
 | Require PR before merging | ON | main直push防止 |
 | Required approvals | 0（無効） | 個人プロジェクトのため不要 |
 | Require status checks | ON (strict) | CI必須 |
-| Required checks | `ci (20)`, `ci (22)`, `ci (24)` | CIマトリクスと一致させること |
+| Required checks | `ci (22)`, `ci (24)` | CIマトリクスと一致させること |
 | Include administrators | ON | 管理者もCI通過必須 |
 | Allow force pushes | OFF | 履歴改変防止 |
 

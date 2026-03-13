@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-13 (v0.23.0実装完了)
+最終更新: 2026-03-13 (v0.24.0実装完了)
 
 ## v0.4.0 — 品質改善
 
@@ -597,6 +597,44 @@
 | Branches | 85% | 85% |
 | Functions | 95% | 94% |
 | Lines | 97% | 97% |
+
+## v0.24.0 — Node.js 20廃止 + 新ツール2本 + ブランチカバレッジ維持
+
+### Phase 1: Node.js 20サポート廃止
+- [x] `.github/workflows/ci.yml` — matrix `[20, 22, 24]` → `[22, 24]`
+- [x] `package.json` — `engines.node` `">=20"` → `">=22"`, `@types/node` `^20` → `^22`
+- [x] `.claude/rules/git-workflow.md` — Required checks更新（`ci (20)` 削除）
+- [x] `README.md` / `README.ja.md` — Node.js要件更新
+
+### Phase 2: 新ツール2本
+- [x] `git_code_age` — ファイル内の行をage bracket別に集計（blameデータ再利用）
+  - `src/tools/git-code-age.ts` + 統合テスト6件
+- [x] `git_commit_message_quality` — コミットメッセージ品質分析
+  - `src/tools/git-commit-message-quality.ts` + 統合テスト6件
+- [x] `src/index.ts` にツール登録（データ取得25→27）
+
+### Phase 3: ブランチカバレッジ維持（85%）
+- [x] `branch-coverage-v024.integration.test.ts` 新規作成（59テスト）
+- [x] 新ツールのエッジケース + 既存ツールの未カバーブランチ追加
+- [x] branches threshold 85%維持
+
+### Phase 4: ドキュメント
+- [x] `src/resources/tool-guide.ts` — 2ツール追加（31→33）
+- [x] `CLAUDE.md` — v0.24.0、ツール数33、Node>=22
+- [x] `README.md` / `README.ja.md` — 新ツールドキュメント
+- [x] `reference/ROADMAP.md` — v0.24.0セクション追加
+- MCP SDK 1.27.1は最新 → no-op
+
+### カバレッジ結果
+| 指標 | v0.23.0 | v0.24.0 |
+|------|---------|---------|
+| Statements | 96% | 96% |
+| Branches | 85% | 85% |
+| Functions | 94% | 94% |
+| Lines | 97% | 96% |
+
+### ブランチ保護（手動）
+- [ ] GitHub Settings → Required checks から `ci (20)` を削除
 
 ## スコープ外
 
