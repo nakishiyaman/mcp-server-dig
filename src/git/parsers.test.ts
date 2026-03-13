@@ -327,6 +327,19 @@ describe("parseDiffStatOutput", () => {
     expect(result.files).toEqual([]);
   });
 
+  it("プラス/マイナス記号がない場合は全量をinsertionsとする", () => {
+    // Some git versions output stat lines without +/- indicators
+    const raw = [
+      " src/new.ts | 5 ",
+      " 1 file changed, 5 insertions(+)",
+    ].join("\n");
+
+    const result = parseDiffStatOutput(raw);
+    expect(result.filesChanged).toBe(1);
+    expect(result.files[0].insertions).toBe(5);
+    expect(result.files[0].deletions).toBe(0);
+  });
+
   it("バイナリファイルのBin行をスキップする", () => {
     const raw = [
       " src/index.ts  | 5 +++--",

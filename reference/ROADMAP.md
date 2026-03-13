@@ -556,6 +556,48 @@
 | Functions | 94% | 95% |
 | Lines | 95% | 97% |
 
+## v0.23.0 — メンテナンス + 新ツール3本 + Node.js 24 CI
+
+### Phase 1: メンテナンス
+- [x] vitest `^4.0.0` → `^4.1.0`, @vitest/coverage-v8 `^4.0.18` → `^4.1.0`
+- [x] package.json files に `"!build/**/*.js.map"` 追加（ソースマップ除外、npm軽量化）
+
+### Phase 2: Node.js 24 CI
+- [x] `.github/workflows/ci.yml` matrix `[20, 22]` → `[20, 22, 24]`
+- [ ] ブランチ保護に `ci (24)` 追加（手動設定必要）
+
+### Phase 3: 新ツール3本
+- [x] `git_contributor_network` — コントリビューター共同作業グラフ
+  - `src/analysis/contributor-network.ts`: analyzeContributorNetwork()
+  - `src/tools/git-contributor-network.ts`: registerGitContributorNetwork()
+  - 統合テスト4件
+- [x] `git_conflict_history` — マージコンフリクト頻発ファイル検出
+  - `src/tools/git-conflict-history.ts`: registerGitConflictHistory()
+  - 統合テスト5件
+- [x] `git_survival_analysis` — コードチャーン時系列分析
+  - `src/tools/git-survival-analysis.ts`: registerGitSurvivalAnalysis()
+  - 統合テスト6件
+
+### Phase 4: カバレッジ維持
+- [x] ブランチカバレッジ向上テスト追加（43件）
+- [x] パーサー単体テスト追加（1件）
+- [x] branches threshold 85%維持
+
+### Phase 5: ドキュメント
+- [x] `src/index.ts` — 3ツール登録（データ取得22→25）
+- [x] `src/resources/tool-guide.ts` — 3ツール追加、ツール数更新（28→31）
+- [x] `CLAUDE.md` — v0.23.0、ツール数28→31
+- [x] `README.md` / `README.ja.md` — 新ツールドキュメント
+- [x] `reference/ROADMAP.md` — v0.23.0セクション追加
+
+### カバレッジ結果
+| 指標 | v0.22.0 | v0.23.0 |
+|------|---------|---------|
+| Statements | 96% | 96% |
+| Branches | 85% | 85% |
+| Functions | 95% | 94% |
+| Lines | 97% | 97% |
+
 ## スコープ外
 
 | 項目 | 理由 |
