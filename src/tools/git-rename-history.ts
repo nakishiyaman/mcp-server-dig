@@ -5,10 +5,11 @@ import { parseRenameOutput } from "../git/parsers.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitRenameHistory(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_rename_history",
-    "Track the rename history of a file. Reconstructs the full rename chain showing how a file was renamed over time. Answers 'What was this file called before?' and 'Where did this code move from?'",
     {
+      description: "Track the rename history of a file. Reconstructs the full rename chain showing how a file was renamed over time. Answers 'What was this file called before?' and 'Where did this code move from?'",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       file_path: z
         .string()
@@ -31,7 +32,8 @@ export function registerGitRenameHistory(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, file_path, max_entries, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

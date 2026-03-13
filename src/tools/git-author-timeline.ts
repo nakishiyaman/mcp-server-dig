@@ -14,10 +14,11 @@ interface AuthorTimeline {
 }
 
 export function registerGitAuthorTimeline(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_author_timeline",
-    "Analyze author activity periods and team composition changes over time. Shows each author's first and last commit dates, active duration, and identifies sole ownership periods. Useful for understanding team history and onboarding patterns.",
     {
+      description: "Analyze author activity periods and team composition changes over time. Shows each author's first and last commit dates, active duration, and identifies sole ownership periods. Useful for understanding team history and onboarding patterns.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       since: z
         .string()
@@ -45,7 +46,8 @@ export function registerGitAuthorTimeline(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, since, path_pattern, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

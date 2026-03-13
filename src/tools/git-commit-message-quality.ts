@@ -34,10 +34,11 @@ const ISSUE_PATTERN = /#\d+|[A-Z]+-\d+/;
 const MAX_SUBJECT_LENGTH = 72;
 
 export function registerGitCommitMessageQuality(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_commit_message_quality",
-    "Analyze commit message quality. Measures Conventional Commits compliance rate, subject length violations, issue reference rate, and type distribution. Useful for enforcing commit message standards and identifying areas where message quality can improve.",
     {
+      description: "Analyze commit message quality. Measures Conventional Commits compliance rate, subject length violations, issue reference rate, and type distribution. Useful for enforcing commit message standards and identifying areas where message quality can improve.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       since: z
         .string()
@@ -69,7 +70,8 @@ export function registerGitCommitMessageQuality(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({
       repo_path,
       since,

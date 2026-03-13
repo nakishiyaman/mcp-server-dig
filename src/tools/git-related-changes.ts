@@ -5,10 +5,11 @@ import { analyzeCoChanges } from "../analysis/co-changes.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitRelatedChanges(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_related_changes",
-    "Find files that frequently change together with a given file (co-change analysis). Useful for understanding implicit dependencies and finding related code.",
     {
+      description: "Find files that frequently change together with a given file (co-change analysis). Useful for understanding implicit dependencies and finding related code.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       file_path: z
         .string()
@@ -38,7 +39,8 @@ export function registerGitRelatedChanges(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, file_path, max_commits, min_coupling, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

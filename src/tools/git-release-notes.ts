@@ -130,10 +130,11 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export function registerGitReleaseNotes(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_release_notes",
-    "Generate release notes between two refs by aggregating and classifying commits using Conventional Commits format. Detects breaking changes, groups by type/scope, and lists contributors.",
     {
+      description: "Generate release notes between two refs by aggregating and classifying commits using Conventional Commits format. Detects breaking changes, groups by type/scope, and lists contributors.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       from_ref: z
         .string()
@@ -171,7 +172,8 @@ export function registerGitReleaseNotes(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, from_ref, to_ref, group_by, include_breaking, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

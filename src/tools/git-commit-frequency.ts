@@ -47,10 +47,11 @@ function formatPeriodKey(dateStr: string, granularity: string): string {
 }
 
 export function registerGitCommitFrequency(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_commit_frequency",
-    "Analyze commit frequency over time periods. Shows how active development is by grouping commits into daily, weekly, or monthly buckets. Useful for identifying development patterns, sprint rhythms, and periods of intense or quiet activity.",
     {
+      description: "Analyze commit frequency over time periods. Shows how active development is by grouping commits into daily, weekly, or monthly buckets. Useful for identifying development patterns, sprint rhythms, and periods of intense or quiet activity.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       granularity: z
         .enum(["daily", "weekly", "monthly"])
@@ -83,7 +84,8 @@ export function registerGitCommitFrequency(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, granularity, since, max_commits, path_pattern, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

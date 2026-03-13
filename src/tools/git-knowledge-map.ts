@@ -5,10 +5,11 @@ import { analyzeKnowledgeMap } from "../analysis/knowledge-map.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitKnowledgeMap(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_knowledge_map",
-    "Map knowledge ownership per directory and calculate bus factor. Shows who owns which parts of the codebase and identifies single-point-of-failure risks (low bus factor).",
     {
+      description: "Map knowledge ownership per directory and calculate bus factor. Shows who owns which parts of the codebase and identifies single-point-of-failure risks (low bus factor).",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       depth: z
         .number()
@@ -43,7 +44,8 @@ export function registerGitKnowledgeMap(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, depth, since, max_commits, path_pattern, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

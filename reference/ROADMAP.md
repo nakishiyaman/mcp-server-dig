@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-13 (v0.24.0開発中)
+最終更新: 2026-03-14 (v0.25.0開発中)
 
 ## v0.24.0 — MCP SDK新機能フル活用
 
@@ -643,6 +643,15 @@
 
 ### ブランチ保護（手動）
 - [x] GitHub Settings → Required checks から `ci (20)` を削除
+
+## v0.25.0 — server.registerTool() 移行
+
+### Phase 1: server.tool() → server.registerTool() 移行
+- [x] 全33ツールファイル（`src/tools/git-*.ts`）を `server.registerTool()` に変換
+  - `server.tool("name", "desc", {schema}, {annotations}, handler)` → `server.registerTool("name", {description, inputSchema, annotations}, handler)`
+- [x] ビルド・全テストパス確認
+- [x] CLAUDE.md バージョン更新
+- [x] ROADMAP v0.25.0セクション追加
 
 ## スコープ外
 

@@ -5,10 +5,11 @@ import { parseBlameOutput } from "../git/parsers.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitBlameContext(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_blame_context",
-    "Get blame information with semantic context — who wrote each section and when. Groups consecutive lines by the same commit into blocks for easier comprehension.",
     {
+      description: "Get blame information with semantic context — who wrote each section and when. Groups consecutive lines by the same commit into blocks for easier comprehension.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       file_path: z
         .string()
@@ -26,7 +27,8 @@ export function registerGitBlameContext(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, file_path, start_line, end_line, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

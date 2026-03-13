@@ -26,10 +26,11 @@ async function countTotalCommits(repoPath: string, since?: string): Promise<numb
 }
 
 export function registerGitRepoHealth(server: McpServer, context?: ToolContext): void {
-  server.tool(
+  server.registerTool(
     "git_repo_health",
-    "Repository-wide health summary combining multiple analyses into a single overview. Answers 'what is the state of this repo?' by reporting: file count, commit activity, top hotspots, highest churn files, contributor distribution, and stale file count.",
     {
+      description: "Repository-wide health summary combining multiple analyses into a single overview. Answers 'what is the state of this repo?' by reporting: file count, commit activity, top hotspots, highest churn files, contributor distribution, and stale file count.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       since: z
         .string()
@@ -64,7 +65,8 @@ export function registerGitRepoHealth(server: McpServer, context?: ToolContext):
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, since, max_commits, stale_threshold_days, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

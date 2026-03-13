@@ -5,10 +5,11 @@ import { analyzeContributors } from "../analysis/contributors.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitContributorPatterns(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_contributor_patterns",
-    "Analyze contributor patterns — who has expertise in what areas. Useful for identifying reviewers, understanding code ownership, and finding domain experts.",
     {
+      description: "Analyze contributor patterns — who has expertise in what areas. Useful for identifying reviewers, understanding code ownership, and finding domain experts.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       path_pattern: z
         .string()
@@ -38,7 +39,8 @@ export function registerGitContributorPatterns(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, path_pattern, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

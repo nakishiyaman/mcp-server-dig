@@ -93,10 +93,11 @@ function buildPeriodOwnership(contributors: Map<string, number>): PeriodOwnershi
 }
 
 export function registerGitCodeOwnershipChanges(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_code_ownership_changes",
-    "Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, and knowledge transfer patterns per directory.",
     {
+      description: "Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, and knowledge transfer patterns per directory.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       period_boundary: z
         .string()
@@ -131,7 +132,8 @@ export function registerGitCodeOwnershipChanges(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, period_boundary, depth, path_pattern, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

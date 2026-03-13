@@ -23,10 +23,11 @@ function padLabel(label: string, width: number): string {
 }
 
 export function registerGitFileRiskProfile(server: McpServer, context?: ToolContext): void {
-  server.tool(
+  server.registerTool(
     "git_file_risk_profile",
-    "Comprehensive risk assessment for a single file by combining multiple analyses: change frequency, code churn, knowledge concentration, implicit coupling, and staleness. Returns a multi-dimensional risk profile to help prioritize review and refactoring efforts.",
     {
+      description: "Comprehensive risk assessment for a single file by combining multiple analyses: change frequency, code churn, knowledge concentration, implicit coupling, and staleness. Returns a multi-dimensional risk profile to help prioritize review and refactoring efforts.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       file_path: z
         .string()
@@ -53,7 +54,8 @@ export function registerGitFileRiskProfile(server: McpServer, context?: ToolCont
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, file_path, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

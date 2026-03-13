@@ -10,10 +10,11 @@ import {
 } from "./response.js";
 
 export function registerGitContributorNetwork(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_contributor_network",
-    "Analyze contributor collaboration network. Shows which developers work on the same files, revealing team collaboration patterns, knowledge silos, and implicit dependencies between people.",
     {
+      description: "Analyze contributor collaboration network. Shows which developers work on the same files, revealing team collaboration patterns, knowledge silos, and implicit dependencies between people.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       since: z
         .string()
@@ -48,7 +49,8 @@ export function registerGitContributorNetwork(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({
       repo_path,
       since,

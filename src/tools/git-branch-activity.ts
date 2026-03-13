@@ -24,10 +24,11 @@ function classifyActivity(
 }
 
 export function registerGitBranchActivity(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_branch_activity",
-    "Analyze branch health and activity levels. Combines for-each-ref, rev-list, and log data to classify branches as active, stale, or abandoned. Shows ahead/behind counts relative to the default branch and merge status.",
     {
+      description: "Analyze branch health and activity levels. Combines for-each-ref, rev-list, and log data to classify branches as active, stale, or abandoned. Shows ahead/behind counts relative to the default branch and merge status.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       include_remote: z
         .boolean()
@@ -59,7 +60,8 @@ export function registerGitBranchActivity(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, include_remote, stale_days, abandoned_days, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);

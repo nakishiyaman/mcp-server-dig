@@ -22,10 +22,11 @@ export interface ConflictHistoryResult {
 }
 
 export function registerGitConflictHistory(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_conflict_history",
-    "Detect files that frequently appear in merge commits. High-frequency merge files indicate conflict-prone areas that may need refactoring or better code organization. Analyzes merge commit file changes to identify hotspots.",
     {
+      description: "Detect files that frequently appear in merge commits. High-frequency merge files indicate conflict-prone areas that may need refactoring or better code organization. Analyzes merge commit file changes to identify hotspots.",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       since: z
         .string()
@@ -60,7 +61,8 @@ export function registerGitConflictHistory(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({
       repo_path,
       since,

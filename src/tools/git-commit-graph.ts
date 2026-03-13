@@ -38,10 +38,11 @@ function parseMergeSources(
 }
 
 export function registerGitCommitGraph(server: McpServer): void {
-  server.tool(
+  server.registerTool(
     "git_commit_graph",
-    "Analyze merge patterns and branch integration topology. Calculates merge ratio, merge frequency, merge sources, and classifies the integration style (continuous, regular, or batch merging).",
     {
+      description: "Analyze merge patterns and branch integration topology. Calculates merge ratio, merge frequency, merge sources, and classifies the integration style (continuous, regular, or batch merging).",
+      inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
       since: z
         .string()
@@ -66,7 +67,8 @@ export function registerGitCommitGraph(server: McpServer): void {
         ),
       output_format: outputFormatSchema,
     },
-    { readOnlyHint: true, openWorldHint: false },
+      annotations: { readOnlyHint: true, openWorldHint: false },
+    },
     async ({ repo_path, since, max_commits, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
