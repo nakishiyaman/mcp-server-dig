@@ -1,7 +1,7 @@
 {
   "name": "mcp-server-dig",
   "mcpName": "io.github.nakishiyaman/dig",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "MCP server for AI-powered code archaeology — git blame, file history, contributor patterns, and related change analysis",
   "type": "module",
   "bin": {
