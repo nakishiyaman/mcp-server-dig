@@ -9,7 +9,7 @@ import {
   closeMcpClient,
   getToolText,
 } from "./mcp-test-helpers.js";
-import { getRepoDir, git } from "./helpers.js";
+import { getRepoDir } from "./helpers.js";
 import { mkdtemp, writeFile, rm, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
