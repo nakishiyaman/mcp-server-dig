@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.24.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.23.0...v0.24.0) (2026-03-13)
+
+
+### Features
+
+* v0.24.0 MCP SDK新機能フル活用 ([b3bae0c](https://github.com/nakishiyaman/mcp-server-dig/commit/b3bae0c76b2fdcd4918a4390816a0b100d3d334e))
+* v0.24.0 MCP SDK新機能フル活用（Annotations・Logging・HTTP Transport・Completions） ([7314faf](https://github.com/nakishiyaman/mcp-server-dig/commit/7314fafeac9875685900a64d8f0cd15389c7a3b7))
+
 ## [0.23.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.22.0...v0.23.0) (2026-03-13)
 
 
