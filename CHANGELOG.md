@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.22.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.21.0...v0.22.0) (2026-03-13)
+
+
+### Features
+
+* v0.23.0 新ツール3本・メンテナンス・Node.js 24 CI ([391d74a](https://github.com/nakishiyaman/mcp-server-dig/commit/391d74af8ab38fdb364f442de97afffde37cd076))
+* v0.23.0 新ツール3本・メンテナンス・Node.js 24 CI対応 ([1f86c4b](https://github.com/nakishiyaman/mcp-server-dig/commit/1f86c4ba688766d5ef6e226f215031f77d316fea))
+
 ## [0.21.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.20.0...v0.21.0) (2026-03-12)
 
 
