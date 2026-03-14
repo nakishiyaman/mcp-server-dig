@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-14 (v0.27.0開発中)
+最終更新: 2026-03-14 (v0.28.0リリース済み)
 
 ## v0.24.0 — MCP SDK新機能フル活用
 
@@ -699,7 +699,9 @@
 | index.ts isMainModule分岐 | 許容 | エントリポイントガードはモジュールimportテストで本質的にカバー不可 |
 | branches 87% | 調整（86%） | 残り163未カバー分岐の大半はcache-context false branches（14）、defensive dead code（parsers/executor）、unreachable switch defaults。87%到達にはテスト基盤の再構築が必要でROI低 |
 
-## v0.27.0 — 新ツール2本（git_reflog_analysis + git_cherry_pick_detect）
+## v0.28.0 (v0.27.0) — 新ツール2本（git_reflog_analysis + git_cherry_pick_detect）
+
+※ release-pleaseがv0.27.0 Release PRマージ時にv0.28.0としてリリース（v0.27.0タグはスキップ）
 
 ### Phase 1: テストリポジトリ拡張
 - [x] `global-setup.ts` — cherry-pick操作追加、reset操作追加（reflogエントリ生成）
