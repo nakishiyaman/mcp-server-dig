@@ -122,6 +122,51 @@ describe("git_diff_context (MCP)", () => {
     expect(text).toContain("src/index.ts");
   });
 
+  it("word_diff=trueで語レベルのdiffを表示する", async () => {
+    const repoDir = getRepoDir();
+    const logOutput = await git(repoDir, "log", "--format=%H", "--max-count=3");
+    const hashes = logOutput.trim().split("\n");
+    const newest = hashes[0];
+    const oldest = hashes[hashes.length - 1];
+
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: repoDir,
+        commit: oldest,
+        compare_to: newest,
+        file_path: "src/index.ts",
+        word_diff: true,
+      },
+    });
+    const text = getToolText(result);
+
+    // Word diff uses {+ +} and [- -] markers
+    expect(text).toContain("Diff:");
+  });
+
+  it("word_diff=trueでstat_only=trueの場合word_diffは無視される", async () => {
+    const repoDir = getRepoDir();
+    const logOutput = await git(repoDir, "log", "--format=%H", "--max-count=3");
+    const hashes = logOutput.trim().split("\n");
+    const newest = hashes[0];
+    const oldest = hashes[hashes.length - 1];
+
+    const result = await client.callTool({
+      name: "git_diff_context",
+      arguments: {
+        repo_path: repoDir,
+        commit: newest,
+        compare_to: oldest,
+        stat_only: true,
+        word_diff: true,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("file(s) changed");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_diff_context",

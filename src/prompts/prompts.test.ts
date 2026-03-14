@@ -7,6 +7,7 @@ import { buildOnboardCodebasePrompt } from "./onboard-codebase.js";
 import { buildFindBugOriginPrompt } from "./find-bug-origin.js";
 import { buildTechnicalDebtPrompt } from "./technical-debt.js";
 import { buildOnboardAreaPrompt } from "./onboard-area.js";
+import { buildAiAgentSafetyPrompt } from "./ai-agent-safety.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -203,6 +204,59 @@ describe("technical-debt prompt", () => {
     expect(text).toContain("git_code_churn");
     expect(text).toContain("git_stale_files");
     expect(text).toContain("git_knowledge_map");
+  });
+});
+
+describe("ai-agent-safety prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildAiAgentSafetyPrompt({
+      repo_path: "/path/to/repo",
+      target_files: "src/index.ts,src/utils.ts",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("src/index.ts");
+    expect(text).toContain("src/utils.ts");
+    expect(text).toContain("git_file_risk_profile");
+    expect(text).toContain("git_impact_analysis");
+    expect(text).toContain("git_related_changes");
+    expect(text).toContain("git_conflict_history");
+  });
+
+  it("ファイルリストがリスト形式で表示される", () => {
+    const result = buildAiAgentSafetyPrompt({
+      repo_path: "/path/to/repo",
+      target_files: "src/a.ts,src/b.ts,src/c.ts",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("- src/a.ts");
+    expect(text).toContain("- src/b.ts");
+    expect(text).toContain("- src/c.ts");
+  });
+
+  it("単一ファイルでも正しく処理される", () => {
+    const result = buildAiAgentSafetyPrompt({
+      repo_path: "/path/to/repo",
+      target_files: "src/index.ts",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("- src/index.ts");
+    expect(text).toContain("リスク評価");
+  });
+
+  it("リスクレベルの出力形式が含まれる", () => {
+    const result = buildAiAgentSafetyPrompt({
+      repo_path: "/path/to/repo",
+      target_files: "src/index.ts",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("HIGH / MEDIUM / LOW");
+    expect(text).toContain("推奨事項");
   });
 });
 

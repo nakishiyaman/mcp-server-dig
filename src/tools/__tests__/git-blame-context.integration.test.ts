@@ -63,6 +63,36 @@ describe("git_blame_context (MCP)", () => {
     expect(result.isError).toBe(true);
   });
 
+  it("detect_moves=trueで移動検出モードのblameを返す", async () => {
+    const result = await client.callTool({
+      name: "git_blame_context",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        detect_moves: true,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Blame context for: src/index.ts");
+    expect(text).toContain("block(s)");
+  });
+
+  it("detect_moves=falseでデフォルトのblameと同じ結果を返す", async () => {
+    const result = await client.callTool({
+      name: "git_blame_context",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/index.ts",
+        detect_moves: false,
+      },
+    });
+    const text = getToolText(result);
+
+    expect(text).toContain("Blame context for: src/index.ts");
+    expect(text).toContain("block(s)");
+  });
+
   it("JSON出力フォーマットで構造化データを返す", async () => {
     const result = await client.callTool({
       name: "git_blame_context",

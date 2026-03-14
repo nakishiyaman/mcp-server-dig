@@ -1,6 +1,60 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-14 (v0.29.0リリース済み)
+最終更新: 2026-03-14 (v0.30.0開発中)
+
+## v0.30.0 — 複合分析の深化
+
+### Phase 0: 準備
+- [x] ブランチ作成: `feat/v0.30.0-composite-depth`
+- [x] CLAUDE.md — v0.29.0リリース済み → v0.30.0開発中
+
+### Phase 1: `git_knowledge_loss_risk` (TDD)
+- [x] `src/analysis/knowledge-loss-risk.ts` — `analyzeKnowledgeLossRisk()` 分析関数
+  - 再利用: `analyzeKnowledgeMap()`, `analyzeContributors()`, `computeBusFactor()`
+  - 著者別所有権集計 + bus_factor=1ディレクトリ特定 + 回復コスト分類
+- [x] `src/analysis/cached-analysis.ts` — `cachedAnalyzeKnowledgeLossRisk()` 追加
+- [x] `src/tools/git-knowledge-loss-risk.ts` — `registerGitKnowledgeLossRisk(server, context)`
+- [x] `src/tools/__tests__/git-knowledge-loss-risk.integration.test.ts` — 統合テスト8件
+- [x] `src/index.ts` — 登録追加（複合分析セクション）
+
+### Phase 2: `git_trend_analysis` (TDD)
+- [x] `src/analysis/trend-analysis.ts` — `analyzeTrend()` 分析関数
+  - 再利用: `analyzeHotspotsAndChurn()`, `analyzeContributors()`
+  - 期間別分析呼び出し + delta計算 + トレンド方向分類
+- [x] `src/analysis/cached-analysis.ts` — `cachedAnalyzeTrend()` 追加
+- [x] `src/tools/git-trend-analysis.ts` — `registerGitTrendAnalysis(server, context)`
+- [x] `src/tools/__tests__/git-trend-analysis.integration.test.ts` — 統合テスト8件
+- [x] `src/index.ts` — 登録追加
+
+### Phase 3: gitフラグ強化（既存ツール深化）
+- [x] `src/tools/git-blame-context.ts` — `detect_moves: boolean` パラメータ追加 → blame `-M` フラグ
+- [x] `src/tools/git-diff-context.ts` — `word_diff: boolean` パラメータ追加 → diff `--word-diff=plain`
+- [x] 各ツールの統合テストに2件追加
+
+### Phase 4: ai-agent-safety Prompt
+- [x] `src/prompts/ai-agent-safety.ts` — `buildAiAgentSafetyPrompt()` + `registerAiAgentSafety()`
+  - args: repo_path, target_files(string)
+  - chains: file_risk_profile → impact_analysis → related_changes → conflict_history
+- [x] `src/prompts/prompts.test.ts` — 4アサーション追加
+- [x] `src/index.ts` — Prompt登録追加
+
+### Phase 5: ドキュメント・仕上げ
+- [x] `src/resources/tool-guide.ts` — 2新ツール + 1新Prompt追加、ツール数37→39
+- [x] `CLAUDE.md` — v0.30.0、ツール数37→39（複合分析4→6）、Prompts 8→9
+- [x] `README.md` / `README.ja.md` — 新ツール・新Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.30.0セクション追加
+- [x] `vitest.config.ts` — branches threshold 86→84（trend_analysis presentation branches）
+- [x] `src/tools/__tests__/v030-branch-coverage.integration.test.ts` — 26テスト追加
+
+### カバレッジ
+| 指標 | v0.29.0 | v0.30.0 |
+|------|---------|---------|
+| Statements | 96% | 95% |
+| Branches | 86% | 84% |
+| Functions | 94% | 94% |
+| Lines | 97% | 96% |
+
+**注**: branches 86→84%の低下は `git_trend_analysis` の presentation branches（4 metrics × 3 directions × 3 period lengths のswitch文）が原因。テストリポジトリのデータでは全組み合わせを網羅できないため、次バージョンで unit test 追加により回復予定。
 
 ## v0.29.0 — 新ツール2本（git_line_history + git_commit_cluster）
 

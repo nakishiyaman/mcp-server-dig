@@ -43,6 +43,8 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | cherry-pick済みコミットを検出したい | git_cherry_pick_detect |
 | 特定の行や関数の変遷を追いたい | git_line_history |
 | 関連コミットのまとまりを検出したい | git_commit_cluster |
+| コントリビューター離脱時のリスクを知りたい | git_knowledge_loss_risk |
+| メトリクスの時系列トレンドを知りたい | git_trend_analysis |
 
 ## カテゴリ別一覧
 
@@ -79,11 +81,13 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_line_history** — 特定の行範囲や関数の変遷履歴（git log -Lベース、blameやfile_historyでは不可能な行レベル進化追跡）
 - **git_commit_cluster** — 時間近接性+ファイル共有度で関連コミット群を検出（logical changeset境界の可視化）
 
-### 組み合わせ分析ツール（4個）
+### 組み合わせ分析ツール（6個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
 - **git_repo_health** — リポジトリ全体の健全性レポート
 - **git_code_ownership_changes** — 日付境界でのコード所有権比較（所有者交代・バス係数変化検出）
 - **git_impact_analysis** — 変更のblast radius分析（co-change・コントリビューター重複・ディレクトリ結合度統合）
+- **git_knowledge_loss_risk** — コントリビューター離脱時の知識喪失リスク評価（bus factor=1ディレクトリ特定・回復コスト分類）
+- **git_trend_analysis** — メトリクスの期間比較トレンド分析（hotspots/churn/contributors/commit_count）
 
 ### ワークフロー統合ツール（2個）
 - **git_review_prep** — PRレビュー用の変更サマリーとリスク情報を一括取得
@@ -91,18 +95,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### output_format（全37ツール対応）
+### output_format（全39ツール対応）
 - \`output_format: "text"\` — デフォルト。人間が読みやすいテキスト形式
 - \`output_format: "json"\` — 構造化JSON形式。プログラムからの利用に最適
 
-### timeout_ms（全37ツール対応）
+### timeout_ms（全39ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
 
 ## Tool Annotations
 
-全37ツールにMCP Tool Annotationsが設定されています:
+全39ツールにMCP Tool Annotationsが設定されています:
 - \`readOnlyHint: true\` — 全ツールが読み取り専用（gitリポジトリを変更しない）
 - \`openWorldHint: false\` — 全ツールがローカルgitリポジトリのみを対象とする
 
@@ -156,6 +160,22 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 2. git_contributor_patterns → 領域の主要貢献者を特定
 3. git_hotspots → 変更が集中しているファイルを確認
 4. git_file_history → 主要ファイルの変更履歴を確認
+
+### 知識喪失リスク評価
+1. git_knowledge_loss_risk → コントリビューター別の離脱リスクを評価
+2. git_knowledge_map → ディレクトリ別の知識集中度を詳細確認
+3. git_author_timeline → 主要コントリビューターの活動期間を確認
+
+### トレンド分析（品質改善/悪化の検出）
+1. git_trend_analysis → hotspots/churn/contributorsの時系列トレンド
+2. git_hotspots → トレンド悪化時の変更集中ファイル特定
+3. git_file_risk_profile → リスクの高いファイルの詳細確認
+
+### AIエージェント安全チェック（ai-agent-safety Prompt推奨）
+1. git_file_risk_profile → 変更対象ファイルのリスク評価
+2. git_impact_analysis → 変更の影響範囲分析
+3. git_related_changes → 変更漏れの可能性がある関連ファイル特定
+4. git_conflict_history → マージコンフリクトリスク確認
 `;
 
 export function getToolGuideContent(): string {
@@ -168,7 +188,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "37ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "39ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

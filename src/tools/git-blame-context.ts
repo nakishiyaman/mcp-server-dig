@@ -16,6 +16,11 @@ export function registerGitBlameContext(server: McpServer): void {
         .describe("Relative path to the file within the repo"),
       start_line: z.number().int().min(1).optional().describe("Start of line range"),
       end_line: z.number().int().min(1).optional().describe("End of line range"),
+      detect_moves: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe("Detect code moved from other files within the same commit (git blame -M). Helps distinguish original author from refactorer."),
       timeout_ms: z
         .number()
         .int()
@@ -29,12 +34,13 @@ export function registerGitBlameContext(server: McpServer): void {
     },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ repo_path, file_path, start_line, end_line, timeout_ms, output_format }) => {
+    async ({ repo_path, file_path, start_line, end_line, detect_moves, timeout_ms, output_format }) => {
       try {
         await validateGitRepo(repo_path);
         await validateFilePath(repo_path, file_path);
 
         const args = ["blame", "--porcelain"];
+        if (detect_moves) args.push("-M");
 
         if (start_line !== undefined && end_line !== undefined) {
           args.push(`-L`, `${start_line},${end_line}`);

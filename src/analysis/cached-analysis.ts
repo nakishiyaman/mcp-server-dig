@@ -13,6 +13,16 @@ import {
   analyzeContributors,
   type ContributorsOptions,
 } from "./contributors.js";
+import {
+  analyzeKnowledgeLossRisk,
+  type KnowledgeLossRiskOptions,
+  type KnowledgeLossRiskResult,
+} from "./knowledge-loss-risk.js";
+import {
+  analyzeTrend,
+  type TrendAnalysisOptions,
+  type TrendResult,
+} from "./trend-analysis.js";
 import type { CombinedNumstatResult } from "../git/parsers.js";
 import type { ContributorStats } from "../git/types.js";
 
@@ -41,6 +51,36 @@ export function cachedAnalyzeContributors(
   if (cached) return Promise.resolve(cached);
 
   return analyzeContributors(repoPath, options).then((result) => {
+    cache.set(key, result);
+    return result;
+  });
+}
+
+export function cachedAnalyzeKnowledgeLossRisk(
+  cache: AnalysisCache,
+  repoPath: string,
+  options: KnowledgeLossRiskOptions = {},
+): Promise<KnowledgeLossRiskResult[]> {
+  const key = buildCacheKey("analyzeKnowledgeLossRisk", repoPath, options as Record<string, unknown>);
+  const cached = cache.get<KnowledgeLossRiskResult[]>(key);
+  if (cached) return Promise.resolve(cached);
+
+  return analyzeKnowledgeLossRisk(repoPath, options).then((result) => {
+    cache.set(key, result);
+    return result;
+  });
+}
+
+export function cachedAnalyzeTrend(
+  cache: AnalysisCache,
+  repoPath: string,
+  options: TrendAnalysisOptions,
+): Promise<TrendResult> {
+  const key = buildCacheKey("analyzeTrend", repoPath, options as unknown as Record<string, unknown>);
+  const cached = cache.get<TrendResult>(key);
+  if (cached) return Promise.resolve(cached);
+
+  return analyzeTrend(repoPath, options).then((result) => {
     cache.set(key, result);
     return result;
   });
