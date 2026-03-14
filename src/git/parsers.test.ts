@@ -158,6 +158,22 @@ describe("parseBlameOutput", () => {
   it("returns empty array for empty input", () => {
     expect(parseBlameOutput("")).toEqual([]);
   });
+
+  it("不完全なblame出力でデフォルト値を使用する", () => {
+    // Blame output with commit hash and content but missing author/email/date/summary
+    const raw = [
+      "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2 1 1 1",
+      "filename src/test.ts",
+      "\tcontent line",
+    ].join("\n");
+
+    const result = parseBlameOutput(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0].author).toBe("");
+    expect(result[0].email).toBe("");
+    expect(result[0].date).toBe("");
+    expect(result[0].summary).toBe("");
+  });
 });
 
 describe("parseShortlogOutput", () => {
@@ -246,6 +262,15 @@ describe("parseNameOnlyLog", () => {
   it("returns empty map for empty input", () => {
     expect(parseNameOnlyLog("").size).toBe(0);
     expect(parseNameOnlyLog("  \n  ").size).toBe(0);
+  });
+
+  it("空ハッシュのセクションをスキップする", () => {
+    // COMMIT: followed by only whitespace creates a section with empty hash
+    const raw = "COMMIT:  \nCOMMIT:abc1234\nsrc/valid.ts";
+
+    const result = parseNameOnlyLog(raw);
+    expect(result.size).toBe(1);
+    expect(result.get("abc1234")).toEqual(["src/valid.ts"]);
   });
 
   it("trims whitespace from hashes and file paths", () => {
@@ -493,6 +518,31 @@ describe("parseStaleFiles", () => {
   it("空入力で空配列を返す", () => {
     expect(parseStaleFiles("", 30)).toEqual([]);
   });
+
+  it("同一ファイルの古いエントリが新しいエントリを上書きしない", () => {
+    const now = new Date("2026-06-01T00:00:00Z");
+    const raw = [
+      "2026-05-31T00:00:00+00:00\tsrc/file.ts",
+      "2025-01-01T00:00:00+00:00\tsrc/file.ts",
+    ].join("\n");
+
+    // The newer date (2026-05-31) should be kept, not overwritten by older
+    const result = parseStaleFiles(raw, 30, now);
+    expect(result).toHaveLength(0); // Not stale because most recent is May 31
+  });
+
+  it("タブなし行とパス空行をスキップする", () => {
+    const now = new Date("2026-06-01T00:00:00Z");
+    const raw = [
+      "no-tab-line",
+      "2025-01-01T00:00:00+00:00\t",
+      "2025-01-01T00:00:00+00:00\tsrc/valid.ts",
+    ].join("\n");
+
+    const result = parseStaleFiles(raw, 30, now);
+    expect(result).toHaveLength(1);
+    expect(result[0].filePath).toBe("src/valid.ts");
+  });
 });
 
 describe("parseTagOutput", () => {
@@ -587,6 +637,22 @@ describe("parseRenameOutput", () => {
 
     const result = parseRenameOutput(raw);
     expect(result).toHaveLength(0);
+  });
+
+  it("不完全なヘッダーでデフォルト値を使用する", () => {
+    // Header with hash but empty author/email/date/subject
+    const raw = [
+      "abc1234||||",
+      "R100\told.ts\tnew.ts",
+    ].join("\n");
+
+    const result = parseRenameOutput(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0].hash).toBe("abc1234");
+    expect(result[0].author).toBe("");
+    expect(result[0].email).toBe("");
+    expect(result[0].date).toBe("");
+    expect(result[0].subject).toBe("");
   });
 });
 
