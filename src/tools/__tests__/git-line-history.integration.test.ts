@@ -117,6 +117,19 @@ describe("git_line_history (MCP)", () => {
     expect(data.entries[0]).toHaveProperty("subject");
   });
 
+  it("存在しない関数名はgitエラーを返す", async () => {
+    const result = await client.callTool({
+      name: "git_line_history",
+      arguments: {
+        repo_path: getRepoDir(),
+        file_path: "src/calculator.ts",
+        funcname: "nonExistentFunctionXyz",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+  });
+
   it("max_commitsで結果を制限する", async () => {
     const result = await client.callTool({
       name: "git_line_history",

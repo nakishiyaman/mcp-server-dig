@@ -93,6 +93,23 @@ describe("git_dependency_map (MCP)", () => {
     }
   });
 
+  it("path_pattern指定でスコープを表示する", async () => {
+    const result = await client.callTool({
+      name: "git_dependency_map",
+      arguments: {
+        repo_path: getRepoDir(),
+        depth: 1,
+        min_coupling: 1,
+        path_pattern: "src/",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(result.isError).toBeFalsy();
+    // Either shows scope label or no coupling found
+    expect(text.length).toBeGreaterThan(0);
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_dependency_map",

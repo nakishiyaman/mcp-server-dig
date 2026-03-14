@@ -108,6 +108,21 @@ describe("git_reflog_analysis (MCP)", () => {
     expect(data.entries[0]).toHaveProperty("date");
   });
 
+  it("action_filterで一致なしの場合メッセージを返す", async () => {
+    const result = await client.callTool({
+      name: "git_reflog_analysis",
+      arguments: {
+        repo_path: getRepoDir(),
+        action_filter: "nonexistent-action-xyz",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(result.isError).toBeFalsy();
+    expect(text).toContain("No reflog entries matching action");
+    expect(text).toContain("nonexistent-action-xyz");
+  });
+
   it("resetアクションがreflogに記録されている", async () => {
     const result = await client.callTool({
       name: "git_reflog_analysis",
