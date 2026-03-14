@@ -355,6 +355,33 @@ Detect cherry-picked or equivalent commits between branches using `git cherry`. 
 | upstream | string | yes | The upstream branch to compare against (e.g. 'main') |
 | head | string | no | The branch to check (default: current HEAD) |
 
+### git_line_history
+
+Track the evolution of specific lines or a function using `git log -L`. Shows how a code block changed across commits — unlike blame (snapshot) or file_history (file-level), this reveals line-level change history.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| file_path | string | yes | File path relative to the repository root |
+| start_line | number | no | Start line of the range (requires end_line) |
+| end_line | number | no | End line of the range (requires start_line) |
+| funcname | string | no | Function name to track (alternative to line range) |
+| max_commits | number | no | Maximum commits to show (default: 20) |
+
+### git_commit_cluster
+
+Detect clusters of related commits by time proximity and shared files. Reveals logical changeset boundaries — groups of commits that form a coherent change.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Only include commits after this date |
+| author | string | no | Filter commits by author name or email |
+| max_commits | number | no | Maximum commits to analyze (default: 200) |
+| time_window_minutes | number | no | Time window for clustering in minutes (default: 120) |
+| min_shared_files | number | no | Minimum shared files to link commits (default: 1) |
+| path_pattern | string | no | Filter commits by file path pattern |
+
 ### git_code_ownership_changes
 
 Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, new/departed contributors, and knowledge transfer patterns.

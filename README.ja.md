@@ -355,6 +355,33 @@ git reflogエントリを分析し、HEADの移動履歴を可視化します。
 | upstream | string | はい | 比較対象のupstreamブランチ（例: 'main'） |
 | head | string | いいえ | チェックするブランチ（デフォルト: 現在のHEAD） |
 
+### git_line_history
+
+`git log -L`を使用して特定の行範囲や関数の変遷を追跡します。blame（スナップショット）やfile_history（ファイル単位）では不可能な、行レベルの進化履歴を表示します。
+
+| パラメータ | 型 | 必須 | 説明 |
+|-----------|------|------|------|
+| repo_path | string | はい | git リポジトリの絶対パス |
+| file_path | string | はい | リポジトリルートからの相対パス |
+| start_line | number | いいえ | 追跡する行範囲の開始行（end_lineも必要） |
+| end_line | number | いいえ | 追跡する行範囲の終了行（start_lineも必要） |
+| funcname | string | いいえ | 追跡する関数名（行範囲の代替手段） |
+| max_commits | number | いいえ | 表示するコミットの最大数（デフォルト: 20） |
+
+### git_commit_cluster
+
+時間的近接性と共有ファイルで関連コミット群を検出します。logical changeset境界の可視化 — 一つのまとまった変更を構成するコミット群をグループ化します。
+
+| パラメータ | 型 | 必須 | 説明 |
+|-----------|------|------|------|
+| repo_path | string | はい | git リポジトリの絶対パス |
+| since | string | いいえ | この日付以降のコミットのみ対象 |
+| author | string | いいえ | 著者名またはメールでフィルタ |
+| max_commits | number | いいえ | 分析するコミットの最大数（デフォルト: 200） |
+| time_window_minutes | number | いいえ | クラスタリングの時間窓（分、デフォルト: 120） |
+| min_shared_files | number | いいえ | コミットをリンクする最小共有ファイル数（デフォルト: 1） |
+| path_pattern | string | いいえ | ファイルパスパターンでフィルタ |
+
 ### git_code_ownership_changes
 
 指定日付を境界に「前期」「後期」のコード所有権を比較し、所有者交代・バス係数変化・新規/離脱コントリビューター・知識移転パターンを検出します。
