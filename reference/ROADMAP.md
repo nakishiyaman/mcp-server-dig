@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-14 (v0.29.0開発中)
+最終更新: 2026-03-14 (v0.29.0リリース済み)
 
 ## v0.29.0 — 新ツール2本（git_line_history + git_commit_cluster）
 
@@ -22,6 +22,9 @@
   - CLAUDE.md — v0.29.0、ツール数37
   - README.md / README.ja.md — 新ツールドキュメント
   - ROADMAP.md — v0.29.0セクション追加
+- [x] Phase 4: ブランチカバレッジ86%維持
+  - 4テスト追加（reflog_analysis, pickaxe, dependency_map, line_history）
+  - branches 85.73% → 86.12%
 
 ## v0.24.0 — MCP SDK新機能フル活用
 
