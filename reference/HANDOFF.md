@@ -3,41 +3,31 @@
 日時: 2026-03-14
 
 ### 完了したタスク
-- **v0.29.0: 新ツール2本（git_line_history + git_commit_cluster）**
-  - Phase 0: CLAUDE.mdバージョン修正（v0.27.0開発中 → v0.29.0開発中）
-  - Phase 1: `git_line_history` ツール実装
-    - `LineHistoryEntry` interface追加（src/git/types.ts）
-    - `parseLineLogOutput()` パーサー + 単体テスト4件（src/git/parsers.ts）
-    - テストリポジトリにcalculator.tsの3段階編集追加（global-setup.ts）
-    - `registerGitLineHistory()` ツール登録（行範囲 + funcname対応）
-    - 統合テスト7件
-  - Phase 2: `git_commit_cluster` ツール実装
-    - `CommitCluster` interface追加（src/git/types.ts）
-    - `clusterCommits()` 純粋関数（union-findベースクラスタリング、src/analysis/commit-cluster.ts）
-    - `registerGitCommitCluster()` ツール登録
-    - 統合テスト8件
-  - Phase 3: 登録・ドキュメント更新
-    - index.ts — 2ツール登録（データ取得29→31）
-    - tool-guide.ts — 2ツール追加（35→37）、コード考古学パターンにline_history追加
-    - CLAUDE.md — v0.29.0、ツール数37
-    - README.md / README.ja.md — 新ツールパラメータテーブル追加
-    - ROADMAP.md — v0.29.0セクション追加
-  - 既存テスト修正: resources.test.ts（29→31個）、contributor-patterns（Alice 2→5 commits）
+- **v0.29.0: リリース完了**
+  - PR #113 作成 → CI全パス → マージ
+  - Release PR #114 自動作成 → CI全パス → auto-merge → npm公開（mcp-server-dig@0.29.0）
+  - GitHub Release + tag v0.29.0 作成済み
+- **ブランチカバレッジ86%回復**（PR #115）
+  - v0.29.0新ツール追加でbranches 85.73%に低下（threshold 86%）
+  - 4テスト追加: reflog_analysis(action_filter空一致), pickaxe(since+author), dependency_map(path_pattern), line_history(存在しない関数名)
+  - branches 85.73% → 86.12%
+  - PR #115 作成 → CI全パス → マージ
 
 ### 現在の状態
-- ブランチ: `feat/v0.29.0-line-history-commit-cluster`
-- 未コミット変更: なし（コミット・push済み）
+- ブランチ: `main`（最新、リモートと同期済み）
+- 未コミット変更: `.claude/settings.local.json` のみ（ローカル設定、コミット不要）
 - ツール数: 37（データ取得31 + 組み合わせ分析4 + ワークフロー統合2）
-- テスト: 617件（全PASS）
-- lint/typecheck: クリーン
+- テスト: 621件（全PASS）
+- カバレッジ: Statements 96%, Branches 86%, Functions 94%, Lines 97%
+- npm: mcp-server-dig@0.29.0 公開済み
 
 ### 次にやるべきこと
-1. PR作成 → CI全パス確認 → マージ
-2. release-pleaseによるv0.29.0リリースPR自動作成を確認
-3. npm公開確認
-4. Phase 4（カバレッジ維持確認）は未実施 — branches 86%threshold維持をCI結果で確認する
+1. CLAUDE.mdのバージョンを「v0.29.0 リリース済み」に更新（現在は「v0.29.0 開発中」）
+2. 次バージョン（v0.30.0）の計画策定
+   - 候補: 新ツール追加、MCP SDK更新、依存関係メンテナンス
+3. ROADMAP/HANDOFF更新のコミット・push
 
 ### ブロッカー/注意点
-- CLAUDE.mdのバージョンはv0.27.0から直接v0.29.0に更新（v0.28.0はリリース済みだがCLAUDE.mdの更新が漏れていた）
 - RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
 - `.claude/settings.local.json` はローカル設定のためコミット不要
+- GitHub Actions Node.js 20 deprecation警告あり（2026-06-02以降はNode 24がデフォルト）— release-please-action@v4が対象
