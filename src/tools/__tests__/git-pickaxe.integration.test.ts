@@ -96,6 +96,22 @@ describe("git_pickaxe (MCP)", () => {
     expect(text).toContain("commit");
   });
 
+  it("sinceとauthorで検索を絞り込む", async () => {
+    const result = await client.callTool({
+      name: "git_pickaxe",
+      arguments: {
+        repo_path: getRepoDir(),
+        search_term: "const x",
+        since: "2000-01-01",
+        author: "Alice",
+      },
+    });
+    const text = getToolText(result);
+
+    expect(result.isError).toBeFalsy();
+    expect(text).toContain("Found");
+  });
+
   it("存在しないリポジトリでエラーを返す", async () => {
     const result = await client.callTool({
       name: "git_pickaxe",
