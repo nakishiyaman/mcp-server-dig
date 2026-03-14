@@ -39,10 +39,12 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | コードの追加/削除トレンドを知りたい | git_survival_analysis |
 | ファイル内のコード年齢分布を知りたい | git_code_age |
 | コミットメッセージの品質を分析したい | git_commit_message_quality |
+| reflogでHEADの移動履歴を見たい | git_reflog_analysis |
+| cherry-pick済みコミットを検出したい | git_cherry_pick_detect |
 
 ## カテゴリ別一覧
 
-### データ取得ツール（27個）
+### データ取得ツール（29個）
 - **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
 - **git_file_history** — ファイルのコミット履歴を時系列で表示
 - **git_commit_show** — 特定コミットの詳細（diff含む）を表示
@@ -70,6 +72,8 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_survival_analysis** — コードチャーンの時系列トレンド分析（追加/削除/チャーンレート）
 - **git_code_age** — ファイル内の行を年齢ブラケット別に集計（blame出力ベース）
 - **git_commit_message_quality** — コミットメッセージ品質分析（Conventional Commits準拠率・長さ・issue参照率）
+- **git_reflog_analysis** — reflogエントリ分析（HEAD移動履歴・アクション別集計・フィルタ）
+- **git_cherry_pick_detect** — cherry-pick検出（git cherry -vベース、equivalent/not-applied分類）
 
 ### 組み合わせ分析ツール（4個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
@@ -83,18 +87,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### output_format（全33ツール対応）
+### output_format（全35ツール対応）
 - \`output_format: "text"\` — デフォルト。人間が読みやすいテキスト形式
 - \`output_format: "json"\` — 構造化JSON形式。プログラムからの利用に最適
 
-### timeout_ms（全33ツール対応）
+### timeout_ms（全35ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
 
 ## Tool Annotations
 
-全33ツールにMCP Tool Annotationsが設定されています:
+全35ツールにMCP Tool Annotationsが設定されています:
 - \`readOnlyHint: true\` — 全ツールが読み取り専用（gitリポジトリを変更しない）
 - \`openWorldHint: false\` — 全ツールがローカルgitリポジトリのみを対象とする
 
@@ -159,7 +163,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "33ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "35ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

@@ -89,3 +89,17 @@ export interface CommitFrequencyBucket {
   authors: number;
   files: number;
 }
+
+export interface ReflogEntry {
+  hash: string;
+  action: string;
+  detail: string;
+  date: string;
+  message: string;
+}
+
+export interface CherryPickEntry {
+  status: "equivalent" | "not-applied";
+  hash: string;
+  subject: string;
+}
