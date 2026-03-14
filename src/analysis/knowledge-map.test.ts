@@ -21,6 +21,11 @@ describe("getDirectoryAtDepth", () => {
   it("depth=1でネストされたパスのトップを返す", () => {
     expect(getDirectoryAtDepth("a/b/c/d.ts", 1)).toBe("a");
   });
+
+  it("ファイルがdepthより浅い場合に親ディレクトリを返す（複数階層）", () => {
+    // parts = ["src", "file.ts"], depth = 3 → parts.length(2) <= depth(3), parts.length > 1
+    expect(getDirectoryAtDepth("src/file.ts", 3)).toBe("src");
+  });
 });
 
 describe("computeBusFactor", () => {

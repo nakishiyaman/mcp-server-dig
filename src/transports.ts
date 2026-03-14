@@ -26,7 +26,12 @@ export function resolveHttpPort(env: Record<string, string | undefined>): number
   return 3000;
 }
 
-export async function startTransport(server: McpServer, mode: TransportMode, port: number): Promise<void> {
+export interface TransportHandle {
+  close: () => Promise<void>;
+  port?: number;
+}
+
+export async function startTransport(server: McpServer, mode: TransportMode, port: number): Promise<TransportHandle> {
   if (mode === "http") {
     const { StreamableHTTPServerTransport } = await import(
       "@modelcontextprotocol/sdk/server/streamableHttp.js"
@@ -57,6 +62,16 @@ export async function startTransport(server: McpServer, mode: TransportMode, por
         resolve();
       });
     });
+
+    const addr = httpServer.address();
+    const actualPort = typeof addr === "object" && addr !== null ? addr.port : port;
+    return {
+      close: () =>
+        new Promise<void>((resolve, reject) => {
+          httpServer.close((err) => (err ? reject(err) : resolve()));
+        }),
+      port: actualPort,
+    };
   } else {
     const { StdioServerTransport } = await import(
       "@modelcontextprotocol/sdk/server/stdio.js"
@@ -64,5 +79,6 @@ export async function startTransport(server: McpServer, mode: TransportMode, por
     const transport = new StdioServerTransport();
     await server.connect(transport);
     logger.info("mcp-server-dig running on stdio");
+    return { close: () => Promise.resolve() };
   }
 }

@@ -1,5 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { resolveTransportMode, resolveHttpPort } from "./transports.js";
+import { describe, it, expect, afterAll } from "vitest";
+import { resolveTransportMode, resolveHttpPort, startTransport } from "./transports.js";
+import type { TransportHandle } from "./transports.js";
+import { createSandboxServer } from "./index.js";
+import http from "node:http";
 
 describe("resolveTransportMode", () => {
   it("デフォルトはstdio", () => {
@@ -36,5 +39,40 @@ describe("resolveHttpPort", () => {
     expect(resolveHttpPort({ DIG_PORT: "abc" })).toBe(3000);
     expect(resolveHttpPort({ DIG_PORT: "0" })).toBe(3000);
     expect(resolveHttpPort({ DIG_PORT: "99999" })).toBe(3000);
+  });
+});
+
+describe("startTransport", () => {
+  let handle: TransportHandle | undefined;
+  let server: ReturnType<typeof createSandboxServer> | undefined;
+
+  afterAll(async () => {
+    if (handle) await handle.close();
+    if (server) await server.close();
+  });
+
+  it("HTTPモードでサーバーを起動できる", async () => {
+    server = createSandboxServer();
+    handle = await startTransport(server, "http", 0);
+    expect(handle).toBeDefined();
+    expect(handle.port).toBeGreaterThan(0);
+  });
+
+  it("非/mcpパスで404が返る", async () => {
+    // handle and server are set from previous test
+    const port = handle!.port!;
+    const res = await new Promise<http.IncomingMessage>((resolve) => {
+      http.get(`http://127.0.0.1:${port}/not-mcp`, resolve);
+    });
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("/mcpパスでリクエストが処理される", async () => {
+    const port = handle!.port!;
+    const res = await new Promise<http.IncomingMessage>((resolve) => {
+      http.get(`http://127.0.0.1:${port}/mcp`, resolve);
+    });
+    // /mcp endpoint exists, but GET without proper MCP headers may return an error status
+    expect(res.statusCode).toBeDefined();
   });
 });

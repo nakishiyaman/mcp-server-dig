@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-14 (v0.25.0開発中)
+最終更新: 2026-03-14 (v0.26.0開発中)
 
 ## v0.24.0 — MCP SDK新機能フル活用
 
@@ -652,6 +652,52 @@
 - [x] ビルド・全テストパス確認
 - [x] CLAUDE.md バージョン更新
 - [x] ROADMAP v0.25.0セクション追加
+
+## v0.26.0 — TypeScript 5.9 + ブランチカバレッジ86%+
+
+### Phase 1: TypeScript 5.9 アップデート
+- [x] `package.json`: `typescript` `^5.8.0` → `^5.9.0`
+- [x] 検証: typecheck → build → test（全585テストパス）
+
+### Phase 2: ブランチカバレッジ向上（85% → 86%+）
+- [x] `src/tools/__tests__/branch-coverage-v026.integration.test.ts` 新規作成
+  - git_contributor_network: 21+著者でnodes/edges truncation分岐カバー
+  - git_why: 空ファイルで`blocks.length === 0`分岐カバー
+  - git_survival_analysis: 空結果 + monthly粒度複数期間ソート
+  - git_conflict_history: マージコミットありだがファイル変更なし
+  - git_impact_analysis: ディレクトリカップリング分岐カバー
+  - git_repo_health: staleファイル分岐 + knowledge_map提案
+  - その他: JSON出力・エッジケースバッチテスト（15件）
+- [x] `src/transports.test.ts` 拡張: HTTP startTransport + 404パス + /mcpパス
+- [x] `src/git/parsers.test.ts` 拡張: 不完全blame出力、空ハッシュ、staleファイルエッジケース
+- [x] `src/analysis/cache.test.ts` 拡張: LRU eviction false branch
+- [x] `src/analysis/knowledge-map.test.ts` 拡張: getDirectoryAtDepth複数階層
+- [x] `vitest.config.ts` branches threshold 85 → 86
+- [x] `vitest.config.ts` coverage exclude: `src/git/types.ts`（純粋型定義ファイル）
+
+### Phase 3: TransportHandle導入
+- [x] `src/transports.ts`: `startTransport` 戻り値を `TransportHandle` に変更（close + port）
+  - HTTPモードのテスタビリティ向上（ポート取得 + サーバー停止）
+
+### Phase 4: ドキュメント
+- [x] `CLAUDE.md` バージョン更新（v0.25.0 → v0.26.0）
+- [x] `reference/ROADMAP.md` v0.26.0セクション追加
+
+### カバレッジ結果
+| 指標 | v0.25.0 | v0.26.0 |
+|------|---------|---------|
+| Statements | 96% | 96% |
+| Branches | 85% | 86% |
+| Functions | 94% | 94% |
+| Lines | 97% | 97% |
+
+### 見送り判断
+| 候補 | 判断 | 理由 |
+|------|------|------|
+| @types/node 25 | 見送り | ターゲットNode 22と不整合 |
+| executor.ts ENOENT分岐 | 延期 | PATH操作が必要、ROI低 |
+| index.ts isMainModule分岐 | 許容 | エントリポイントガードはモジュールimportテストで本質的にカバー不可 |
+| branches 87% | 調整（86%） | 残り163未カバー分岐の大半はcache-context false branches（14）、defensive dead code（parsers/executor）、unreachable switch defaults。87%到達にはテスト基盤の再構築が必要でROI低 |
 
 ## スコープ外
 

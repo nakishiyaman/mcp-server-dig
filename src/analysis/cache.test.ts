@@ -56,6 +56,29 @@ describe("AnalysisCache", () => {
     expect(cache.get("key3")).toBe("value3");
   });
 
+  it("eviction時に新しいエントリを正しくスキップする", () => {
+    const cache = new AnalysisCache({ maxEntries: 3 });
+    // Insert 3 entries with staggered times
+    cache.set("oldest", "v1");
+    vi.advanceTimersByTime(10);
+    cache.set("middle", "v2");
+    vi.advanceTimersByTime(10);
+    cache.set("newest", "v3");
+    vi.advanceTimersByTime(10);
+
+    // Access oldest to make it most recently used
+    cache.get("oldest");
+    vi.advanceTimersByTime(10);
+
+    // Add 4th entry — "middle" should be evicted (oldest lastAccessed)
+    // During eviction loop: oldest (recently accessed, newer) → false branch hit
+    cache.set("extra", "v4");
+    expect(cache.get("oldest")).toBe("v1");
+    expect(cache.get("middle")).toBeUndefined();
+    expect(cache.get("newest")).toBe("v3");
+    expect(cache.get("extra")).toBe("v4");
+  });
+
   it("clearですべてのエントリが削除される", () => {
     const cache = new AnalysisCache();
     cache.set("key1", "value1");

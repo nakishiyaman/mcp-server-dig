@@ -10,11 +10,12 @@ export default defineConfig({
       exclude: [
         "src/**/*.test.ts",
         "src/tools/__tests__/**",
+        "src/git/types.ts",
       ],
       reporter: ["text", "text-summary", "lcov"],
       thresholds: {
         statements: 50,
-        branches: 85,
+        branches: 86,
         functions: 50,
         lines: 50,
       },
