@@ -34,6 +34,11 @@ export function registerGitDiffContext(server: McpServer): void {
         .optional()
         .default(3)
         .describe("Number of context lines in unified diff (default: 3)"),
+      word_diff: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe("Show word-level differences instead of line-level (git diff --word-diff=plain). Useful for seeing exactly which words changed within a line."),
       timeout_ms: z
         .number()
         .int()
@@ -54,6 +59,7 @@ export function registerGitDiffContext(server: McpServer): void {
       file_path,
       stat_only,
       context_lines,
+      word_diff,
       timeout_ms,
       output_format,
     }) => {
@@ -100,7 +106,7 @@ export function registerGitDiffContext(server: McpServer): void {
         }
 
         // Full diff
-        const args = ["diff", `-U${context_lines}`, base, commit];
+        const args = ["diff", `-U${context_lines}`, ...(word_diff ? ["--word-diff=plain"] : []), base, commit];
         if (file_path) args.push("--", file_path);
 
         const output = await execGit(args, repo_path, timeout_ms);

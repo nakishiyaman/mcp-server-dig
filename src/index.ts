@@ -49,6 +49,8 @@ import { registerGitReflogAnalysis } from "./tools/git-reflog-analysis.js";
 import { registerGitCherryPickDetect } from "./tools/git-cherry-pick-detect.js";
 import { registerGitLineHistory } from "./tools/git-line-history.js";
 import { registerGitCommitCluster } from "./tools/git-commit-cluster.js";
+import { registerGitKnowledgeLossRisk } from "./tools/git-knowledge-loss-risk.js";
+import { registerGitTrendAnalysis } from "./tools/git-trend-analysis.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -57,6 +59,7 @@ import { registerOnboardCodebase } from "./prompts/onboard-codebase.js";
 import { registerFindBugOrigin } from "./prompts/find-bug-origin.js";
 import { registerTechnicalDebt } from "./prompts/technical-debt.js";
 import { registerOnboardArea } from "./prompts/onboard-area.js";
+import { registerAiAgentSafety } from "./prompts/ai-agent-safety.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -107,6 +110,8 @@ export function createDigServer() {
   registerGitRepoHealth(server, context);
   registerGitCodeOwnershipChanges(server);
   registerGitImpactAnalysis(server, context);
+  registerGitKnowledgeLossRisk(server, context);
+  registerGitTrendAnalysis(server, context);
 
   // Workflow integration tools (with cache context)
   registerGitReviewPrep(server, context);
@@ -121,6 +126,7 @@ export function createDigServer() {
   registerFindBugOrigin(server);
   registerTechnicalDebt(server);
   registerOnboardArea(server);
+  registerAiAgentSafety(server);
 
   // Resources
   registerToolGuide(server);
