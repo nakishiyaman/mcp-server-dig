@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.26.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.25.0...v0.26.0) (2026-03-14)
+
+
+### Features
+
+* TypeScript 5.9 + ブランチカバレッジ86%+ ([97e00f3](https://github.com/nakishiyaman/mcp-server-dig/commit/97e00f38427de4d8c10cfe4d93f6043ea7a68d4d))
+* TypeScript 5.9アップデート + ブランチカバレッジ86%+ ([86bfd6c](https://github.com/nakishiyaman/mcp-server-dig/commit/86bfd6cf1c61505b87cd32e51fee1e6b264fbc55))
+
 ## [0.25.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.24.0...v0.25.0) (2026-03-13)
 
 
