@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.30.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.29.0...v0.30.0) (2026-03-14)
+
+
+### Features
+
+* v0.30.0 複合分析の深化 ([f32b9f0](https://github.com/nakishiyaman/mcp-server-dig/commit/f32b9f044c85e57243ecacf2e6e21cde7e35b710))
+* v0.30.0 複合分析の深化 — 新ツール2本 + Prompt1本 + gitフラグ強化 ([92ea488](https://github.com/nakishiyaman/mcp-server-dig/commit/92ea4881dbe3fb7fb474c564bdf148f1a7d07358))
+
 ## [0.29.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.28.0...v0.29.0) (2026-03-14)
 
 
