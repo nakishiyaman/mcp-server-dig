@@ -334,6 +334,27 @@ Analyze commit message quality metrics including Conventional Commits compliance
 | path_pattern | string | no | Limit analysis to commits touching this path |
 | author | string | no | Filter by author name or email |
 
+### git_reflog_analysis
+
+Analyze git reflog entries to understand HEAD movement history. Shows branch switches, resets, rebases, and other ref updates. Useful for recovering lost commits and understanding local workflow patterns.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| ref | string | no | The ref to show reflog for (default: HEAD) |
+| max_entries | number | no | Maximum number of reflog entries (default: 50, max: 500) |
+| action_filter | string | no | Filter by action type (e.g. 'commit', 'checkout', 'reset', 'rebase') |
+
+### git_cherry_pick_detect
+
+Detect cherry-picked or equivalent commits between branches using `git cherry`. Shows which commits have already been applied to upstream and which are unique. Useful for identifying duplicate work across branches.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| upstream | string | yes | The upstream branch to compare against (e.g. 'main') |
+| head | string | no | The branch to check (default: current HEAD) |
+
 ### git_code_ownership_changes
 
 Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, new/departed contributors, and knowledge transfer patterns.

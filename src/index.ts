@@ -45,6 +45,8 @@ import { registerGitConflictHistory } from "./tools/git-conflict-history.js";
 import { registerGitSurvivalAnalysis } from "./tools/git-survival-analysis.js";
 import { registerGitCodeAge } from "./tools/git-code-age.js";
 import { registerGitCommitMessageQuality } from "./tools/git-commit-message-quality.js";
+import { registerGitReflogAnalysis } from "./tools/git-reflog-analysis.js";
+import { registerGitCherryPickDetect } from "./tools/git-cherry-pick-detect.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -65,7 +67,7 @@ export function createDigServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (27)
+  // Data retrieval tools (29)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -93,6 +95,8 @@ export function createDigServer() {
   registerGitSurvivalAnalysis(server);
   registerGitCodeAge(server);
   registerGitCommitMessageQuality(server);
+  registerGitReflogAnalysis(server);
+  registerGitCherryPickDetect(server);
 
   // Composite analysis tools (with cache context)
   registerGitFileRiskProfile(server, context);

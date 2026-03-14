@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-14 (v0.26.0開発中)
+最終更新: 2026-03-14 (v0.27.0開発中)
 
 ## v0.24.0 — MCP SDK新機能フル活用
 
@@ -698,6 +698,30 @@
 | executor.ts ENOENT分岐 | 延期 | PATH操作が必要、ROI低 |
 | index.ts isMainModule分岐 | 許容 | エントリポイントガードはモジュールimportテストで本質的にカバー不可 |
 | branches 87% | 調整（86%） | 残り163未カバー分岐の大半はcache-context false branches（14）、defensive dead code（parsers/executor）、unreachable switch defaults。87%到達にはテスト基盤の再構築が必要でROI低 |
+
+## v0.27.0 — 新ツール2本（git_reflog_analysis + git_cherry_pick_detect）
+
+### Phase 1: テストリポジトリ拡張
+- [x] `global-setup.ts` — cherry-pick操作追加、reset操作追加（reflogエントリ生成）
+
+### Phase 2: `git_reflog_analysis`（TDD）
+- [x] `ReflogEntry` interface追加（src/git/types.ts）
+- [x] `src/tools/git-reflog-analysis.ts` — registerGitReflogAnalysis()
+- [x] 統合テスト7件
+- [x] `src/index.ts` にツール登録（データ取得27→28）
+
+### Phase 3: `git_cherry_pick_detect`（TDD）
+- [x] `CherryPickEntry` interface追加（src/git/types.ts）
+- [x] `src/tools/git-cherry-pick-detect.ts` — registerGitCherryPickDetect()
+- [x] 統合テスト6件
+- [x] `src/index.ts` にツール登録（データ取得28→29）
+
+### Phase 4: ドキュメント・仕上げ
+- [x] `src/resources/tool-guide.ts` — 2ツール追加（33→35）
+- [x] `CLAUDE.md` — v0.27.0、ツール数33→35（データ取得27→29）
+- [x] `README.md` / `README.ja.md` — 新ツールドキュメント
+- [x] `reference/ROADMAP.md` — v0.27.0セクション追加
+- [x] `vitest.config.ts` — branches threshold 86維持
 
 ## スコープ外
 

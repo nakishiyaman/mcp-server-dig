@@ -139,9 +139,25 @@ export async function setup({
     await git("commit", "-m", `feat: add ${author.name}'s contribution`);
   }
 
-  // Switch back to Bob for bulk commits
+  // Cherry-pick: pick a feature-branch commit into main for cherry-pick detection tests
+  const featureCommitHash = (
+    await git("log", "feature-branch", "--format=%H", "-1")
+  ).trim();
+  await git("cherry-pick", featureCommitHash);
+
+  // Reset: create reflog entries for reflog analysis tests
   await git("config", "user.name", "Bob");
   await git("config", "user.email", "bob@example.com");
+  await writeFile(
+    join(repoDir, "src", "reflog-test.ts"),
+    "export const reflog = true;\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "feat: add reflog test file");
+  // Soft reset to create a reset entry in reflog
+  await git("reset", "--soft", "HEAD~1");
+  // Re-commit to restore
+  await git("commit", "-m", "feat: add reflog test file (re-committed)");
 
   // Commits (Bob): bulk commits for truncation testing
   for (let i = 0; i < 50; i++) {
