@@ -41,10 +41,12 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | コミットメッセージの品質を分析したい | git_commit_message_quality |
 | reflogでHEADの移動履歴を見たい | git_reflog_analysis |
 | cherry-pick済みコミットを検出したい | git_cherry_pick_detect |
+| 特定の行や関数の変遷を追いたい | git_line_history |
+| 関連コミットのまとまりを検出したい | git_commit_cluster |
 
 ## カテゴリ別一覧
 
-### データ取得ツール（29個）
+### データ取得ツール（31個）
 - **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
 - **git_file_history** — ファイルのコミット履歴を時系列で表示
 - **git_commit_show** — 特定コミットの詳細（diff含む）を表示
@@ -74,6 +76,8 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_commit_message_quality** — コミットメッセージ品質分析（Conventional Commits準拠率・長さ・issue参照率）
 - **git_reflog_analysis** — reflogエントリ分析（HEAD移動履歴・アクション別集計・フィルタ）
 - **git_cherry_pick_detect** — cherry-pick検出（git cherry -vベース、equivalent/not-applied分類）
+- **git_line_history** — 特定の行範囲や関数の変遷履歴（git log -Lベース、blameやfile_historyでは不可能な行レベル進化追跡）
+- **git_commit_cluster** — 時間近接性+ファイル共有度で関連コミット群を検出（logical changeset境界の可視化）
 
 ### 組み合わせ分析ツール（4個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
@@ -87,18 +91,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### output_format（全35ツール対応）
+### output_format（全37ツール対応）
 - \`output_format: "text"\` — デフォルト。人間が読みやすいテキスト形式
 - \`output_format: "json"\` — 構造化JSON形式。プログラムからの利用に最適
 
-### timeout_ms（全35ツール対応）
+### timeout_ms（全37ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
 
 ## Tool Annotations
 
-全35ツールにMCP Tool Annotationsが設定されています:
+全37ツールにMCP Tool Annotationsが設定されています:
 - \`readOnlyHint: true\` — 全ツールが読み取り専用（gitリポジトリを変更しない）
 - \`openWorldHint: false\` — 全ツールがローカルgitリポジトリのみを対象とする
 
@@ -111,9 +115,10 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ### コード考古学（なぜこのコードがあるのか調査）
 1. git_why → 対象行の来歴を把握
-2. git_pickaxe → 関連する文字列の追加/削除履歴を追跡
-3. git_file_history → ファイル全体の変遷を確認
-4. git_rename_history → ファイルの移動・改名を追跡
+2. git_line_history → 特定の関数/行範囲の変遷を追跡
+3. git_pickaxe → 関連する文字列の追加/削除履歴を追跡
+4. git_file_history → ファイル全体の変遷を確認
+5. git_rename_history → ファイルの移動・改名を追跡
 
 ### PRレビュー
 1. git_review_prep → 変更概要とリスクファイルを把握
@@ -163,7 +168,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "35ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "37ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

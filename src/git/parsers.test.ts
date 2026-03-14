@@ -11,6 +11,7 @@ import {
   parseStaleFiles,
   parseTagOutput,
   parseRenameOutput,
+  parseLineLogOutput,
 } from "./parsers.js";
 
 describe("parseLogOutput", () => {
@@ -719,5 +720,87 @@ describe("parseCombinedNumstat", () => {
     expect(result.hotspots).toHaveLength(2);
     const png = result.churn.find((c) => c.filePath === "image.png");
     expect(png?.totalChurn).toBe(0);
+  });
+});
+
+describe("parseLineLogOutput", () => {
+  it("git log -Lの出力をパースする", () => {
+    const raw = [
+      "commit abc1234def5678abc1234def5678abc1234de567",
+      "Author: Alice <alice@example.com>",
+      "Date:   2026-01-15 10:00:00 +0900",
+      "",
+      "    feat: add login function",
+      "",
+      "diff --git a/src/auth.ts b/src/auth.ts",
+      "--- a/src/auth.ts",
+      "+++ b/src/auth.ts",
+      "@@ -1,3 +1,5 @@",
+      " const x = 1;",
+      "+function login() {}",
+      "+function logout() {}",
+    ].join("\n");
+
+    const result = parseLineLogOutput(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0].hash).toBe("abc1234def5678abc1234def5678abc1234de567");
+    expect(result[0].author).toBe("Alice");
+    expect(result[0].email).toBe("alice@example.com");
+    expect(result[0].date).toBe("2026-01-15 10:00:00 +0900");
+    expect(result[0].subject).toBe("feat: add login function");
+    expect(result[0].diff).toContain("diff --git");
+    expect(result[0].diff).toContain("+function login() {}");
+  });
+
+  it("複数コミットをパースする", () => {
+    const raw = [
+      "commit aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "Author: Alice <alice@example.com>",
+      "Date:   2026-01-15 10:00:00 +0900",
+      "",
+      "    feat: first change",
+      "",
+      "diff --git a/src/file.ts b/src/file.ts",
+      "@@ -1,2 +1,3 @@",
+      " line1",
+      "+line2",
+      "",
+      "commit bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "Author: Bob <bob@example.com>",
+      "Date:   2026-01-14 09:00:00 +0900",
+      "",
+      "    fix: second change",
+      "",
+      "diff --git a/src/file.ts b/src/file.ts",
+      "@@ -1,3 +1,2 @@",
+      " line1",
+      "-line2",
+    ].join("\n");
+
+    const result = parseLineLogOutput(raw);
+    expect(result).toHaveLength(2);
+    expect(result[0].hash).toBe("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    expect(result[0].author).toBe("Alice");
+    expect(result[1].hash).toBe("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+    expect(result[1].author).toBe("Bob");
+  });
+
+  it("空入力で空配列を返す", () => {
+    expect(parseLineLogOutput("")).toEqual([]);
+    expect(parseLineLogOutput("  \n  ")).toEqual([]);
+  });
+
+  it("diffがないコミットでは空文字列のdiffを返す", () => {
+    const raw = [
+      "commit aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "Author: Alice <alice@example.com>",
+      "Date:   2026-01-15 10:00:00 +0900",
+      "",
+      "    feat: initial commit",
+    ].join("\n");
+
+    const result = parseLineLogOutput(raw);
+    expect(result).toHaveLength(1);
+    expect(result[0].diff).toBe("");
   });
 });

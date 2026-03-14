@@ -103,3 +103,20 @@ export interface CherryPickEntry {
   hash: string;
   subject: string;
 }
+
+export interface LineHistoryEntry {
+  hash: string;
+  author: string;
+  email: string;
+  date: string;
+  subject: string;
+  diff: string;
+}
+
+export interface CommitCluster {
+  id: number;
+  commits: CommitInfo[];
+  startDate: string;
+  endDate: string;
+  sharedFiles: string[];
+}

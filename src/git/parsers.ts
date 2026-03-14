@@ -6,6 +6,7 @@ import type {
   DiffStat,
   FileChurn,
   FileHotspot,
+  LineHistoryEntry,
   RenameEntry,
   StaleFile,
   TagInfo,
@@ -430,4 +431,82 @@ export function parseTagOutput(raw: string): TagInfo[] {
   }
 
   return tags;
+}
+
+/**
+ * Parse `git log -L` output into line history entries.
+ *
+ * The output format consists of commit headers followed by diffs.
+ * Each commit starts with a line matching "commit <hash>",
+ * followed by Author:, Date:, blank line, subject, blank line, then diff hunks.
+ */
+export function parseLineLogOutput(raw: string): LineHistoryEntry[] {
+  if (!raw.trim()) return [];
+
+  const entries: LineHistoryEntry[] = [];
+  // Split on commit boundaries
+  const sections = raw.split(/^(?=commit [0-9a-f]{7,40}\b)/m).filter((s) => s.trim().length > 0);
+
+  for (const section of sections) {
+    const lines = section.split("\n");
+
+    // First line: "commit <hash>"
+    const commitMatch = lines[0]?.match(/^commit ([0-9a-f]{7,40})/);
+    if (!commitMatch) continue;
+
+    const hash = commitMatch[1];
+    let author = "";
+    let email = "";
+    let date = "";
+    let subject = "";
+    let diffStartIdx = -1;
+
+    // Parse header lines
+    let inHeader = true;
+    let foundBlankAfterHeader = false;
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (inHeader) {
+        const authorMatch = line.match(/^Author:\s+(.+?)\s+<(.+?)>/);
+        if (authorMatch) {
+          author = authorMatch[1];
+          email = authorMatch[2];
+          continue;
+        }
+        const dateMatch = line.match(/^Date:\s+(.+)/);
+        if (dateMatch) {
+          date = dateMatch[1].trim();
+          continue;
+        }
+        if (line.trim() === "") {
+          inHeader = false;
+          continue;
+        }
+        continue;
+      }
+
+      // After header: first non-blank line is subject
+      if (!foundBlankAfterHeader) {
+        if (line.trim() !== "") {
+          subject = line.trim();
+          foundBlankAfterHeader = true;
+          continue;
+        }
+        continue;
+      }
+
+      // Look for diff start
+      if (line.startsWith("diff --git") || line.startsWith("---") || line.startsWith("@@")) {
+        diffStartIdx = i;
+        break;
+      }
+    }
+
+    const diff = diffStartIdx >= 0 ? lines.slice(diffStartIdx).join("\n").trimEnd() : "";
+
+    entries.push({ hash, author, email, date, subject, diff });
+  }
+
+  return entries;
 }

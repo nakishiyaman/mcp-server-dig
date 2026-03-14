@@ -139,6 +139,30 @@ export async function setup({
     await git("commit", "-m", `feat: add ${author.name}'s contribution`);
   }
 
+  // Line history: create a function that gets modified across multiple commits
+  await git("config", "user.name", "Alice");
+  await git("config", "user.email", "alice@example.com");
+  await writeFile(
+    join(repoDir, "src", "calculator.ts"),
+    "export function calculate(a: number, b: number) {\n  return a + b;\n}\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "feat: add calculator function");
+
+  await writeFile(
+    join(repoDir, "src", "calculator.ts"),
+    "export function calculate(a: number, b: number) {\n  // validate inputs\n  if (isNaN(a) || isNaN(b)) throw new Error('invalid');\n  return a + b;\n}\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "fix: add input validation to calculator");
+
+  await writeFile(
+    join(repoDir, "src", "calculator.ts"),
+    "export function calculate(a: number, b: number, op: string = '+') {\n  // validate inputs\n  if (isNaN(a) || isNaN(b)) throw new Error('invalid');\n  if (op === '-') return a - b;\n  return a + b;\n}\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "feat: support subtraction in calculator");
+
   // Cherry-pick: pick a feature-branch commit into main for cherry-pick detection tests
   const featureCommitHash = (
     await git("log", "feature-branch", "--format=%H", "-1")

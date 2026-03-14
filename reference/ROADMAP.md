@@ -1,6 +1,27 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-14 (v0.27.0開発中)
+最終更新: 2026-03-14 (v0.29.0開発中)
+
+## v0.29.0 — 新ツール2本（git_line_history + git_commit_cluster）
+
+- [x] Phase 0: CLAUDE.mdバージョン修正（v0.27.0開発中 → v0.29.0開発中）
+- [x] Phase 1: `git_line_history` — git log -Lベースの行レベル変遷追跡
+  - LineHistoryEntry interface追加
+  - parseLineLogOutput() パーサー + 単体テスト
+  - テストリポジトリにcalculator.tsの複数編集追加
+  - registerGitLineHistory() ツール登録
+  - 統合テスト7件
+- [x] Phase 2: `git_commit_cluster` — 時間近接性+ファイル共有度でコミット群検出
+  - CommitCluster interface追加
+  - clusterCommits() 純粋関数（union-findベースクラスタリング）
+  - registerGitCommitCluster() ツール登録
+  - 統合テスト8件
+- [x] Phase 3: 登録・ドキュメント
+  - index.ts — 2ツール登録（データ取得29→31）
+  - tool-guide.ts — 2ツール追加（35→37）
+  - CLAUDE.md — v0.29.0、ツール数37
+  - README.md / README.ja.md — 新ツールドキュメント
+  - ROADMAP.md — v0.29.0セクション追加
 
 ## v0.24.0 — MCP SDK新機能フル活用
 
