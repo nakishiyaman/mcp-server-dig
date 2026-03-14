@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.27.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.26.0...v0.27.0) (2026-03-14)
+
+
+### Features
+
+* git_reflog_analysis + git_cherry_pick_detect ツール追加 ([eac0289](https://github.com/nakishiyaman/mcp-server-dig/commit/eac02890f0491f97ed42b88c11d9e665f282bdfe))
+* git_reflog_analysis + git_cherry_pick_detect ツール追加 ([9f50a26](https://github.com/nakishiyaman/mcp-server-dig/commit/9f50a264a8a84d8f047172dc0c2707b2f0de0cbb))
+
 ## [0.26.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.25.0...v0.26.0) (2026-03-14)
 
 
