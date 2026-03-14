@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.29.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.28.0...v0.29.0) (2026-03-14)
+
+
+### Features
+
+* git_line_history・git_commit_cluster ツール実装 (v0.29.0) ([f1005ac](https://github.com/nakishiyaman/mcp-server-dig/commit/f1005ac94b79728d9c7a679f763596f8737ded4e))
+* git_line_history・git_commit_clusterツール実装 (v0.29.0) ([af616bd](https://github.com/nakishiyaman/mcp-server-dig/commit/af616bd01e0069ab791dfe8480478d19aa9c3e8c))
+
 ## [0.28.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.27.0...v0.28.0) (2026-03-14)
 
 
