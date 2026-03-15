@@ -152,6 +152,7 @@ async function measureMetric(
     case "hotspots": {
       const combined = await analyzeHotspotsAndChurn(repoPath, {
         since,
+        until,
         pathPattern: opts.pathPattern,
         timeoutMs: opts.timeoutMs,
         hotspotsTopN: 1000,
@@ -162,6 +163,7 @@ async function measureMetric(
     case "churn": {
       const combined = await analyzeHotspotsAndChurn(repoPath, {
         since,
+        until,
         pathPattern: opts.pathPattern,
         timeoutMs: opts.timeoutMs,
         hotspotsTopN: 1,
@@ -172,6 +174,7 @@ async function measureMetric(
     case "contributors": {
       const result = await analyzeContributors(repoPath, {
         since,
+        until,
         pathPattern: opts.pathPattern,
         timeoutMs: opts.timeoutMs,
       } satisfies ContributorsOptions);
@@ -180,6 +183,7 @@ async function measureMetric(
     case "commit_count": {
       const result = await analyzeContributors(repoPath, {
         since,
+        until,
         pathPattern: opts.pathPattern,
         timeoutMs: opts.timeoutMs,
       } satisfies ContributorsOptions);
