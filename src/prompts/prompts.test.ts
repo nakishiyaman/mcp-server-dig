@@ -11,6 +11,7 @@ import { buildAiAgentSafetyPrompt } from "./ai-agent-safety.js";
 import { buildPlanRefactoringPrompt } from "./plan-refactoring.js";
 import { buildAssessChangeRiskPrompt } from "./assess-change-risk.js";
 import { buildIdentifyTechDebtPrompt } from "./identify-tech-debt.js";
+import { buildDiagnosePerformancePrompt } from "./diagnose-performance.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -392,5 +393,52 @@ describe("identify-tech-debt prompt", () => {
 
     const text = (result.messages[0].content as { type: string; text: string }).text;
     expect(text).toContain("top_n: 10");
+  });
+});
+
+describe("diagnose-performance prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildDiagnosePerformancePrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("git_repo_statistics");
+    expect(text).toContain("git_hotspots");
+    expect(text).toContain("git_stale_files");
+    expect(text).toContain("git_trend_analysis");
+    expect(text).toContain("git_dependency_map");
+  });
+
+  it("path_patternが指定された場合メッセージに含まれる", () => {
+    const result = buildDiagnosePerformancePrompt({
+      repo_path: "/path/to/repo",
+      path_pattern: "src/",
+      top_n: "5",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("path_pattern: src/");
+    expect(text).toContain("top_n_files: 5");
+  });
+
+  it("path_patternが未指定の場合path_filterの記述がない", () => {
+    const result = buildDiagnosePerformancePrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).not.toContain("path_pattern:");
+  });
+
+  it("デフォルトのtop_nが10である", () => {
+    const result = buildDiagnosePerformancePrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("top_n_files: 10");
   });
 });

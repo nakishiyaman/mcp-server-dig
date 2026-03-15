@@ -55,6 +55,8 @@ import { registerGitRefactorCandidates } from "./tools/git-refactor-candidates.j
 import { registerGitReleaseComparison } from "./tools/git-release-comparison.js";
 import { registerGitComplexityHotspots } from "./tools/git-complexity-hotspots.js";
 import { registerGitMergeTimeline } from "./tools/git-merge-timeline.js";
+import { registerGitRepoStatistics } from "./tools/git-repo-statistics.js";
+import { registerGitCommitPatterns } from "./tools/git-commit-patterns.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -67,6 +69,7 @@ import { registerAiAgentSafety } from "./prompts/ai-agent-safety.js";
 import { registerPlanRefactoring } from "./prompts/plan-refactoring.js";
 import { registerAssessChangeRisk } from "./prompts/assess-change-risk.js";
 import { registerIdentifyTechDebt } from "./prompts/identify-tech-debt.js";
+import { registerDiagnosePerformance } from "./prompts/diagnose-performance.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -79,7 +82,7 @@ export function createDigServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (32 tools)
+  // Data retrieval tools (34 tools)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -112,6 +115,8 @@ export function createDigServer() {
   registerGitLineHistory(server);
   registerGitCommitCluster(server);
   registerGitMergeTimeline(server);
+  registerGitRepoStatistics(server);
+  registerGitCommitPatterns(server);
 
   // Composite analysis tools (with cache context) (9 tools)
   registerGitFileRiskProfile(server, context);
@@ -141,6 +146,7 @@ export function createDigServer() {
   registerPlanRefactoring(server);
   registerAssessChangeRisk(server);
   registerIdentifyTechDebt(server);
+  registerDiagnosePerformance(server);
 
   // Resources
   registerToolGuide(server);
