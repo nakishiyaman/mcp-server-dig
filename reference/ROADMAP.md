@@ -1,6 +1,36 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.31.0開発中)
+最終更新: 2026-03-15 (v0.32.0開発中)
+
+## v0.32.0 — ブランチカバレッジ回復
+
+### Phase 1: ブランチカバレッジ回復（85.93% → 86.72%）
+- [x] `src/tools/__tests__/branch-coverage-v032.integration.test.ts` 新規作成（17テスト）
+  - git_release_comparison: formatDelta正負ゼロ分岐、topHotspots表示、assessment分岐
+  - git_refactor_candidates: HIGH risk next actions、サマリー表示
+  - git_reflog_analysis: 空reflog分岐
+  - git_trend_analysis: worsening方向 + next actions（hotspots/contributors）
+  - git_knowledge_loss_risk: HIGH/MEDIUM/LOW risk directory出力、highRisk next actions
+  - git_survival_analysis: daily粒度、since+path_pattern空結果
+  - ref-comparison.ts: busFactors.length === 0分岐
+
+### Phase 2: ドキュメント
+- [x] `CLAUDE.md` — v0.31.0 → v0.32.0
+- [x] `reference/ROADMAP.md` — v0.32.0セクション追加
+
+### カバレッジ結果
+| 指標 | v0.31.0 | v0.32.0 |
+|------|---------|---------|
+| Statements | 96% | 96% |
+| Branches | 85.93% | 86.72% |
+| Functions | 94% | 94% |
+| Lines | 97% | 97% |
+
+### 見送り判断
+| 候補 | 判断 | 理由 |
+|------|------|------|
+| branches threshold 87% | 見送り（86%維持） | 残り未カバー分岐はcache-context false branches（`context ? cached : uncached`ternary）が大半。MCP統合テストではcachedパスのみ通るため87%到達にはテスト基盤変更が必要 |
+| @types/node 25 | 見送り継続 | ターゲットNode 22と不整合 |
 
 ## v0.31.0 — 新ツール2本 + 新Prompt2本
 
