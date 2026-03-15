@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-14 (v0.30.0リリース済み)
+最終更新: 2026-03-15 (v0.30.0リリース済み、branches 86%回復)
 
 ## v0.30.0 — 複合分析の深化
 
@@ -43,18 +43,19 @@
 - [x] `CLAUDE.md` — v0.30.0、ツール数37→39（複合分析4→6）、Prompts 8→9
 - [x] `README.md` / `README.ja.md` — 新ツール・新Promptドキュメント
 - [x] `reference/ROADMAP.md` — v0.30.0セクション追加
-- [x] `vitest.config.ts` — branches threshold 86→84（trend_analysis presentation branches）
+- [x] `vitest.config.ts` — branches threshold 86→84→86（回復済み）
 - [x] `src/tools/__tests__/v030-branch-coverage.integration.test.ts` — 26テスト追加
+- [x] `src/tools/__tests__/trend-analysis-branches.integration.test.ts` — 26ユニットテスト追加（presentation branches回復）
 
 ### カバレッジ
-| 指標 | v0.29.0 | v0.30.0 |
-|------|---------|---------|
-| Statements | 96% | 95% |
-| Branches | 86% | 84% |
-| Functions | 94% | 94% |
-| Lines | 97% | 96% |
+| 指標 | v0.29.0 | v0.30.0 (initial) | v0.30.0 (final) |
+|------|---------|---------|---------|
+| Statements | 96% | 95% | 95% |
+| Branches | 86% | 84% | 86% |
+| Functions | 94% | 94% | 94% |
+| Lines | 97% | 96% | 96% |
 
-**注**: branches 86→84%の低下は `git_trend_analysis` の presentation branches（4 metrics × 3 directions × 3 period lengths のswitch文）が原因。テストリポジトリのデータでは全組み合わせを網羅できないため、次バージョンで unit test 追加により回復予定。
+**回復**: `formatMetricValue`, `interpretTrend`, `classifyDirection` を export し、全 metric × direction 組み合わせをユニットテストでカバー。
 
 ## v0.29.0 — 新ツール2本（git_line_history + git_commit_cluster）
 
