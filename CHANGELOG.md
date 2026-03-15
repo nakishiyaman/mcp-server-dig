@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.33.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.32.0...v0.33.0) (2026-03-15)
+
+
+### Features
+
+* v0.33.0 新ツール2本+新Prompt1本 ([97cace0](https://github.com/nakishiyaman/mcp-server-dig/commit/97cace0f3529abf1ebe16d41b4dda6d9967be740))
+* v0.33.0 新ツール2本+新Prompt1本（git_complexity_hotspots, git_merge_timeline, identify-tech-debt） ([aab048e](https://github.com/nakishiyaman/mcp-server-dig/commit/aab048ebddc69a1894986f648b2fb7e2bdbca016))
+
 ## [0.32.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.31.0...v0.32.0) (2026-03-15)
 
 
