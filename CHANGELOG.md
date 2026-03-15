@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.36.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.35.0...v0.36.0) (2026-03-15)
+
+
+### Features
+
+* git_offboarding_simulation・git_coordination_bottleneck・plan-release追加（v0.36.0） ([a0c05d8](https://github.com/nakishiyaman/mcp-server-dig/commit/a0c05d84e2447b8600ba5ea26970e29cb7f5aaca))
+* git_offboarding_simulation・git_coordination_bottleneck・plan-release追加（v0.36.0） ([04b4e46](https://github.com/nakishiyaman/mcp-server-dig/commit/04b4e460a02391832dac7b59cd98d7cbb899fb16))
+
 ## [0.35.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.34.0...v0.35.0) (2026-03-15)
 
 
