@@ -13,6 +13,7 @@ import { buildAssessChangeRiskPrompt } from "./assess-change-risk.js";
 import { buildIdentifyTechDebtPrompt } from "./identify-tech-debt.js";
 import { buildDiagnosePerformancePrompt } from "./diagnose-performance.js";
 import { buildPostIncidentReviewPrompt } from "./post-incident-review.js";
+import { buildPlanReleasePrompt } from "./plan-release.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -494,5 +495,61 @@ describe("post-incident-review prompt", () => {
     expect(text).toContain("根本原因分析");
     expect(text).toContain("再発防止策");
     expect(text).toContain("HIGH / MEDIUM / LOW");
+  });
+});
+
+describe("plan-release prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildPlanReleasePrompt({
+      repo_path: "/path/to/repo",
+      base_ref: "v0.35.0",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("v0.35.0");
+    expect(text).toContain("git_release_comparison");
+    expect(text).toContain("git_revert_analysis");
+    expect(text).toContain("git_file_risk_profile");
+    expect(text).toContain("git_coordination_bottleneck");
+    expect(text).toContain("git_trend_analysis");
+  });
+
+  it("head_ref指定時にメッセージに含まれる", () => {
+    const result = buildPlanReleasePrompt({
+      repo_path: "/path/to/repo",
+      base_ref: "v0.35.0",
+      head_ref: "feat/new-feature",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("feat/new-feature");
+    expect(text).toContain("head_ref: feat/new-feature");
+  });
+
+  it("head_ref未指定でHEADがデフォルトとして使われる", () => {
+    const result = buildPlanReleasePrompt({
+      repo_path: "/path/to/repo",
+      base_ref: "v0.35.0",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("HEAD");
+    // head_ref: HEAD は手順内に出現するが、ユーザー指定の head_ref 行は出ない
+    expect(text).not.toContain("head_ref: feat/");
+  });
+
+  it("release_date指定時にメッセージに含まれる", () => {
+    const result = buildPlanReleasePrompt({
+      repo_path: "/path/to/repo",
+      base_ref: "v0.35.0",
+      release_date: "2026-04-01",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("2026-04-01");
+    expect(text).toContain("リリース予定日");
+    expect(text).toContain("スケジュールリスク");
   });
 });

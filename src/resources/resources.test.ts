@@ -56,7 +56,7 @@ describe("tool-guide resource", () => {
 
   it("カテゴリ別一覧セクションが含まれる", () => {
     expect(content).toContain("データ取得ツール（35個）");
-    expect(content).toContain("組み合わせ分析ツール（10個）");
+    expect(content).toContain("組み合わせ分析ツール（12個）");
     expect(content).toContain("ワークフロー統合ツール（2個）");
   });
 

@@ -27,6 +27,8 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 | `git_release_comparison` | Compare repository metrics between two git refs (tags, branches, commits) — shows how hotspots, churn, contributor count, and bus factor changed between releases |
 | `git_complexity_hotspots` | Identify and rank maintenance complexity hotspots using 6-dimension assessment (change frequency, code churn, knowledge concentration, coupling, staleness, conflict frequency) |
 | `git_contributor_growth` | Analyze contributor growth and retention over time — tracks new/departed contributors per period (monthly/quarterly), computes retention rates, bus factor trends, and classifies trajectory as growing/stable/shrinking |
+| `git_offboarding_simulation` | Simulate the impact of a contributor leaving — recomputes bus factor per directory after removing the author's contributions, identifies new single-points-of-failure and knowledge gaps |
+| `git_coordination_bottleneck` | Detect directories with high coordination cost — ranks by composite score of change frequency, unique authors, and ownership distribution to identify merge conflict hotspots |
 
 ### Data Retrieval
 
@@ -607,6 +609,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `identify-tech-debt` | Multi-tool technical debt analysis — chains refactor candidates, complexity hotspots, risk profiles, code age, and knowledge loss risk for a comprehensive debt report | `repo_path`, `path_pattern?`, `top_n?` |
 | `diagnose-performance` | Repository performance diagnosis — chains repo statistics, hotspots, stale files, trend analysis, and dependency mapping for a comprehensive performance report | `repo_path`, `path_pattern?`, `top_n?` |
 | `post-incident-review` | Post-incident review — chains commit search, diff context, revert analysis, file risk profile, and impact analysis to identify root cause and recommend prevention measures | `repo_path`, `incident_date`, `suspected_files?` |
+| `plan-release` | Release planning review — chains release comparison, revert analysis, file risk profile, coordination bottleneck, and trend analysis to support release decisions | `repo_path`, `base_ref`, `head_ref?`, `release_date?` |
 
 ## Resources
 
@@ -713,17 +716,17 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 41 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 49 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Output Format
 
-All 41 tools accept an optional `output_format` parameter:
+All 49 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 
 ### Tool Annotations
 
-All 41 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
+All 49 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
 
 ### Streamable HTTP Transport
 

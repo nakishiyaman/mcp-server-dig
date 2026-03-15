@@ -1,6 +1,38 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.35.0開発中)
+最終更新: 2026-03-15 (v0.36.0開発中)
+
+## v0.36.0 — 新ツール2本（組み合わせ分析2） + 新Prompt1本
+
+### Phase 1-2: 分析層
+- [x] `src/analysis/offboarding-simulation.ts` — 離脱シミュレーション純粋関数
+- [x] `src/analysis/offboarding-simulation.test.ts` — テスト3件
+- [x] `src/analysis/coordination-bottleneck.ts` — 調整コスト計算純粋関数
+- [x] `src/analysis/coordination-bottleneck.test.ts` — テスト4件
+- [x] `src/analysis/risk-classifiers.ts` — `classifyCoordinationCost` 追加
+- [x] `src/analysis/risk-classifiers.test.ts` — テスト8件追加
+
+### Phase 3: キャッシュ層
+- [x] `src/analysis/cached-analysis.ts` — `cachedAnalyzeKnowledgeMap` 追加
+
+### Phase 4: git_offboarding_simulation
+- [x] `src/tools/git-offboarding-simulation.ts` — 離脱シミュレーションツール新規作成
+- [x] `src/tools/__tests__/git-offboarding-simulation.integration.test.ts` — 統合テスト7件
+
+### Phase 5: git_coordination_bottleneck
+- [x] `src/tools/git-coordination-bottleneck.ts` — 調整コスト分析ツール新規作成
+- [x] `src/tools/__tests__/git-coordination-bottleneck.integration.test.ts` — 統合テスト7件
+
+### Phase 6: plan-release Prompt
+- [x] `src/prompts/plan-release.ts` — リリース計画レビューPrompt新規作成
+- [x] `src/prompts/prompts.test.ts` — テスト4件追加
+
+### Phase 7: 登録・ドキュメント
+- [x] `src/index.ts` — 2ツール + 1 Prompt登録（47→49ツール、14→15 Prompts）
+- [x] `src/resources/tool-guide.ts` — 2ツール追加、新ワークフローパターン
+- [x] `CLAUDE.md` — v0.36.0、ツール数更新
+- [x] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.36.0セクション追加
 
 ## v0.35.0 — 新ツール2本（データ1 + 複合分析1） + 新Prompt1本
 
