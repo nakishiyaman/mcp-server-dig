@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.34.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.33.0...v0.34.0) (2026-03-15)
+
+
+### Features
+
+* git_repo_statistics・git_commit_patterns・diagnose-performance追加 ([d20032d](https://github.com/nakishiyaman/mcp-server-dig/commit/d20032d6368339b4546f0b74e64db12075d21ac3))
+* v0.34.0 新データツール2本 + 新Prompt1本 ([9878403](https://github.com/nakishiyaman/mcp-server-dig/commit/9878403e239f3b0e01bff30be24d0df0858373a5))
+
 ## [0.33.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.32.0...v0.33.0) (2026-03-15)
 
 
