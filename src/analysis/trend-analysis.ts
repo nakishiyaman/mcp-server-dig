@@ -194,7 +194,7 @@ async function measureMetric(
  * For contributors: increase = improving (more people contributing)
  * For commit_count: neutral (just activity, context-dependent)
  */
-function classifyDirection(
+export function classifyDirection(
   metric: TrendMetric,
   delta: number,
   baseValue: number,

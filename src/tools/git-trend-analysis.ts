@@ -136,7 +136,7 @@ export function registerGitTrendAnalysis(server: McpServer, context?: ToolContex
   );
 }
 
-function formatMetricValue(metric: string, value: number): string {
+export function formatMetricValue(metric: string, value: number): string {
   switch (metric) {
     case "hotspots":
       return `${value} files changed`;
@@ -151,7 +151,7 @@ function formatMetricValue(metric: string, value: number): string {
   }
 }
 
-function interpretTrend(metric: string, direction: string): string {
+export function interpretTrend(metric: string, direction: string): string {
   if (direction === "stable") {
     return `Interpretation: ${metric} is stable — no significant change between periods.`;
   }
