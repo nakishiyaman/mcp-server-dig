@@ -12,6 +12,7 @@ import { buildPlanRefactoringPrompt } from "./plan-refactoring.js";
 import { buildAssessChangeRiskPrompt } from "./assess-change-risk.js";
 import { buildIdentifyTechDebtPrompt } from "./identify-tech-debt.js";
 import { buildDiagnosePerformancePrompt } from "./diagnose-performance.js";
+import { buildPostIncidentReviewPrompt } from "./post-incident-review.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -440,5 +441,58 @@ describe("diagnose-performance prompt", () => {
 
     const text = (result.messages[0].content as { type: string; text: string }).text;
     expect(text).toContain("top_n_files: 10");
+  });
+});
+
+describe("post-incident-review prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildPostIncidentReviewPrompt({
+      repo_path: "/path/to/repo",
+      incident_date: "2024-03-15",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("2024-03-15");
+    expect(text).toContain("git_search_commits");
+    expect(text).toContain("git_diff_context");
+    expect(text).toContain("git_revert_analysis");
+    expect(text).toContain("git_impact_analysis");
+  });
+
+  it("suspected_filesが指定された場合ファイルリストが表示される", () => {
+    const result = buildPostIncidentReviewPrompt({
+      repo_path: "/path/to/repo",
+      incident_date: "2024-03-15",
+      suspected_files: "src/auth.ts,src/db.ts",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("- src/auth.ts");
+    expect(text).toContain("- src/db.ts");
+    expect(text).toContain("git_file_risk_profile");
+  });
+
+  it("suspected_filesが未指定の場合疑わしいファイルの記述がない", () => {
+    const result = buildPostIncidentReviewPrompt({
+      repo_path: "/path/to/repo",
+      incident_date: "2024-03-15",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).not.toContain("疑わしいファイル:");
+  });
+
+  it("レポート形式の出力指示が含まれる", () => {
+    const result = buildPostIncidentReviewPrompt({
+      repo_path: "/path/to/repo",
+      incident_date: "2024-03-15",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("根本原因分析");
+    expect(text).toContain("再発防止策");
+    expect(text).toContain("HIGH / MEDIUM / LOW");
   });
 });

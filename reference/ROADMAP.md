@@ -1,6 +1,28 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.34.0開発中)
+最終更新: 2026-03-15 (v0.35.0開発中)
+
+## v0.35.0 — 新ツール2本（データ1 + 複合分析1） + 新Prompt1本
+
+### Phase 1: git_revert_analysis（データツール）
+- [x] `src/tools/__tests__/global-setup.ts` — リバートコミット追加（Alice: buggy feature + revert）
+- [x] `src/tools/git-revert-analysis.ts` — リバートパターン分析ツール新規作成
+- [x] `src/tools/__tests__/git-revert-analysis.integration.test.ts` — 統合テスト7件
+
+### Phase 2: git_contributor_growth（複合分析ツール）
+- [x] `src/tools/git-contributor-growth.ts` — コントリビューター増減・定着率分析ツール新規作成
+- [x] `src/tools/__tests__/git-contributor-growth.integration.test.ts` — 統合テスト7件
+
+### Phase 3: post-incident-review Prompt
+- [x] `src/prompts/post-incident-review.ts` — ポストインシデントレビューPrompt新規作成
+- [x] `src/prompts/prompts.test.ts` — テスト4件追加
+
+### Phase 4: 登録・ドキュメント
+- [x] `src/index.ts` — 2ツール + 1 Prompt登録（45→47ツール、13→14 Prompts）
+- [x] `src/resources/tool-guide.ts` — 2ツール追加、新ワークフローパターン
+- [x] `CLAUDE.md` — v0.35.0、ツール数更新
+- [x] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.35.0セクション追加
 
 ## v0.34.0 — 新データツール2本 + 新Prompt1本
 

@@ -57,6 +57,8 @@ import { registerGitComplexityHotspots } from "./tools/git-complexity-hotspots.j
 import { registerGitMergeTimeline } from "./tools/git-merge-timeline.js";
 import { registerGitRepoStatistics } from "./tools/git-repo-statistics.js";
 import { registerGitCommitPatterns } from "./tools/git-commit-patterns.js";
+import { registerGitRevertAnalysis } from "./tools/git-revert-analysis.js";
+import { registerGitContributorGrowth } from "./tools/git-contributor-growth.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -70,6 +72,7 @@ import { registerPlanRefactoring } from "./prompts/plan-refactoring.js";
 import { registerAssessChangeRisk } from "./prompts/assess-change-risk.js";
 import { registerIdentifyTechDebt } from "./prompts/identify-tech-debt.js";
 import { registerDiagnosePerformance } from "./prompts/diagnose-performance.js";
+import { registerPostIncidentReview } from "./prompts/post-incident-review.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -82,7 +85,7 @@ export function createDigServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (34 tools)
+  // Data retrieval tools (35 tools)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -117,8 +120,9 @@ export function createDigServer() {
   registerGitMergeTimeline(server);
   registerGitRepoStatistics(server);
   registerGitCommitPatterns(server);
+  registerGitRevertAnalysis(server);
 
-  // Composite analysis tools (with cache context) (9 tools)
+  // Composite analysis tools (with cache context) (10 tools)
   registerGitFileRiskProfile(server, context);
   registerGitRepoHealth(server, context);
   registerGitCodeOwnershipChanges(server);
@@ -128,6 +132,7 @@ export function createDigServer() {
   registerGitRefactorCandidates(server, context);
   registerGitReleaseComparison(server, context);
   registerGitComplexityHotspots(server, context);
+  registerGitContributorGrowth(server);
 
   // Workflow integration tools (with cache context)
   registerGitReviewPrep(server, context);
@@ -147,6 +152,7 @@ export function createDigServer() {
   registerAssessChangeRisk(server);
   registerIdentifyTechDebt(server);
   registerDiagnosePerformance(server);
+  registerPostIncidentReview(server);
 
   // Resources
   registerToolGuide(server);

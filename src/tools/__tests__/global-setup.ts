@@ -183,7 +183,20 @@ export async function setup({
   // Re-commit to restore
   await git("commit", "-m", "feat: add reflog test file (re-committed)");
 
+  // Revert: create a revert commit for revert_analysis tests
+  await git("config", "user.name", "Alice");
+  await git("config", "user.email", "alice@example.com");
+  await writeFile(
+    join(repoDir, "src", "buggy.ts"),
+    "export const buggy = true;\n",
+  );
+  await git("add", ".");
+  await git("commit", "-m", "feat: add buggy feature");
+  await git("revert", "HEAD", "--no-edit");
+
   // Commits (Bob): bulk commits for truncation testing
+  await git("config", "user.name", "Bob");
+  await git("config", "user.email", "bob@example.com");
   for (let i = 0; i < 50; i++) {
     await writeFile(
       join(repoDir, "src", "index.ts"),

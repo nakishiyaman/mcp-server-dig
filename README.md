@@ -26,6 +26,7 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 | `git_refactor_candidates` | Identify and rank refactoring candidates across the repository using 5-dimension risk assessment (change frequency, code churn, knowledge concentration, coupling, staleness) |
 | `git_release_comparison` | Compare repository metrics between two git refs (tags, branches, commits) — shows how hotspots, churn, contributor count, and bus factor changed between releases |
 | `git_complexity_hotspots` | Identify and rank maintenance complexity hotspots using 6-dimension assessment (change frequency, code churn, knowledge concentration, coupling, staleness, conflict frequency) |
+| `git_contributor_growth` | Analyze contributor growth and retention over time — tracks new/departed contributors per period (monthly/quarterly), computes retention rates, bus factor trends, and classifies trajectory as growing/stable/shrinking |
 
 ### Data Retrieval
 
@@ -413,6 +414,18 @@ Identify and rank maintenance complexity hotspots using 6-dimension risk assessm
 | top_n | number | no | Number of top hotspots to return (default: 10, max: 100) |
 | path_pattern | string | no | Filter files by path pattern |
 
+### git_contributor_growth
+
+Analyze contributor growth and retention over time. Tracks new/departed contributors per period (monthly or quarterly), computes retention rates, bus factor trends, and classifies overall trajectory as growing/stable/shrinking.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| period | string | no | Aggregation period: `"monthly"`, `"quarterly"` (default: `"monthly"`) |
+| since | string | no | Date filter (e.g. `"2024-01-01"`, `"1 year ago"`) |
+| path_pattern | string | no | Filter commits affecting paths matching pattern |
+| max_commits | number | no | Maximum number of commits to analyze (default: 10000) |
+
 ### git_code_ownership_changes
 
 Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, new/departed contributors, and knowledge transfer patterns.
@@ -563,6 +576,17 @@ Analyze commit distribution by day-of-week and hour-of-day — heatmap-style pat
 | max_commits | number | no | Maximum number of commits to analyze (default: 1000) |
 | path_pattern | string | no | Filter commits affecting paths matching pattern |
 
+### git_revert_analysis
+
+Analyze revert patterns in the repository — detects commits created by `git revert`, links them to their original commits, calculates time-to-revert statistics, and identifies files that are frequently reverted (revert hotspots).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Date filter (e.g. `"2024-01-01"`, `"6 months ago"`) |
+| path_pattern | string | no | Filter reverts affecting paths matching pattern |
+| top_n | number | no | Number of hotspot entries to return (default: 10) |
+
 ## Prompts
 
 MCP Prompts provide guided workflows that chain multiple tools together for common use cases.
@@ -582,6 +606,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `assess-change-risk` | Pre-change risk assessment — evaluates file risk, blast radius, knowledge distribution, and code history before making changes | `repo_path`, `file_path`, `change_description?` |
 | `identify-tech-debt` | Multi-tool technical debt analysis — chains refactor candidates, complexity hotspots, risk profiles, code age, and knowledge loss risk for a comprehensive debt report | `repo_path`, `path_pattern?`, `top_n?` |
 | `diagnose-performance` | Repository performance diagnosis — chains repo statistics, hotspots, stale files, trend analysis, and dependency mapping for a comprehensive performance report | `repo_path`, `path_pattern?`, `top_n?` |
+| `post-incident-review` | Post-incident review — chains commit search, diff context, revert analysis, file risk profile, and impact analysis to identify root cause and recommend prevention measures | `repo_path`, `incident_date`, `suspected_files?` |
 
 ## Resources
 
