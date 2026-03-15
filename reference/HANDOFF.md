@@ -1,27 +1,31 @@
 ## セッション引き継ぎ
 
-日時: 2026-03-15
+日時: 2026-03-16
 
 ### 完了したタスク
-- **v0.36.0 実装完了**（PR #137 作成済み・CIパス待ち）
-  - `git_offboarding_simulation` — 特定著者の離脱シミュレーション（bus factor再計算・新規SPOF検出）
-  - `git_coordination_bottleneck` — ディレクトリ別調整コスト分析（変更頻度×著者数×所有分散度）
-  - `plan-release` Prompt — リリース計画レビューワークフロー（5ツール連鎖）
-  - 分析層: offboarding-simulation.ts, coordination-bottleneck.ts, classifyCoordinationCost, cachedAnalyzeKnowledgeMap
-  - ツール: 47 → 49（組み合わせ分析10→12）、Prompts: 14 → 15、テスト: 791 → 824
-  - 全ドキュメント更新済み（CLAUDE.md, README.md, README.ja.md, tool-guide, ROADMAP）
+- TLA+記事（モデル検査・状態空間爆発）の分析・説明
+- mcp-server-digへの推奨プラクティス評価（第4回評価、8項目）
+  - 採用候補3件: 不変条件テスト、プロパティベーステスト（fast-check）、キャッシュ層プロパティテスト
+  - 採用済み2件: 小さなモデルで検証、状態空間の意識的縮小
+  - 見送り3件: TLA+仕様記述、TLC/Apalache導入
+- `docs/recommended-practices.md` に第4回評価セクション追加
+- `reference/ROADMAP.md` にv0.37.0セクション追加（プロパティベーステスト導入計画）
 
 ### 現在の状態
-- ブランチ: `feat/v0.36.0-offboarding-coordination`（mainから分岐）
-- 未コミット変更: なし（`.claude/settings.local.json` のみローカル変更、コミット対象外）
-- PR: https://github.com/nakishiyaman/mcp-server-dig/pull/137
-- 検証済み: `npm run build && npm run test && npm run typecheck && npm run lint` 全パス（824テスト）
+- ブランチ: `docs/handoff-v0.36.0`
+- v0.36.0はリリース済み
+- v0.37.0の計画策定完了（未実装）
 
 ### 次にやるべきこと
-- PR #137 のCIパス確認 → マージ
-- release-pleaseによるv0.36.0リリース（自動）
-- v0.37.0の計画
+- v0.37.0の実装開始（`feat/v0.37.0-property-testing` ブランチをmainから作成）
+  - Phase 1: `@fast-check/vitest` devDependency追加 + パーサープロパティテスト
+  - Phase 2: 不変条件テスト（truncation、execFile引数安全性等）
+  - Phase 3: キャッシュ層プロパティテスト（TTL/LRU不変条件）
+  - Phase 4: ドキュメント更新
 
 ### ブロッカー/注意点
+- `docs/handoff-v0.36.0` ブランチの変更をmainにマージしてからv0.37.0ブランチを作成すること
+- fast-checkはvitest統合パッケージ `@fast-check/vitest` を使用する
 - RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
 - `.claude/settings.local.json` の変更はコミット対象外にすること
+- release-please-action が Node.js 20 で警告あり（2026-06-02以降 Node.js 24 強制）→ v4の更新を追跡

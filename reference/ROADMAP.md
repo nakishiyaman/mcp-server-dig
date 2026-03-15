@@ -1,6 +1,35 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.36.0開発中)
+最終更新: 2026-03-16 (v0.36.0リリース済み、v0.37.0計画中)
+
+## v0.37.0 — プロパティベーステスト導入（TLA+記事知見の転用）
+
+### 背景
+TLA+のモデル検査・状態空間爆発の解説記事から、形式検証の概念をテスト戦略に転用する。
+詳細な評価記録: `docs/recommended-practices.md` 第4回評価
+
+### Phase 1: fast-check導入 + パーサープロパティテスト
+- [ ] `package.json` — `@fast-check/vitest` devDependency追加
+- [ ] `src/git/parsers.property.test.ts` — パーサー堅牢性プロパティテスト
+  - 全パーサー（parseLogOutput, parseBlamePorcelain, parseDiffStatOutput等）が任意文字列入力でクラッシュしない
+  - parseLogOutput: 出力が常に配列（空含む）
+  - parseBlamePorcelain: 出力の各エントリにcommitHashが存在
+
+### Phase 2: 不変条件テスト
+- [ ] `src/tools/__tests__/invariants.test.ts` — システム不変条件の体系的テスト
+  - 全ツール出力が50,000文字以下（truncation不変条件）
+  - successResponse/errorResponseの戻り値構造が常にMCP準拠
+  - execGitの引数が常に文字列配列（シェルインジェクション防止）
+
+### Phase 3: キャッシュ層プロパティテスト
+- [ ] `src/analysis/cache.property.test.ts` — キャッシュ不変条件テスト
+  - TTL超過エントリが`get()`で返されない
+  - エントリ数がmaxEntries（100）を超えない
+  - ランダムなget/set操作列でクラッシュしない
+
+### Phase 4: ドキュメント
+- [ ] `CLAUDE.md` — v0.37.0、プロパティベーステスト導入記載
+- [ ] `reference/ROADMAP.md` — v0.37.0完了チェック
 
 ## v0.36.0 — 新ツール2本（組み合わせ分析2） + 新Prompt1本
 
