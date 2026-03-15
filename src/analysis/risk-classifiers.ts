@@ -155,6 +155,34 @@ export function riskLabel(level: RiskLevel): string {
   }
 }
 
+export function classifyConflictFrequency(
+  mergeAppearances: number,
+  totalMerges: number,
+): RiskDimension {
+  if (totalMerges === 0 || mergeAppearances === 0) {
+    return { level: "LOW", detail: "no merge appearances" };
+  }
+
+  const percentage = Math.round((mergeAppearances / totalMerges) * 100);
+
+  if (percentage >= 20) {
+    return {
+      level: "HIGH",
+      detail: `${mergeAppearances} merges (${percentage}%)`,
+    };
+  }
+  if (percentage >= 10) {
+    return {
+      level: "MEDIUM",
+      detail: `${mergeAppearances} merges (${percentage}%)`,
+    };
+  }
+  return {
+    level: "LOW",
+    detail: `${mergeAppearances} merges (${percentage}%)`,
+  };
+}
+
 export function classifyIntegrationStyle(
   mergeRatio: number,
   mergesPerWeek: number,

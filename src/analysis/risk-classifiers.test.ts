@@ -5,6 +5,7 @@ import {
   classifyKnowledgeRisk,
   classifyCoupling,
   classifyStaleness,
+  classifyConflictFrequency,
   overallRisk,
   riskLabel,
   classifyIntegrationStyle,
@@ -195,6 +196,38 @@ describe("riskLabel", () => {
 
   it("LOWでLOW RISKを返す", () => {
     expect(riskLabel("LOW")).toBe("LOW RISK");
+  });
+});
+
+describe("classifyConflictFrequency", () => {
+  it("totalMerges=0でLOWを返す", () => {
+    const result = classifyConflictFrequency(5, 0);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toBe("no merge appearances");
+  });
+
+  it("mergeAppearances=0でLOWを返す", () => {
+    const result = classifyConflictFrequency(0, 10);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toBe("no merge appearances");
+  });
+
+  it("percentage>=20でHIGHを返す", () => {
+    const result = classifyConflictFrequency(4, 20);
+    expect(result.level).toBe("HIGH");
+    expect(result.detail).toContain("20%");
+  });
+
+  it("percentage>=10かつ<20でMEDIUMを返す", () => {
+    const result = classifyConflictFrequency(2, 20);
+    expect(result.level).toBe("MEDIUM");
+    expect(result.detail).toContain("10%");
+  });
+
+  it("percentage<10でLOWを返す", () => {
+    const result = classifyConflictFrequency(1, 20);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toContain("5%");
   });
 });
 
