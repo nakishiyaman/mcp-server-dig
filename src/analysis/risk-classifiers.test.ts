@@ -6,6 +6,7 @@ import {
   classifyCoupling,
   classifyStaleness,
   classifyConflictFrequency,
+  classifyCoordinationCost,
   overallRisk,
   riskLabel,
   classifyIntegrationStyle,
@@ -246,5 +247,39 @@ describe("classifyIntegrationStyle", () => {
 
   it("低頻度でbatch mergingを返す", () => {
     expect(classifyIntegrationStyle(0.1, 0.5)).toBe("batch merging");
+  });
+});
+
+describe("classifyCoordinationCost", () => {
+  it("空のスコア配列でLOWを返す", () => {
+    expect(classifyCoordinationCost(10, [])).toBe("LOW");
+  });
+
+  it("スコア0でLOWを返す", () => {
+    expect(classifyCoordinationCost(0, [100, 50, 0])).toBe("LOW");
+  });
+
+  it("ratio>=0.5でHIGHを返す", () => {
+    expect(classifyCoordinationCost(60, [100, 60, 10])).toBe("HIGH");
+  });
+
+  it("ratio>=0.2でMEDIUMを返す", () => {
+    expect(classifyCoordinationCost(30, [100, 30, 10])).toBe("MEDIUM");
+  });
+
+  it("ratio<0.2でLOWを返す", () => {
+    expect(classifyCoordinationCost(10, [100, 50, 10])).toBe("LOW");
+  });
+
+  it("最大スコアと同じでHIGHを返す", () => {
+    expect(classifyCoordinationCost(100, [100, 50, 10])).toBe("HIGH");
+  });
+
+  it("境界値0.5でHIGHを返す", () => {
+    expect(classifyCoordinationCost(50, [100, 50])).toBe("HIGH");
+  });
+
+  it("境界値0.2でMEDIUMを返す", () => {
+    expect(classifyCoordinationCost(20, [100, 20])).toBe("MEDIUM");
   });
 });

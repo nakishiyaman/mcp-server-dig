@@ -59,6 +59,8 @@ import { registerGitRepoStatistics } from "./tools/git-repo-statistics.js";
 import { registerGitCommitPatterns } from "./tools/git-commit-patterns.js";
 import { registerGitRevertAnalysis } from "./tools/git-revert-analysis.js";
 import { registerGitContributorGrowth } from "./tools/git-contributor-growth.js";
+import { registerGitOffboardingSimulation } from "./tools/git-offboarding-simulation.js";
+import { registerGitCoordinationBottleneck } from "./tools/git-coordination-bottleneck.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -73,6 +75,7 @@ import { registerAssessChangeRisk } from "./prompts/assess-change-risk.js";
 import { registerIdentifyTechDebt } from "./prompts/identify-tech-debt.js";
 import { registerDiagnosePerformance } from "./prompts/diagnose-performance.js";
 import { registerPostIncidentReview } from "./prompts/post-incident-review.js";
+import { registerPlanRelease } from "./prompts/plan-release.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -122,7 +125,7 @@ export function createDigServer() {
   registerGitCommitPatterns(server);
   registerGitRevertAnalysis(server);
 
-  // Composite analysis tools (with cache context) (10 tools)
+  // Composite analysis tools (with cache context) (12 tools)
   registerGitFileRiskProfile(server, context);
   registerGitRepoHealth(server, context);
   registerGitCodeOwnershipChanges(server);
@@ -133,6 +136,8 @@ export function createDigServer() {
   registerGitReleaseComparison(server, context);
   registerGitComplexityHotspots(server, context);
   registerGitContributorGrowth(server);
+  registerGitOffboardingSimulation(server, context);
+  registerGitCoordinationBottleneck(server, context);
 
   // Workflow integration tools (with cache context)
   registerGitReviewPrep(server, context);
@@ -153,6 +158,7 @@ export function createDigServer() {
   registerIdentifyTechDebt(server);
   registerDiagnosePerformance(server);
   registerPostIncidentReview(server);
+  registerPlanRelease(server);
 
   // Resources
   registerToolGuide(server);

@@ -28,8 +28,28 @@ import {
   type RefAnalysisOptions,
   type RefMetrics,
 } from "./ref-comparison.js";
+import {
+  analyzeKnowledgeMap,
+  type KnowledgeMapOptions,
+  type DirectoryKnowledge,
+} from "./knowledge-map.js";
 import type { CombinedNumstatResult } from "../git/parsers.js";
 import type { ContributorStats } from "../git/types.js";
+
+export function cachedAnalyzeKnowledgeMap(
+  cache: AnalysisCache,
+  repoPath: string,
+  options: KnowledgeMapOptions = {},
+): Promise<DirectoryKnowledge[]> {
+  const key = buildCacheKey("analyzeKnowledgeMap", repoPath, options as Record<string, unknown>);
+  const cached = cache.get<DirectoryKnowledge[]>(key);
+  if (cached) return Promise.resolve(cached);
+
+  return analyzeKnowledgeMap(repoPath, options).then((result) => {
+    cache.set(key, result);
+    return result;
+  });
+}
 
 export function cachedAnalyzeHotspotsAndChurn(
   cache: AnalysisCache,

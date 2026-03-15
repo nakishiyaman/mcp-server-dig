@@ -183,6 +183,22 @@ export function classifyConflictFrequency(
   };
 }
 
+export function classifyCoordinationCost(
+  score: number,
+  allScores: number[],
+): RiskLevel {
+  if (allScores.length === 0 || score === 0) return "LOW";
+
+  const maxScore = Math.max(...allScores);
+  if (maxScore === 0) return "LOW";
+
+  const ratio = score / maxScore;
+
+  if (ratio >= 0.5) return "HIGH";
+  if (ratio >= 0.2) return "MEDIUM";
+  return "LOW";
+}
+
 export function classifyIntegrationStyle(
   mergeRatio: number,
   mergesPerWeek: number,
