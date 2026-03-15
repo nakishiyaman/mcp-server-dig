@@ -23,6 +23,11 @@ import {
   type TrendAnalysisOptions,
   type TrendResult,
 } from "./trend-analysis.js";
+import {
+  analyzeAtRef,
+  type RefAnalysisOptions,
+  type RefMetrics,
+} from "./ref-comparison.js";
 import type { CombinedNumstatResult } from "../git/parsers.js";
 import type { ContributorStats } from "../git/types.js";
 
@@ -66,6 +71,22 @@ export function cachedAnalyzeKnowledgeLossRisk(
   if (cached) return Promise.resolve(cached);
 
   return analyzeKnowledgeLossRisk(repoPath, options).then((result) => {
+    cache.set(key, result);
+    return result;
+  });
+}
+
+export function cachedAnalyzeAtRef(
+  cache: AnalysisCache,
+  repoPath: string,
+  ref: string,
+  options: RefAnalysisOptions = {},
+): Promise<RefMetrics> {
+  const key = buildCacheKey("analyzeAtRef", repoPath, { ref, ...options } as Record<string, unknown>);
+  const cached = cache.get<RefMetrics>(key);
+  if (cached) return Promise.resolve(cached);
+
+  return analyzeAtRef(repoPath, ref, options).then((result) => {
     cache.set(key, result);
     return result;
   });

@@ -8,6 +8,8 @@ import { buildFindBugOriginPrompt } from "./find-bug-origin.js";
 import { buildTechnicalDebtPrompt } from "./technical-debt.js";
 import { buildOnboardAreaPrompt } from "./onboard-area.js";
 import { buildAiAgentSafetyPrompt } from "./ai-agent-safety.js";
+import { buildPlanRefactoringPrompt } from "./plan-refactoring.js";
+import { buildAssessChangeRiskPrompt } from "./assess-change-risk.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -275,5 +277,72 @@ describe("onboard-area prompt", () => {
     expect(text).toContain("git_contributor_patterns");
     expect(text).toContain("git_hotspots");
     expect(text).toContain("git_file_history");
+  });
+});
+
+describe("plan-refactoring prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildPlanRefactoringPrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("git_refactor_candidates");
+    expect(text).toContain("git_file_risk_profile");
+    expect(text).toContain("git_why");
+    expect(text).toContain("git_impact_analysis");
+  });
+
+  it("path_patternが指定された場合メッセージに含まれる", () => {
+    const result = buildPlanRefactoringPrompt({
+      repo_path: "/path/to/repo",
+      path_pattern: "src/",
+      top_n: "5",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("path_pattern: src/");
+    expect(text).toContain("top_n: 5");
+  });
+});
+
+describe("assess-change-risk prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildAssessChangeRiskPrompt({
+      repo_path: "/path/to/repo",
+      file_path: "src/index.ts",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("src/index.ts");
+    expect(text).toContain("git_file_risk_profile");
+    expect(text).toContain("git_impact_analysis");
+    expect(text).toContain("git_knowledge_map");
+    expect(text).toContain("git_why");
+  });
+
+  it("change_descriptionが指定された場合メッセージに含まれる", () => {
+    const result = buildAssessChangeRiskPrompt({
+      repo_path: "/path/to/repo",
+      file_path: "src/index.ts",
+      change_description: "認証ロジックのリファクタリング",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("認証ロジックのリファクタリング");
+  });
+
+  it("change_descriptionが未指定の場合変更内容の記述がない", () => {
+    const result = buildAssessChangeRiskPrompt({
+      repo_path: "/path/to/repo",
+      file_path: "src/index.ts",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).not.toContain("変更内容:");
   });
 });

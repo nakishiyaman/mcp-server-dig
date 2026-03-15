@@ -1,6 +1,31 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.30.0リリース済み、trend_analysis区間値バグ修正)
+最終更新: 2026-03-15 (v0.31.0開発中)
+
+## v0.31.0 — 新ツール2本 + 新Prompt2本
+
+### Phase 1: `git_refactor_candidates`
+- [x] `src/tools/git-refactor-candidates.ts` — 5次元リスク評価でリファクタリング候補ランキング
+- [x] `src/tools/__tests__/git-refactor-candidates.integration.test.ts` — 統合テスト6件
+
+### Phase 2: `git_release_comparison`
+- [x] `src/analysis/knowledge-map.ts` — `until`パラメータ追加
+- [x] `src/analysis/ref-comparison.ts` — `analyzeAtRef()` 新規
+- [x] `src/analysis/cached-analysis.ts` — `cachedAnalyzeAtRef()` 追加
+- [x] `src/tools/git-release-comparison.ts` — ツール実装
+- [x] `src/tools/__tests__/git-release-comparison.integration.test.ts` — 統合テスト6件
+
+### Phase 3: Prompt 2本
+- [x] `src/prompts/plan-refactoring.ts` — リファクタリング計画ワークフロー
+- [x] `src/prompts/assess-change-risk.ts` — 変更前リスク評価ワークフロー
+- [x] `src/prompts/prompts.test.ts` — テスト追加
+
+### Phase 4: ドキュメント・仕上げ
+- [x] `src/index.ts` — 2ツール + 2 Prompt登録
+- [x] `src/resources/tool-guide.ts` — 2ツール追加（39→41）
+- [x] `CLAUDE.md` — v0.31.0、ツール数41、Prompt数11
+- [x] `README.md` / `README.ja.md` — 新ツール・新Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.31.0セクション追加
 
 ## v0.30.0 — 複合分析の深化
 

@@ -23,6 +23,8 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 | `git_impact_analysis` | Blast radius analysis for a file or directory — combines co-change networks, contributor overlap, and directory coupling |
 | `git_knowledge_loss_risk` | Assess knowledge loss risk per contributor — identifies directories where a single person owns most of the code (bus factor = 1) and estimates recovery cost |
 | `git_trend_analysis` | Analyze trends over time by comparing metrics across multiple time periods — tracks whether hotspot count, code churn, contributor count, or commit activity is improving, stable, or worsening |
+| `git_refactor_candidates` | Identify and rank refactoring candidates across the repository using 5-dimension risk assessment (change frequency, code churn, knowledge concentration, coupling, staleness) |
+| `git_release_comparison` | Compare repository metrics between two git refs (tags, branches, commits) — shows how hotspots, churn, contributor count, and bus factor changed between releases |
 
 ### Data Retrieval
 
@@ -530,6 +532,8 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `technical-debt` | Technical debt analysis — identifies high-risk files, knowledge concentration, and stale areas | `repo_path` |
 | `onboard-area` | Area-specific onboarding — knowledge owners, contributors, and change history for a directory | `repo_path`, `directory` |
 | `ai-agent-safety` | Pre-flight risk check for AI agents before modifying files — chains file_risk_profile, impact_analysis, related_changes, and conflict_history | `repo_path`, `file_path` |
+| `plan-refactoring` | Refactoring planning — ranks candidates by 5-dimension risk, then drills into top files with risk profile, code archaeology, and impact analysis | `repo_path`, `path_pattern?`, `top_n?` |
+| `assess-change-risk` | Pre-change risk assessment — evaluates file risk, blast radius, knowledge distribution, and code history before making changes | `repo_path`, `file_path`, `change_description?` |
 
 ## Resources
 
@@ -636,17 +640,17 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 39 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 41 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Output Format
 
-All 39 tools accept an optional `output_format` parameter:
+All 41 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 
 ### Tool Annotations
 
-All 39 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
+All 41 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
 
 ### Streamable HTTP Transport
 

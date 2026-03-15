@@ -10,6 +10,7 @@ export interface DirectoryKnowledge {
 export interface KnowledgeMapOptions {
   depth?: number;
   since?: string;
+  until?: string;
   maxCommits?: number;
   pathPattern?: string;
   timeoutMs?: number;
@@ -25,7 +26,7 @@ export async function analyzeKnowledgeMap(
   repoPath: string,
   options: KnowledgeMapOptions = {},
 ): Promise<DirectoryKnowledge[]> {
-  const { depth = 1, since, maxCommits = 500, pathPattern, timeoutMs } = options;
+  const { depth = 1, since, until, maxCommits = 500, pathPattern, timeoutMs } = options;
 
   const args = [
     "log",
@@ -34,6 +35,7 @@ export async function analyzeKnowledgeMap(
     `--max-count=${maxCommits}`,
   ];
   if (since) args.push(`--since=${since}`);
+  if (until) args.push(`--until=${until}`);
   if (pathPattern) args.push("--", pathPattern);
 
   const output = await execGit(args, repoPath, timeoutMs);

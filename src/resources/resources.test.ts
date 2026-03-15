@@ -43,6 +43,8 @@ describe("tool-guide resource", () => {
       "git_why",
       "git_knowledge_loss_risk",
       "git_trend_analysis",
+      "git_refactor_candidates",
+      "git_release_comparison",
     ];
 
     for (const name of toolNames) {
@@ -52,7 +54,7 @@ describe("tool-guide resource", () => {
 
   it("カテゴリ別一覧セクションが含まれる", () => {
     expect(content).toContain("データ取得ツール（31個）");
-    expect(content).toContain("組み合わせ分析ツール（6個）");
+    expect(content).toContain("組み合わせ分析ツール（8個）");
     expect(content).toContain("ワークフロー統合ツール（2個）");
   });
 
