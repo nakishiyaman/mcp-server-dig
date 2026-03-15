@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.32.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.31.0...v0.32.0) (2026-03-15)
+
+
+### Features
+
+* v0.32.0 ブランチカバレッジ回復（85.93% → 86.72%） ([57c1487](https://github.com/nakishiyaman/mcp-server-dig/commit/57c14873153f7208c418ade3064fde0af892a91f))
+* ブランチカバレッジ回復テスト17件追加（85.93% → 86.72%） ([777d263](https://github.com/nakishiyaman/mcp-server-dig/commit/777d2638d2b5029e64f75ad79df5db8e7b2212b9))
+
+
+### Bug Fixes
+
+* git_release_comparison テストのCI環境依存を修正 ([0c2f421](https://github.com/nakishiyaman/mcp-server-dig/commit/0c2f4212edd53538c40fe1a7c46569768a0f1074))
+
 ## [0.31.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.30.1...v0.31.0) (2026-03-15)
 
 
