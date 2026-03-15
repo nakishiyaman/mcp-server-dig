@@ -542,6 +542,27 @@ Repository-wide health summary combining file count, commit activity, top hotspo
 | max_commits | number | no | Number of commits to analyze (default: 500) |
 | stale_threshold_days | number | no | Days without change to consider stale (default: 180) |
 
+### git_repo_statistics
+
+Analyze repository physical structure and size metrics — object counts, pack statistics, total commits, branch/tag counts, repository age, and largest tracked files.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| top_n_files | number | no | Number of largest tracked files to include (default: 10, max: 100) |
+
+### git_commit_patterns
+
+Analyze commit distribution by day-of-week and hour-of-day — heatmap-style patterns including peak activity windows, weekday/weekend ratios, and timezone distribution.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| author | string | no | Filter by author name or email (substring match) |
+| since | string | no | Date filter (e.g. `"2024-01-01"`, `"6 months ago"`) |
+| max_commits | number | no | Maximum number of commits to analyze (default: 1000) |
+| path_pattern | string | no | Filter commits affecting paths matching pattern |
+
 ## Prompts
 
 MCP Prompts provide guided workflows that chain multiple tools together for common use cases.
@@ -560,6 +581,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `plan-refactoring` | Refactoring planning — ranks candidates by 5-dimension risk, then drills into top files with risk profile, code archaeology, and impact analysis | `repo_path`, `path_pattern?`, `top_n?` |
 | `assess-change-risk` | Pre-change risk assessment — evaluates file risk, blast radius, knowledge distribution, and code history before making changes | `repo_path`, `file_path`, `change_description?` |
 | `identify-tech-debt` | Multi-tool technical debt analysis — chains refactor candidates, complexity hotspots, risk profiles, code age, and knowledge loss risk for a comprehensive debt report | `repo_path`, `path_pattern?`, `top_n?` |
+| `diagnose-performance` | Repository performance diagnosis — chains repo statistics, hotspots, stale files, trend analysis, and dependency mapping for a comprehensive performance report | `repo_path`, `path_pattern?`, `top_n?` |
 
 ## Resources
 

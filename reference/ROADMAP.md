@@ -1,6 +1,27 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.33.0リリース済み)
+最終更新: 2026-03-15 (v0.34.0開発中)
+
+## v0.34.0 — 新データツール2本 + 新Prompt1本
+
+### Phase 1: git_repo_statistics（データツール）
+- [x] `src/tools/git-repo-statistics.ts` — リポジトリ物理構造分析ツール新規作成
+- [x] `src/tools/__tests__/git-repo-statistics.integration.test.ts` — 統合テスト6件
+
+### Phase 2: git_commit_patterns（データツール）
+- [x] `src/tools/git-commit-patterns.ts` — 曜日・時間帯別コミット分布分析ツール新規作成
+- [x] `src/tools/__tests__/git-commit-patterns.integration.test.ts` — 統合テスト7件
+
+### Phase 3: diagnose-performance Prompt
+- [x] `src/prompts/diagnose-performance.ts` — パフォーマンス診断ワークフローPrompt新規作成
+- [x] `src/prompts/prompts.test.ts` — テスト4件追加
+
+### Phase 4: 登録・ドキュメント
+- [x] `src/index.ts` — 2ツール + 1 Prompt登録（43→45ツール、12→13 Prompts）
+- [x] `src/resources/tool-guide.ts` — 2ツール追加、新ワークフローパターン
+- [x] `CLAUDE.md` — v0.34.0、ツール数更新
+- [x] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.34.0セクション追加
 
 ## v0.33.0 — 新ツール2本 + 新Prompt1本
 
