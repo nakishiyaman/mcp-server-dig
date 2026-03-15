@@ -29,8 +29,8 @@ describe("git_contributor_patterns (MCP)", () => {
 
     expect(text).toContain("Alice");
     expect(text).toContain("Bob");
-    // Alice has 5 commits (initial + feat + calculator x3)
-    expect(text).toContain("5 commits");
+    // Alice has 7 commits (initial + feat + calculator x3 + buggy feature + revert)
+    expect(text).toContain("7 commits");
   });
 
   it("last active日付が含まれる", async () => {
