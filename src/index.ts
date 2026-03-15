@@ -51,6 +51,8 @@ import { registerGitLineHistory } from "./tools/git-line-history.js";
 import { registerGitCommitCluster } from "./tools/git-commit-cluster.js";
 import { registerGitKnowledgeLossRisk } from "./tools/git-knowledge-loss-risk.js";
 import { registerGitTrendAnalysis } from "./tools/git-trend-analysis.js";
+import { registerGitRefactorCandidates } from "./tools/git-refactor-candidates.js";
+import { registerGitReleaseComparison } from "./tools/git-release-comparison.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -60,6 +62,8 @@ import { registerFindBugOrigin } from "./prompts/find-bug-origin.js";
 import { registerTechnicalDebt } from "./prompts/technical-debt.js";
 import { registerOnboardArea } from "./prompts/onboard-area.js";
 import { registerAiAgentSafety } from "./prompts/ai-agent-safety.js";
+import { registerPlanRefactoring } from "./prompts/plan-refactoring.js";
+import { registerAssessChangeRisk } from "./prompts/assess-change-risk.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -72,7 +76,7 @@ export function createDigServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (31)
+  // Data retrieval tools (31 tools)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -112,6 +116,8 @@ export function createDigServer() {
   registerGitImpactAnalysis(server, context);
   registerGitKnowledgeLossRisk(server, context);
   registerGitTrendAnalysis(server, context);
+  registerGitRefactorCandidates(server, context);
+  registerGitReleaseComparison(server, context);
 
   // Workflow integration tools (with cache context)
   registerGitReviewPrep(server, context);
@@ -127,6 +133,8 @@ export function createDigServer() {
   registerTechnicalDebt(server);
   registerOnboardArea(server);
   registerAiAgentSafety(server);
+  registerPlanRefactoring(server);
+  registerAssessChangeRisk(server);
 
   // Resources
   registerToolGuide(server);

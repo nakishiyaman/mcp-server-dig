@@ -45,6 +45,8 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | 関連コミットのまとまりを検出したい | git_commit_cluster |
 | コントリビューター離脱時のリスクを知りたい | git_knowledge_loss_risk |
 | メトリクスの時系列トレンドを知りたい | git_trend_analysis |
+| リファクタリング候補をランキングしたい | git_refactor_candidates |
+| リリース間のメトリクスを比較したい | git_release_comparison |
 
 ## カテゴリ別一覧
 
@@ -81,13 +83,15 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_line_history** — 特定の行範囲や関数の変遷履歴（git log -Lベース、blameやfile_historyでは不可能な行レベル進化追跡）
 - **git_commit_cluster** — 時間近接性+ファイル共有度で関連コミット群を検出（logical changeset境界の可視化）
 
-### 組み合わせ分析ツール（6個）
+### 組み合わせ分析ツール（8個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
 - **git_repo_health** — リポジトリ全体の健全性レポート
 - **git_code_ownership_changes** — 日付境界でのコード所有権比較（所有者交代・バス係数変化検出）
 - **git_impact_analysis** — 変更のblast radius分析（co-change・コントリビューター重複・ディレクトリ結合度統合）
 - **git_knowledge_loss_risk** — コントリビューター離脱時の知識喪失リスク評価（bus factor=1ディレクトリ特定・回復コスト分類）
 - **git_trend_analysis** — メトリクスの期間比較トレンド分析（hotspots/churn/contributors/commit_count）
+- **git_refactor_candidates** — リポジトリ全体から5次元リスク評価でリファクタリング候補をランキング
+- **git_release_comparison** — 2つのref間でhotspots/churn/contributors/bus factorを比較
 
 ### ワークフロー統合ツール（2個）
 - **git_review_prep** — PRレビュー用の変更サマリーとリスク情報を一括取得
@@ -95,18 +99,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### output_format（全39ツール対応）
+### output_format（全41ツール対応）
 - \`output_format: "text"\` — デフォルト。人間が読みやすいテキスト形式
 - \`output_format: "json"\` — 構造化JSON形式。プログラムからの利用に最適
 
-### timeout_ms（全39ツール対応）
+### timeout_ms（全41ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
 
 ## Tool Annotations
 
-全39ツールにMCP Tool Annotationsが設定されています:
+全41ツールにMCP Tool Annotationsが設定されています:
 - \`readOnlyHint: true\` — 全ツールが読み取り専用（gitリポジトリを変更しない）
 - \`openWorldHint: false\` — 全ツールがローカルgitリポジトリのみを対象とする
 
@@ -171,6 +175,23 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 2. git_hotspots → トレンド悪化時の変更集中ファイル特定
 3. git_file_risk_profile → リスクの高いファイルの詳細確認
 
+### リファクタリング計画（plan-refactoring Prompt推奨）
+1. git_refactor_candidates → リポジトリ全体のリファクタリング候補をランキング
+2. git_file_risk_profile → 上位候補の詳細リスクを確認
+3. git_why → リスクの高いコードの経緯を調査
+4. git_impact_analysis → リファクタリングの影響範囲を確認
+
+### リリース比較
+1. git_release_comparison → 2つのref間のメトリクス比較
+2. git_hotspots → 変更集中ファイルの詳細確認
+3. git_trend_analysis → メトリクスの時系列トレンド分析
+
+### 変更リスク評価（assess-change-risk Prompt推奨）
+1. git_file_risk_profile → 変更対象ファイルの現在のリスク状態を把握
+2. git_impact_analysis → 変更の影響範囲を分析
+3. git_knowledge_map → 知識分布とレビュワー候補を特定
+4. git_why → 対象コードの経緯を調査
+
 ### AIエージェント安全チェック（ai-agent-safety Prompt推奨）
 1. git_file_risk_profile → 変更対象ファイルのリスク評価
 2. git_impact_analysis → 変更の影響範囲分析
@@ -188,7 +209,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "39ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "41ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({
