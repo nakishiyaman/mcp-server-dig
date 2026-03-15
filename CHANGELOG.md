@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.30.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.30.0...v0.30.1) (2026-03-15)
+
+
+### Bug Fixes
+
+* trend_analysisの期間別集計を累積値から区間値に修正 ([ba5314a](https://github.com/nakishiyaman/mcp-server-dig/commit/ba5314a8eb6a87afb4d1beaff5c15aaba2a75980))
+* trend_analysisの期間別集計を累積値から区間値に修正 ([d862f36](https://github.com/nakishiyaman/mcp-server-dig/commit/d862f364344ef880c750496da8b684b75fdccd27))
+
 ## [0.30.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.29.0...v0.30.0) (2026-03-14)
 
 
