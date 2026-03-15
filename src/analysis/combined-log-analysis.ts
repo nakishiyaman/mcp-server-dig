@@ -7,6 +7,7 @@ import {
 export interface CombinedAnalysisOptions {
   pathPattern?: string;
   since?: string;
+  until?: string;
   maxCommits?: number;
   hotspotsTopN?: number;
   churnTopN?: number;
@@ -25,6 +26,7 @@ export async function analyzeHotspotsAndChurn(
   const {
     pathPattern,
     since,
+    until,
     maxCommits = 500,
     hotspotsTopN = 20,
     churnTopN = 20,
@@ -39,6 +41,7 @@ export async function analyzeHotspotsAndChurn(
   ];
 
   if (since) args.push(`--since=${since}`);
+  if (until) args.push(`--until=${until}`);
   if (pathPattern) args.push("--", pathPattern);
 
   const output = await execGit(args, repoPath, timeoutMs);

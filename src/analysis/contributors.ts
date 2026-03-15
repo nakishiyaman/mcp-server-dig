@@ -5,6 +5,7 @@ import type { ContributorStats } from "../git/types.js";
 export interface ContributorsOptions {
   pathPattern?: string;
   since?: string;
+  until?: string;
   maxCommits?: number;
   timeoutMs?: number;
 }
@@ -13,10 +14,11 @@ export async function analyzeContributors(
   repoPath: string,
   options: ContributorsOptions = {},
 ): Promise<{ stats: ContributorStats[]; totalCommits: number }> {
-  const { pathPattern, since, maxCommits = 500, timeoutMs } = options;
+  const { pathPattern, since, until, maxCommits = 500, timeoutMs } = options;
 
   const shortlogArgs = ["shortlog", "-sne", `--max-count=${maxCommits}`];
   if (since) shortlogArgs.push(`--since=${since}`);
+  if (until) shortlogArgs.push(`--until=${until}`);
   shortlogArgs.push("HEAD");
   if (pathPattern) shortlogArgs.push("--", pathPattern);
 
