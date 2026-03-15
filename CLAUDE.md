@@ -119,4 +119,4 @@ npm run typecheck        # tsc --noEmit
 - ロードマップ: `reference/ROADMAP.md`
 - セッション引き継ぎ: `reference/HANDOFF.md`
 - Tessera導入評価: `docs/recommended-practices.md`
-- 現在のステータス: **v0.32.0 開発中**（41ツール: データ取得31 + 組み合わせ分析8 + ワークフロー統合2, Prompts 11, Resources 2, Tool Annotations・MCP Logging・Streamable HTTP・Completions対応、server.registerTool()移行済み、TypeScript 5.9、TransportHandle導入）
+- 現在のステータス: **v0.33.0 開発中**（43ツール: データ取得32 + 組み合わせ分析9 + ワークフロー統合2, Prompts 12, Resources 2, Tool Annotations・MCP Logging・Streamable HTTP・Completions対応、server.registerTool()移行済み、TypeScript 5.9、TransportHandle導入）

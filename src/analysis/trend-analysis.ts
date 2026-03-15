@@ -88,7 +88,7 @@ interface PeriodBoundary {
   until: string;
 }
 
-function computePeriodBoundaries(
+export function computePeriodBoundaries(
   periodLength: PeriodLength,
   numPeriods: number,
 ): PeriodBoundary[] {
@@ -124,7 +124,7 @@ function computePeriodBoundaries(
   return boundaries;
 }
 
-function formatPeriodLabel(date: Date, periodLength: PeriodLength): string {
+export function formatPeriodLabel(date: Date, periodLength: PeriodLength): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");

@@ -25,6 +25,7 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 | `git_trend_analysis` | Analyze trends over time by comparing metrics across multiple time periods — tracks whether hotspot count, code churn, contributor count, or commit activity is improving, stable, or worsening |
 | `git_refactor_candidates` | Identify and rank refactoring candidates across the repository using 5-dimension risk assessment (change frequency, code churn, knowledge concentration, coupling, staleness) |
 | `git_release_comparison` | Compare repository metrics between two git refs (tags, branches, commits) — shows how hotspots, churn, contributor count, and bus factor changed between releases |
+| `git_complexity_hotspots` | Identify and rank maintenance complexity hotspots using 6-dimension assessment (change frequency, code churn, knowledge concentration, coupling, staleness, conflict frequency) |
 
 ### Data Retrieval
 
@@ -388,6 +389,30 @@ Detect clusters of related commits by time proximity and shared files. Reveals l
 | min_shared_files | number | no | Minimum shared files to link commits (default: 1) |
 | path_pattern | string | no | Filter commits by file path pattern |
 
+### git_merge_timeline
+
+Analyze merge frequency over time. Shows merge counts, branch activity, and trend direction per period.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| granularity | string | no | Time period granularity: `"weekly"`, `"monthly"`, `"quarterly"` (default: `"monthly"`) |
+| num_periods | number | no | Number of periods to analyze (default: 6, max: 24) |
+| path_pattern | string | no | Filter to a specific path |
+| since | string | no | Override start date |
+
+### git_complexity_hotspots
+
+Identify and rank maintenance complexity hotspots using 6-dimension risk assessment (change frequency, code churn, knowledge concentration, coupling, staleness, conflict frequency).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| since | string | no | Date filter |
+| max_commits | number | no | Number of commits to analyze (default: 500) |
+| top_n | number | no | Number of top hotspots to return (default: 10, max: 100) |
+| path_pattern | string | no | Filter files by path pattern |
+
 ### git_code_ownership_changes
 
 Compare code ownership before and after a date boundary. Detects owner handoffs, bus factor changes, new/departed contributors, and knowledge transfer patterns.
@@ -534,6 +559,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `ai-agent-safety` | Pre-flight risk check for AI agents before modifying files — chains file_risk_profile, impact_analysis, related_changes, and conflict_history | `repo_path`, `file_path` |
 | `plan-refactoring` | Refactoring planning — ranks candidates by 5-dimension risk, then drills into top files with risk profile, code archaeology, and impact analysis | `repo_path`, `path_pattern?`, `top_n?` |
 | `assess-change-risk` | Pre-change risk assessment — evaluates file risk, blast radius, knowledge distribution, and code history before making changes | `repo_path`, `file_path`, `change_description?` |
+| `identify-tech-debt` | Multi-tool technical debt analysis — chains refactor candidates, complexity hotspots, risk profiles, code age, and knowledge loss risk for a comprehensive debt report | `repo_path`, `path_pattern?`, `top_n?` |
 
 ## Resources
 

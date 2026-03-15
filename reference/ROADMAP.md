@@ -1,6 +1,29 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.32.0開発中)
+最終更新: 2026-03-15 (v0.33.0開発中)
+
+## v0.33.0 — 新ツール2本 + 新Prompt1本
+
+### Phase 1: git_complexity_hotspots（複合分析ツール）
+- [x] `src/analysis/risk-classifiers.ts` — `classifyConflictFrequency()` 追加
+- [x] `src/analysis/risk-classifiers.test.ts` — 境界値テスト5件追加
+- [x] `src/tools/git-complexity-hotspots.ts` — 6次元リスク評価ツール新規作成
+- [x] `src/tools/__tests__/git-complexity-hotspots.integration.test.ts` — 統合テスト7件
+
+### Phase 2: git_merge_timeline（データツール）
+- [x] `src/analysis/trend-analysis.ts` — `computePeriodBoundaries()`, `formatPeriodLabel()` をexport化
+- [x] `src/tools/git-merge-timeline.ts` — マージ頻度時系列分析ツール新規作成
+- [x] `src/tools/__tests__/git-merge-timeline.integration.test.ts` — 統合テスト5件
+
+### Phase 3: identify-tech-debt Prompt
+- [x] `src/prompts/identify-tech-debt.ts` — 技術的負債分析ワークフローPrompt新規作成
+- [x] `src/prompts/prompts.test.ts` — テスト4件追加
+
+### Phase 4: 登録・ドキュメント
+- [x] `src/index.ts` — 2ツール + 1 Prompt登録
+- [x] `src/resources/tool-guide.ts` — 2ツール追加、新ワークフローパターン
+- [x] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.33.0セクション追加
 
 ## v0.32.0 — ブランチカバレッジ回復
 

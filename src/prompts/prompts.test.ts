@@ -10,6 +10,7 @@ import { buildOnboardAreaPrompt } from "./onboard-area.js";
 import { buildAiAgentSafetyPrompt } from "./ai-agent-safety.js";
 import { buildPlanRefactoringPrompt } from "./plan-refactoring.js";
 import { buildAssessChangeRiskPrompt } from "./assess-change-risk.js";
+import { buildIdentifyTechDebtPrompt } from "./identify-tech-debt.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -344,5 +345,52 @@ describe("assess-change-risk prompt", () => {
 
     const text = (result.messages[0].content as { type: string; text: string }).text;
     expect(text).not.toContain("変更内容:");
+  });
+});
+
+describe("identify-tech-debt prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildIdentifyTechDebtPrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("git_refactor_candidates");
+    expect(text).toContain("git_complexity_hotspots");
+    expect(text).toContain("git_file_risk_profile");
+    expect(text).toContain("git_code_age");
+    expect(text).toContain("git_knowledge_loss_risk");
+  });
+
+  it("path_patternが指定された場合メッセージに含まれる", () => {
+    const result = buildIdentifyTechDebtPrompt({
+      repo_path: "/path/to/repo",
+      path_pattern: "src/",
+      top_n: "5",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("path_pattern: src/");
+    expect(text).toContain("top_n: 5");
+  });
+
+  it("path_patternが未指定の場合path_filterの記述がない", () => {
+    const result = buildIdentifyTechDebtPrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).not.toContain("path_pattern:");
+  });
+
+  it("デフォルトのtop_nが10である", () => {
+    const result = buildIdentifyTechDebtPrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("top_n: 10");
   });
 });
