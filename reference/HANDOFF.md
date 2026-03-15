@@ -3,23 +3,25 @@
 日時: 2026-03-15
 
 ### 完了したタスク
-- **v0.34.0 実装完了**（PR作成・マージ・リリース前）
-  - `git_repo_statistics` — リポジトリ物理構造分析データツール（統合テスト6件）
-  - `git_commit_patterns` — 曜日・時間帯別コミット分布分析データツール（統合テスト7件）
-  - `diagnose-performance` — パフォーマンス診断ワークフローPrompt（テスト4件）
-  - ツール: 43 → 45、Prompts: 12 → 13、テスト: 756 → 773
-  - 全ドキュメント更新済み（CLAUDE.md, README.md, README.ja.md, tool-guide, ROADMAP）
+- **v0.34.0 リリース完了**
+  - PR #131 作成 → CI全パス → マージ
+  - release-please PR #132 → auto-merge → npm publish成功
+  - `mcp-server-dig@0.34.0` 公開済み
+- **GitHub Actions Node.js 24対応**（PR #133）
+  - `actions/checkout@v4` → `@v5`
+  - `actions/setup-node@v4` → `@v5`
+  - `ci.yml` から `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` 削除（v5で不要）
+  - Node.js 20 deprecation警告が完全に解消
 
 ### 現在の状態
-- ブランチ: `feat/v0.34.0-new-tools`（mainから分岐、未push）
-- 未コミット変更: あり（全実装・テスト・ドキュメント）
-- 検証済み: `npm run build && npm run test && npm run typecheck && npm run lint` 全パス
+- ブランチ: `main`（最新）
+- 未コミット変更: `.claude/settings.local.json` のみ（無視可）
+- v0.34.0: リリース済み（45ツール、13 Prompts、2 Resources）
 
 ### 次にやるべきこと
-- PR作成 → CIパス確認 → マージ
-- release-pleaseによるv0.34.0リリース（自動）
-- v0.35.0の計画
+- v0.35.0の計画（新ツール追加、カバレッジ向上、依存関係更新等）
+- `release-please-action` v5リリース時に更新（現在v4が最新、Node 20）
 
 ### ブロッカー/注意点
 - RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
-- release-please.ymlの`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`未設定
+- `release-please-action@v4` はまだNode 20 — `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` で対応中

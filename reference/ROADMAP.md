@@ -1,6 +1,13 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-15 (v0.34.0開発中)
+最終更新: 2026-03-15 (v0.34.0リリース済み)
+
+## CI: GitHub Actions Node.js 24対応
+
+- [x] `actions/checkout@v4` → `@v5`（Node.js 24ネイティブ対応）
+- [x] `actions/setup-node@v4` → `@v5`（Node.js 24ネイティブ対応）
+- [x] `ci.yml` から `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` env削除（v5で不要）
+- [x] `release-please.yml` は `release-please-action@v4` がまだNode 20のためenv維持
 
 ## v0.34.0 — 新データツール2本 + 新Prompt1本
 
