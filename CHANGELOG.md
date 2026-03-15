@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.35.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.34.0...v0.35.0) (2026-03-15)
+
+
+### Features
+
+* git_revert_analysis・git_contributor_growth・post-incident-review追加（v0.35.0） ([68e9d05](https://github.com/nakishiyaman/mcp-server-dig/commit/68e9d05066257abd9be53cb910ea899d11f99a8c))
+* git_revert_analysis・git_contributor_growth・post-incident-review追加（v0.35.0） ([d7e9ec6](https://github.com/nakishiyaman/mcp-server-dig/commit/d7e9ec6b04e52792292cbc1834e6f570da952ac3))
+
 ## [0.34.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.33.0...v0.34.0) (2026-03-15)
 
 
