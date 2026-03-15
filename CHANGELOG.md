@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.31.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.30.1...v0.31.0) (2026-03-15)
+
+
+### Features
+
+* git_refactor_candidates + git_release_comparison ツール、plan-refactoring + assess-change-risk Prompt追加 ([10b5919](https://github.com/nakishiyaman/mcp-server-dig/commit/10b59199944b383a60400b80f763fc81a66736fe))
+* git_refactor_candidates + git_release_comparison ツール実装、plan-refactoring + assess-change-risk Prompt追加 ([21e80c8](https://github.com/nakishiyaman/mcp-server-dig/commit/21e80c88a8231d312e56d1e10c3d737dd41001fa))
+
 ## [0.30.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.30.0...v0.30.1) (2026-03-15)
 
 
