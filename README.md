@@ -603,6 +603,15 @@ Detect statistical anomalies (spikes and drops) in commit frequency using mean +
 | threshold_sigma | number | no | Number of standard deviations for anomaly detection (default: 2) |
 | path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
 
+### git_tag_analysis
+
+Analyze tag-based release patterns — semver distribution, annotated vs lightweight tags, release interval statistics, frequency trend, and naming prefix distribution.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| pattern | string | no | Glob pattern to filter tags, e.g. `"v1.*"` or `"release-*"` |
+
 ## Prompts
 
 MCP Prompts provide guided workflows that chain multiple tools together for common use cases.
@@ -625,6 +634,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `post-incident-review` | Post-incident review — chains commit search, diff context, revert analysis, file risk profile, and impact analysis to identify root cause and recommend prevention measures | `repo_path`, `incident_date`, `suspected_files?` |
 | `plan-release` | Release planning review — chains release comparison, revert analysis, file risk profile, coordination bottleneck, and trend analysis to support release decisions | `repo_path`, `base_ref`, `head_ref?`, `release_date?` |
 | `find-experts` | Find domain experts — discovers knowledge owners for a specific area using knowledge map, author timeline, blame, and contributor network | `repo_path`, `path_pattern`, `since?` |
+| `analyze-release-cadence` | Release cadence analysis — chains tag analysis, commit frequency, and trend analysis to evaluate release health | `repo_path`, `since?` |
 
 ## Resources
 

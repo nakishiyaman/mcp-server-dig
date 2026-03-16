@@ -15,6 +15,7 @@ import { buildDiagnosePerformancePrompt } from "./diagnose-performance.js";
 import { buildPostIncidentReviewPrompt } from "./post-incident-review.js";
 import { buildPlanReleasePrompt } from "./plan-release.js";
 import { buildFindExpertsPrompt } from "./find-experts.js";
+import { buildAnalyzeReleaseCadencePrompt } from "./analyze-release-cadence.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -604,5 +605,51 @@ describe("find-experts prompt", () => {
     expect(text).toContain("エキスパートランキング");
     expect(text).toContain("推奨連絡順序");
     expect(text).toContain("知識リスク評価");
+  });
+});
+
+describe("analyze-release-cadence prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildAnalyzeReleaseCadencePrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("git_tag_analysis");
+    expect(text).toContain("git_commit_frequency");
+    expect(text).toContain("git_trend_analysis");
+  });
+
+  it("sinceが指定された場合メッセージに含まれる", () => {
+    const result = buildAnalyzeReleaseCadencePrompt({
+      repo_path: "/path/to/repo",
+      since: "2024-01-01",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("2024-01-01");
+    expect(text).toContain("since: 2024-01-01");
+  });
+
+  it("sinceが未指定の場合sinceの記述がない", () => {
+    const result = buildAnalyzeReleaseCadencePrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).not.toContain("since:");
+  });
+
+  it("出力形式にリリースサマリーと推奨事項が含まれる", () => {
+    const result = buildAnalyzeReleaseCadencePrompt({
+      repo_path: "/path/to/repo",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("リリースサマリー");
+    expect(text).toContain("推奨事項");
+    expect(text).toContain("HIGH / MEDIUM / LOW");
   });
 });

@@ -63,6 +63,7 @@ import { registerGitOffboardingSimulation } from "./tools/git-offboarding-simula
 import { registerGitCoordinationBottleneck } from "./tools/git-coordination-bottleneck.js";
 import { registerGitVelocityAnomalies } from "./tools/git-velocity-anomalies.js";
 import { registerGitExpertiseDecay } from "./tools/git-expertise-decay.js";
+import { registerGitTagAnalysis } from "./tools/git-tag-analysis.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -79,6 +80,7 @@ import { registerDiagnosePerformance } from "./prompts/diagnose-performance.js";
 import { registerPostIncidentReview } from "./prompts/post-incident-review.js";
 import { registerPlanRelease } from "./prompts/plan-release.js";
 import { registerFindExperts } from "./prompts/find-experts.js";
+import { registerAnalyzeReleaseCadence } from "./prompts/analyze-release-cadence.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -91,7 +93,7 @@ export function createDigServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (36 tools)
+  // Data retrieval tools (37 tools)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -128,6 +130,7 @@ export function createDigServer() {
   registerGitCommitPatterns(server);
   registerGitRevertAnalysis(server);
   registerGitVelocityAnomalies(server);
+  registerGitTagAnalysis(server);
 
   // Composite analysis tools (with cache context) (13 tools)
   registerGitFileRiskProfile(server, context);
@@ -165,6 +168,7 @@ export function createDigServer() {
   registerPostIncidentReview(server);
   registerPlanRelease(server);
   registerFindExperts(server);
+  registerAnalyzeReleaseCadence(server);
 
   // Resources
   registerToolGuide(server);

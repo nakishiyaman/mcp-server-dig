@@ -49,6 +49,7 @@ describe("tool-guide resource", () => {
       "git_merge_timeline",
       "git_velocity_anomalies",
       "git_expertise_decay",
+      "git_tag_analysis",
     ];
 
     for (const name of toolNames) {
@@ -57,7 +58,7 @@ describe("tool-guide resource", () => {
   });
 
   it("カテゴリ別一覧セクションが含まれる", () => {
-    expect(content).toContain("データ取得ツール（36個）");
+    expect(content).toContain("データ取得ツール（37個）");
     expect(content).toContain("組み合わせ分析ツール（13個）");
     expect(content).toContain("ワークフロー統合ツール（2個）");
   });
