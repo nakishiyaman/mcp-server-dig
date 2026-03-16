@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-16 (v0.39.0開発中)
+最終更新: 2026-03-16 (v0.39.0リリース済み)
 
 ## v0.39.0 — formatPeriodKey共通化 + git_tag_analysis + analyze-release-cadence
 
