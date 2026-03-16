@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.37.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.36.0...v0.37.0) (2026-03-16)
+
+
+### Features
+
+* プロパティベーステスト導入（v0.37.0） ([46499e8](https://github.com/nakishiyaman/mcp-server-dig/commit/46499e8b0b17d6e9d98ed2715da400572defd376))
+* プロパティベーステスト導入（v0.37.0） ([8406a63](https://github.com/nakishiyaman/mcp-server-dig/commit/8406a6300a99349e58b2155af6a7df1a6f051a2c))
+
 ## [0.36.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.35.0...v0.36.0) (2026-03-15)
 
 
