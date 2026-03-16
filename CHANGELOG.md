@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.39.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.39.0...v0.39.1) (2026-03-16)
+
+
+### Bug Fixes
+
+* 未使用import(successResponse)を削除 ([64b0af3](https://github.com/nakishiyaman/mcp-server-dig/commit/64b0af3504cf1950216371d0fe1a5ec586a9132e))
+
 ## [0.39.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.38.0...v0.39.0) (2026-03-16)
 
 
