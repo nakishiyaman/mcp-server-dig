@@ -61,6 +61,8 @@ import { registerGitRevertAnalysis } from "./tools/git-revert-analysis.js";
 import { registerGitContributorGrowth } from "./tools/git-contributor-growth.js";
 import { registerGitOffboardingSimulation } from "./tools/git-offboarding-simulation.js";
 import { registerGitCoordinationBottleneck } from "./tools/git-coordination-bottleneck.js";
+import { registerGitVelocityAnomalies } from "./tools/git-velocity-anomalies.js";
+import { registerGitExpertiseDecay } from "./tools/git-expertise-decay.js";
 import { registerInvestigateCode } from "./prompts/investigate-code.js";
 import { registerReviewPr } from "./prompts/review-pr.js";
 import { registerAssessHealth } from "./prompts/assess-health.js";
@@ -76,6 +78,7 @@ import { registerIdentifyTechDebt } from "./prompts/identify-tech-debt.js";
 import { registerDiagnosePerformance } from "./prompts/diagnose-performance.js";
 import { registerPostIncidentReview } from "./prompts/post-incident-review.js";
 import { registerPlanRelease } from "./prompts/plan-release.js";
+import { registerFindExperts } from "./prompts/find-experts.js";
 import { registerToolGuide } from "./resources/tool-guide.js";
 import { registerRepoSummary } from "./resources/repo-summary.js";
 
@@ -88,7 +91,7 @@ export function createDigServer() {
     cache: new AnalysisCache(),
   };
 
-  // Data retrieval tools (35 tools)
+  // Data retrieval tools (36 tools)
   registerGitFileHistory(server);
   registerGitBlameContext(server);
   registerGitRelatedChanges(server);
@@ -124,8 +127,9 @@ export function createDigServer() {
   registerGitRepoStatistics(server);
   registerGitCommitPatterns(server);
   registerGitRevertAnalysis(server);
+  registerGitVelocityAnomalies(server);
 
-  // Composite analysis tools (with cache context) (12 tools)
+  // Composite analysis tools (with cache context) (13 tools)
   registerGitFileRiskProfile(server, context);
   registerGitRepoHealth(server, context);
   registerGitCodeOwnershipChanges(server);
@@ -138,6 +142,7 @@ export function createDigServer() {
   registerGitContributorGrowth(server);
   registerGitOffboardingSimulation(server, context);
   registerGitCoordinationBottleneck(server, context);
+  registerGitExpertiseDecay(server, context);
 
   // Workflow integration tools (with cache context)
   registerGitReviewPrep(server, context);
@@ -159,6 +164,7 @@ export function createDigServer() {
   registerDiagnosePerformance(server);
   registerPostIncidentReview(server);
   registerPlanRelease(server);
+  registerFindExperts(server);
 
   // Resources
   registerToolGuide(server);

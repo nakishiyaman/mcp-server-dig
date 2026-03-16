@@ -14,6 +14,7 @@ import { buildIdentifyTechDebtPrompt } from "./identify-tech-debt.js";
 import { buildDiagnosePerformancePrompt } from "./diagnose-performance.js";
 import { buildPostIncidentReviewPrompt } from "./post-incident-review.js";
 import { buildPlanReleasePrompt } from "./plan-release.js";
+import { buildFindExpertsPrompt } from "./find-experts.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -551,5 +552,57 @@ describe("plan-release prompt", () => {
     expect(text).toContain("2026-04-01");
     expect(text).toContain("リリース予定日");
     expect(text).toContain("スケジュールリスク");
+  });
+});
+
+describe("find-experts prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildFindExpertsPrompt({
+      repo_path: "/path/to/repo",
+      area: "src/tools/",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("src/tools/");
+    expect(text).toContain("git_knowledge_map");
+    expect(text).toContain("git_author_timeline");
+    expect(text).toContain("git_blame_context");
+    expect(text).toContain("git_contributor_network");
+  });
+
+  it("contextが指定された場合メッセージに含まれる", () => {
+    const result = buildFindExpertsPrompt({
+      repo_path: "/path/to/repo",
+      area: "src/auth/",
+      context: "セキュリティレビューの担当者を探している",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("セキュリティレビューの担当者を探している");
+    expect(text).toContain("調査の背景:");
+  });
+
+  it("contextが未指定の場合背景情報の記述がない", () => {
+    const result = buildFindExpertsPrompt({
+      repo_path: "/path/to/repo",
+      area: "src/tools/",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).not.toContain("調査の背景:");
+  });
+
+  it("報告形式にエキスパートランキングと推奨連絡順序が含まれる", () => {
+    const result = buildFindExpertsPrompt({
+      repo_path: "/path/to/repo",
+      area: "src/",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("エキスパートランキング");
+    expect(text).toContain("推奨連絡順序");
+    expect(text).toContain("知識リスク評価");
   });
 });

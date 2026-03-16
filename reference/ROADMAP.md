@@ -1,6 +1,37 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-16 (v0.37.0リリース済み)
+最終更新: 2026-03-16 (v0.38.0開発中)
+
+## v0.38.0 — 新ツール2本 + 新Prompt1本（知識衰退・速度異常・エキスパート発見）
+
+### Phase 1: 分析層 — 純粋関数 (TDD)
+- [x] `src/analysis/velocity-anomaly.ts` — 速度異常検出純粋関数（NEW）
+- [x] `src/analysis/velocity-anomaly.test.ts` — テスト6件
+- [x] `src/analysis/expertise-decay.ts` — 専門知識衰退分析（NEW）
+- [x] `src/analysis/risk-classifiers.ts` — `classifyExpertiseDecay` 追加
+- [x] `src/analysis/risk-classifiers.test.ts` — テスト6件追加
+
+### Phase 2: キャッシュ層
+- [x] `src/analysis/cached-analysis.ts` — `cachedAnalyzeExpertiseDecay` 追加
+
+### Phase 3: git_expertise_decay ツール（複合分析）
+- [x] `src/tools/git-expertise-decay.ts` — 知識所有者活動鮮度分析ツール（NEW）
+- [x] `src/tools/__tests__/git-expertise-decay.integration.test.ts` — 統合テスト7件
+
+### Phase 4: git_velocity_anomalies ツール（データ）
+- [x] `src/tools/git-velocity-anomalies.ts` — コミット頻度異常検出ツール（NEW）
+- [x] `src/tools/__tests__/git-velocity-anomalies.integration.test.ts` — 統合テスト7件
+
+### Phase 5: find-experts Prompt
+- [x] `src/prompts/find-experts.ts` — エキスパート発見Prompt（NEW）
+- [x] `src/prompts/prompts.test.ts` — テスト4件追加
+
+### Phase 6: 登録・ドキュメント
+- [x] `src/index.ts` — データ36 + 複合13 + Prompt16登録
+- [x] `src/resources/tool-guide.ts` — 51ツール対応、新連携パターン3件追加
+- [x] `CLAUDE.md` — v0.38.0、51ツール、16 Prompts
+- [x] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.38.0セクション追加
 
 ## v0.37.0 — プロパティベーステスト導入（TLA+記事知見の転用）
 

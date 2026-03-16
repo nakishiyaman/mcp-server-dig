@@ -199,6 +199,32 @@ export function classifyCoordinationCost(
   return "LOW";
 }
 
+/**
+ * Classify expertise decay risk for a directory.
+ *
+ * @param busFactor - number of contributors needed to cover 50% of commits
+ * @param activeOwnerCount - number of currently active owners
+ * @param totalOwnerCount - total number of owners
+ */
+export function classifyExpertiseDecay(
+  busFactor: number,
+  activeOwnerCount: number,
+  totalOwnerCount: number,
+): RiskLevel {
+  if (totalOwnerCount === 0) return "HIGH";
+
+  // HIGH: busFactor<=1 and no active owners, or busFactor<=2 and all inactive
+  if (busFactor <= 1 && activeOwnerCount === 0) return "HIGH";
+  if (busFactor <= 2 && activeOwnerCount === 0) return "HIGH";
+
+  // MEDIUM: some inactive owners but active owners remain, or busFactor<=2 with fading
+  if (activeOwnerCount < totalOwnerCount && activeOwnerCount > 0 && busFactor <= 2) return "MEDIUM";
+  if (activeOwnerCount < totalOwnerCount && activeOwnerCount > 0) return "MEDIUM";
+
+  // LOW: all owners active
+  return "LOW";
+}
+
 export function classifyIntegrationStyle(
   mergeRatio: number,
   mergesPerWeek: number,

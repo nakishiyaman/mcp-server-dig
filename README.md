@@ -29,6 +29,7 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 | `git_contributor_growth` | Analyze contributor growth and retention over time — tracks new/departed contributors per period (monthly/quarterly), computes retention rates, bus factor trends, and classifies trajectory as growing/stable/shrinking |
 | `git_offboarding_simulation` | Simulate the impact of a contributor leaving — recomputes bus factor per directory after removing the author's contributions, identifies new single-points-of-failure and knowledge gaps |
 | `git_coordination_bottleneck` | Detect directories with high coordination cost — ranks by composite score of change frequency, unique authors, and ownership distribution to identify merge conflict hotspots |
+| `git_expertise_decay` | Track expertise freshness — detect directories where dominant code owners have become inactive or are fading |
 
 ### Data Retrieval
 
@@ -589,6 +590,19 @@ Analyze revert patterns in the repository — detects commits created by `git re
 | path_pattern | string | no | Filter reverts affecting paths matching pattern |
 | top_n | number | no | Number of hotspot entries to return (default: 10) |
 
+### git_velocity_anomalies
+
+Detect statistical anomalies (spikes and drops) in commit frequency using mean +/- N sigma threshold.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| granularity | string | no | Time granularity: `"daily"`, `"weekly"` (default), or `"monthly"` |
+| since | string | no | Date filter, e.g. `"2024-01-01"` or `"6 months ago"` |
+| max_commits | number | no | Maximum commits to analyze (default: 1000) |
+| threshold_sigma | number | no | Number of standard deviations for anomaly detection (default: 2) |
+| path_pattern | string | no | Limit analysis to a specific path, e.g. `"src/"` |
+
 ## Prompts
 
 MCP Prompts provide guided workflows that chain multiple tools together for common use cases.
@@ -610,6 +624,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `diagnose-performance` | Repository performance diagnosis — chains repo statistics, hotspots, stale files, trend analysis, and dependency mapping for a comprehensive performance report | `repo_path`, `path_pattern?`, `top_n?` |
 | `post-incident-review` | Post-incident review — chains commit search, diff context, revert analysis, file risk profile, and impact analysis to identify root cause and recommend prevention measures | `repo_path`, `incident_date`, `suspected_files?` |
 | `plan-release` | Release planning review — chains release comparison, revert analysis, file risk profile, coordination bottleneck, and trend analysis to support release decisions | `repo_path`, `base_ref`, `head_ref?`, `release_date?` |
+| `find-experts` | Find domain experts — discovers knowledge owners for a specific area using knowledge map, author timeline, blame, and contributor network | `repo_path`, `path_pattern`, `since?` |
 
 ## Resources
 
@@ -716,17 +731,17 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 49 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 51 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Output Format
 
-All 49 tools accept an optional `output_format` parameter:
+All 51 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 
 ### Tool Annotations
 
-All 49 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
+All 51 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
 
 ### Streamable HTTP Transport
 

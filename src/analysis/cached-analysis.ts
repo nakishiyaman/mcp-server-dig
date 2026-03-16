@@ -33,6 +33,11 @@ import {
   type KnowledgeMapOptions,
   type DirectoryKnowledge,
 } from "./knowledge-map.js";
+import {
+  analyzeExpertiseDecay,
+  type ExpertiseDecayOptions,
+  type ExpertiseDecayResult,
+} from "./expertise-decay.js";
 import type { CombinedNumstatResult } from "../git/parsers.js";
 import type { ContributorStats } from "../git/types.js";
 
@@ -91,6 +96,21 @@ export function cachedAnalyzeKnowledgeLossRisk(
   if (cached) return Promise.resolve(cached);
 
   return analyzeKnowledgeLossRisk(repoPath, options).then((result) => {
+    cache.set(key, result);
+    return result;
+  });
+}
+
+export function cachedAnalyzeExpertiseDecay(
+  cache: AnalysisCache,
+  repoPath: string,
+  options: ExpertiseDecayOptions = {},
+): Promise<ExpertiseDecayResult> {
+  const key = buildCacheKey("analyzeExpertiseDecay", repoPath, options as Record<string, unknown>);
+  const cached = cache.get<ExpertiseDecayResult>(key);
+  if (cached) return Promise.resolve(cached);
+
+  return analyzeExpertiseDecay(repoPath, options).then((result) => {
     cache.set(key, result);
     return result;
   });
