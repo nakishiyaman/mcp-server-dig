@@ -3,28 +3,36 @@
 日時: 2026-03-16
 
 ### 完了したタスク
-- v0.38.0 実装完了（PR未作成）
-  - `git_expertise_decay` ツール: 知識所有者の活動鮮度分析（active/fading/inactive分類）
-  - `git_velocity_anomalies` ツール: コミット頻度の統計的異常検出（mean±Nσ）
-  - `find-experts` Prompt: 特定領域のエキスパート発見ワークフロー
-  - 分析層: `detectVelocityAnomalies()`, `analyzeExpertiseDecay()`, `classifyExpertiseDecay()`
-  - キャッシュ層: `cachedAnalyzeExpertiseDecay()`
-  - ドキュメント: CLAUDE.md, README.md, README.ja.md, ROADMAP.md, tool-guide.ts 全更新
-  - 51ツール（データ36 + 複合13 + ワークフロー2）、16 Prompts
+- v0.39.0 実装完了（PR未作成）
+  - **Phase 1: formatPeriodKey共通化**
+    - `src/tools/period-utils.ts` に共通関数を抽出（3ファイルの重複解消）
+    - 単体テスト8件
+  - **Phase 2: git_tag_analysis ツール**（データ取得37番目）
+    - semverパターン分布、annotated/lightweight判別、リリース間隔統計、頻度トレンド、命名prefix分布
+    - 純粋関数をexportし単体テスト17件 + 統合テスト11件
+  - **Phase 3: analyze-release-cadence Prompt**（17番目）
+    - git_tag_analysis → git_commit_frequency → git_trend_analysis チェーン
+    - Promptテスト4件
+  - **Phase 4: 登録・ドキュメント**
+    - 52ツール、17 Prompts体制
+    - tool-guide, CLAUDE.md, README.md, README.ja.md, ROADMAP.md 更新
 
 ### 現在の状態
-- ブランチ: `feat/v0.38.0-expertise-decay-velocity-anomalies`
-- 未コミット変更: なし（`.claude/settings.local.json` のみ対象外）
-- テスト: 883件全パス
-- typecheck/lint/build: 全パス
+- ブランチ: `feat/v0.39.0-tag-analysis-refactor`（pushed）
+- 未コミット変更: なし（`.claude/settings.local.json` のみ — コミット不要）
+- テスト: 924 passed（+33 from v0.38.0の891）
+- build / typecheck / lint: 全クリア
 
 ### 次にやるべきこと
-- PR作成 → CIパス確認 → マージ
-- release-pleaseによるRelease PR自動作成 → v0.38.0リリース
+- PR作成: `feat/v0.39.0-tag-analysis-refactor` → `main`
+- CI通過確認後マージ
+- release-pleaseによるv0.39.0リリースPR自動作成を待つ
+- branches coverage 86%閾値の回復検討（v0.38.0時点で既に未達、`npm run test:coverage`で確認可能）
 
 ### ブロッカー/注意点
-- `.claude/settings.local.json` の変更はコミット対象外にすること
-- `@fast-check/vitest` のdeprecation warning: "Importing from vitest/suite is deprecated since Vitest 4.1" — fast-check側の対応待ち
-- RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
-- release-please-action が Node.js 20 で警告あり（2026-06-02以降 Node.js 24 強制）→ v4の更新を追跡
-- `formatPeriodKey` がgit-commit-frequency.tsとgit-velocity-anomalies.tsで重複定義（非export関数のため）→ 将来のリファクタ候補
+- branches coverage 83.57%（86%閾値未達）— これはv0.38.0時点で既に存在していた問題。CIには含まれていないため、PRマージには影響しない。`git-tag-analysis.ts`の純粋関数は単体テスト済みだが、v8 coverage providerがESM importの一部ブランチを計測できていない可能性あり
+- release-please-action v5は未リリース — 追跡継続のみ（no-op）
+
+### リファクタ候補（将来）
+- `toPeriodKey`（Date型、`src/analysis/time-series.ts`のみ）は1箇所のため共通化不要
+- `formatPeriodLabel`（analysis層、既にexport済み）は別用途のため共通化不要
