@@ -29,7 +29,7 @@ describe("git_tag_list (MCP)", () => {
 
     expect(text).toContain("v0.1.0");
     expect(text).toContain("v0.2.0");
-    expect(text).toContain("2 tag(s)");
+    expect(text).toContain("8 tag(s)");
   });
 
   it("パターンでタグをフィルタリングする", async () => {
@@ -102,7 +102,7 @@ describe("git_tag_list (MCP)", () => {
     const data = JSON.parse(text);
 
     expect(data).toHaveProperty("sort", "newest");
-    expect(data).toHaveProperty("totalTags", 2);
+    expect(data).toHaveProperty("totalTags", 8);
     expect(data).toHaveProperty("tags");
     expect(data.tags[0]).toHaveProperty("name");
     expect(data.tags[0]).toHaveProperty("date");

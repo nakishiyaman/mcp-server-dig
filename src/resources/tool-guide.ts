@@ -57,10 +57,11 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | 調整コストが高い場所は？ | git_coordination_bottleneck |
 | 知識所有者の活動が衰退している領域は？ | git_expertise_decay |
 | コミット頻度の異常を検出したい | git_velocity_anomalies |
+| タグベースのリリースパターンを分析したい | git_tag_analysis |
 
 ## カテゴリ別一覧
 
-### データ取得ツール（36個）
+### データ取得ツール（37個）
 - **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
 - **git_file_history** — ファイルのコミット履歴を時系列で表示
 - **git_commit_show** — 特定コミットの詳細（diff含む）を表示
@@ -97,6 +98,7 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_commit_patterns** — 曜日・時間帯別コミット分布ヒートマップ分析（ピーク活動ウィンドウ・平日/週末比率・TZ分布）
 - **git_revert_analysis** — リバートパターン分析（リバート検出・オリジナルコミット紐付け・time-to-revert統計・リバートホットスポット）
 - **git_velocity_anomalies** — コミット頻度の統計的異常検出（スパイク/ドロップ検出・mean±Nσ閾値・期間別分析）
+- **git_tag_analysis** — タグベースのリリースパターン分析（semver分布・annotated/lightweight判別・リリース間隔統計・頻度トレンド・命名prefix分布）
 
 ### 組み合わせ分析ツール（13個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
@@ -119,18 +121,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### output_format（全51ツール対応）
+### output_format（全52ツール対応）
 - \`output_format: "text"\` — デフォルト。人間が読みやすいテキスト形式
 - \`output_format: "json"\` — 構造化JSON形式。プログラムからの利用に最適
 
-### timeout_ms（全51ツール対応）
+### timeout_ms（全52ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
 
 ## Tool Annotations
 
-全51ツールにMCP Tool Annotationsが設定されています:
+全52ツールにMCP Tool Annotationsが設定されています:
 - \`readOnlyHint: true\` — 全ツールが読み取り専用（gitリポジトリを変更しない）
 - \`openWorldHint: false\` — 全ツールがローカルgitリポジトリのみを対象とする
 
@@ -263,6 +265,11 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 3. git_author_timeline → 主要コントリビューターの活動期間を確認
 4. git_offboarding_simulation → 離脱シミュレーションでインパクトを確認
 
+### リリースケイデンス分析（analyze-release-cadence Prompt推奨）
+1. git_tag_analysis → タグベースのリリースパターン分析
+2. git_commit_frequency → 月次コミット頻度のトレンド確認
+3. git_trend_analysis → メトリクスの時系列トレンド分析
+
 ### AIエージェント安全チェック（ai-agent-safety Prompt推奨）
 1. git_file_risk_profile → 変更対象ファイルのリスク評価
 2. git_impact_analysis → 変更の影響範囲分析
@@ -280,7 +287,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "51ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "52ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

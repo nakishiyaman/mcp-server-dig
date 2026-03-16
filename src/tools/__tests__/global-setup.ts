@@ -206,6 +206,19 @@ export async function setup({
     await git("commit", "-m", `chore: bulk commit ${i}`);
   }
 
+  // Additional tags for git_tag_analysis coverage
+  // Lightweight tags (non-annotated) for tag type coverage
+  await git("tag", "beta-0.1");
+  // Annotated semver tags for bump classification coverage
+  await git("tag", "-a", "v0.2.1", "-m", "Patch release");
+  await git("tag", "-a", "v1.0.0", "-m", "Major release");
+  // Pre-release semver tag (annotated)
+  await git("tag", "-a", "v1.1.0-rc.1", "-m", "Release candidate 1");
+  // Non-semver tag (annotated)
+  await git("tag", "-a", "release-2024Q1", "-m", "Q1 release");
+  // Tag without prefix for prefix extraction edge case
+  await git("tag", "20240101");
+
   provide("integrationRepoDir", repoDir);
 }
 

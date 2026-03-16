@@ -1,6 +1,30 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-16 (v0.38.0開発中)
+最終更新: 2026-03-16 (v0.39.0開発中)
+
+## v0.39.0 — formatPeriodKey共通化 + git_tag_analysis + analyze-release-cadence
+
+### Phase 1: formatPeriodKey共通化（リファクタリング）
+- [x] `src/tools/period-utils.ts` — `formatPeriodKey` 共通モジュール（NEW）
+- [x] `src/tools/period-utils.test.ts` — テスト8件
+- [x] `src/tools/git-commit-frequency.ts` — ローカル定義削除、import追加
+- [x] `src/tools/git-velocity-anomalies.ts` — 同上
+- [x] `src/tools/git-survival-analysis.ts` — 同上
+
+### Phase 2: git_tag_analysis ツール（TDD）
+- [x] `src/tools/git-tag-analysis.ts` — タグベースリリースパターン分析ツール（NEW）
+- [x] `src/tools/__tests__/git-tag-analysis.integration.test.ts` — 統合テスト7件
+
+### Phase 3: analyze-release-cadence Prompt
+- [x] `src/prompts/analyze-release-cadence.ts` — リリースケイデンス分析Prompt（NEW）
+- [x] `src/prompts/prompts.test.ts` — テスト4件追加
+
+### Phase 4: 登録・ドキュメント
+- [x] `src/index.ts` — データ37 + 複合13 + Prompt17登録
+- [x] `src/resources/tool-guide.ts` — 52ツール対応、リリースケイデンス分析パターン追加
+- [x] `CLAUDE.md` — v0.39.0、52ツール、17 Prompts
+- [x] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.39.0セクション追加
 
 ## v0.38.0 — 新ツール2本 + 新Prompt1本（知識衰退・速度異常・エキスパート発見）
 
