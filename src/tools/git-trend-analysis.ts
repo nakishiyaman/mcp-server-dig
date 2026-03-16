@@ -69,10 +69,19 @@ export function registerGitTrendAnalysis(server: McpServer, context?: ToolContex
           : await analyzeTrend(repo_path, analysisOptions);
 
         if (result.periods.every((p) => p.value === 0)) {
-          return successResponse(
+          const emptyMsg =
             `No ${metric} data found across ${num_periods} ${period_length} periods.` +
-            (path_pattern ? ` (scope: ${path_pattern})` : ""),
-          );
+            (path_pattern ? ` (scope: ${path_pattern})` : "");
+          const emptyData = {
+            metric: result.metric,
+            periodLength: result.periodLength,
+            direction: result.direction,
+            delta: result.delta,
+            deltaPercentage: result.deltaPercentage,
+            pathPattern: path_pattern ?? null,
+            periods: result.periods,
+          };
+          return formatResponse(emptyData, () => emptyMsg, output_format);
         }
 
         const directionLabel = result.direction === "improving"
