@@ -3,24 +3,24 @@
 日時: 2026-03-16
 
 ### 完了したタスク
-- v0.37.0 プロパティベーステスト導入（全Phase完了）
-  - Phase 1: `@fast-check/vitest` devDependency追加 + パーサープロパティテスト（17テスト）
-  - Phase 2: 不変条件テスト — successResponse/errorResponse/formatResponse（6テスト）
-  - Phase 3: キャッシュ層プロパティテスト — TTL/LRU/buildCacheKey（6テスト）
-  - Phase 4: ドキュメント更新（CLAUDE.md、ROADMAP.md）
-- `AnalysisCache.evictLRU()` 空文字キーバグ修正（プロパティテストで発見）
-  - `if (oldestKey)` → `if (oldestKey !== undefined)` — 空文字キーがJavaScript falsyで削除されないバグ
+- v0.37.0 リリース完了（PR #140 → Release PR #141 → npm publish）
+  - PR作成・CIパス・マージ
+  - release-please Release PR自動作成・auto-merge
+  - GitHub Release + tag `v0.37.0` 作成
+  - npm publish (`mcp-server-dig@0.37.0`) 成功
 
 ### 現在の状態
-- ブランチ: `feat/v0.37.0-property-testing`
-- 未コミット変更: あり（コミット・push予定）
-- テスト: 853件全パス（うちプロパティテスト29件新規）
+- ブランチ: `main`（v0.37.0リリース済み）
+- 未コミット変更: `.claude/settings.local.json` のみ（コミット対象外）
+- テスト: 853件全パス（うちプロパティテスト29件）
 - typecheck/lint/build: 全パス
 
 ### 次にやるべきこと
-- コミット・pushしてPR作成 → mainにマージ
-- release-pleaseによるv0.37.0リリース
-- v0.38.0の計画策定
+- v0.38.0の計画策定（ROADMAPにセクション追加）
+- 候補検討:
+  - 新ツール追加
+  - MCP SDK更新（最新バージョン確認）
+  - release-please-action v4 → Node.js 24対応版への更新（2026-06-02期限）
 
 ### ブロッカー/注意点
 - `.claude/settings.local.json` の変更はコミット対象外にすること
