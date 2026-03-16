@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.38.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.37.0...v0.38.0) (2026-03-16)
+
+
+### Features
+
+* git_expertise_decay + git_velocity_anomalies + find-experts Prompt ([4c9345e](https://github.com/nakishiyaman/mcp-server-dig/commit/4c9345e4c6830c756c25d159461f4f72e1e5abcd))
+* git_expertise_decay + git_velocity_anomalies + find-experts Prompt実装 ([ccb9693](https://github.com/nakishiyaman/mcp-server-dig/commit/ccb9693b9f61492f08541789a8ef2278a1cdd79d))
+
 ## [0.37.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.36.0...v0.37.0) (2026-03-16)
 
 
