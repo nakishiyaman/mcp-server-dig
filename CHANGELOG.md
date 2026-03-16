@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.39.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.38.0...v0.39.0) (2026-03-16)
+
+
+### Features
+
+* v0.39.0 — formatPeriodKey共通化 + git_tag_analysis + analyze-release-cadence ([00504bf](https://github.com/nakishiyaman/mcp-server-dig/commit/00504bf651cc7498a766c6fafb77569130bd8303))
+* v0.39.0 — formatPeriodKey共通化 + git_tag_analysis + analyze-release-cadence ([15a9e83](https://github.com/nakishiyaman/mcp-server-dig/commit/15a9e83ab004b4ab2f73bab3117ff71470d66916))
+
 ## [0.38.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.37.0...v0.38.0) (2026-03-16)
 
 
