@@ -30,6 +30,7 @@ MCP server for AI-powered code archaeology — explore git blame, file history, 
 | `git_offboarding_simulation` | Simulate the impact of a contributor leaving — recomputes bus factor per directory after removing the author's contributions, identifies new single-points-of-failure and knowledge gaps |
 | `git_coordination_bottleneck` | Detect directories with high coordination cost — ranks by composite score of change frequency, unique authors, and ownership distribution to identify merge conflict hotspots |
 | `git_expertise_decay` | Track expertise freshness — detect directories where dominant code owners have become inactive or are fading |
+| `git_stability_prediction` | Predict file stability by combining 4 signals: revert ratio, churn trend, code age, and conflict frequency — scores each file 0-100 |
 
 ### Data Retrieval
 
@@ -612,6 +613,30 @@ Analyze tag-based release patterns — semver distribution, annotated vs lightwe
 | repo_path | string | yes | Absolute path to the git repository |
 | pattern | string | no | Glob pattern to filter tags, e.g. `"v1.*"` or `"release-*"` |
 
+### git_activity_drought
+
+Detect files with prolonged periods of no development activity (droughts). Identifies stagnant code by finding consecutive time periods with zero commits.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| path_pattern | string | no | Limit analysis to a specific path |
+| since | string | no | Start of analysis window (default: "1 year ago") |
+| granularity | string | no | Time granularity: "weekly" or "monthly" (default) |
+| min_drought_periods | number | no | Minimum consecutive zero-activity periods to report (default: 2) |
+| top_n | number | no | Maximum number of files to return (default: 20) |
+
+### git_stability_prediction
+
+Predict file stability by combining 4 signals: revert ratio, churn trend, code age, and conflict frequency. Returns a stability score (0-100) for each file.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| repo_path | string | yes | Absolute path to the git repository |
+| path_pattern | string | no | Limit analysis to a specific path |
+| since | string | no | Date filter, e.g. "2024-01-01" or "6 months ago" |
+| top_n | number | no | Maximum number of files to return (default: 20) |
+
 ## Prompts
 
 MCP Prompts provide guided workflows that chain multiple tools together for common use cases.
@@ -635,6 +660,7 @@ MCP Prompts provide guided workflows that chain multiple tools together for comm
 | `plan-release` | Release planning review — chains release comparison, revert analysis, file risk profile, coordination bottleneck, and trend analysis to support release decisions | `repo_path`, `base_ref`, `head_ref?`, `release_date?` |
 | `find-experts` | Find domain experts — discovers knowledge owners for a specific area using knowledge map, author timeline, blame, and contributor network | `repo_path`, `path_pattern`, `since?` |
 | `analyze-release-cadence` | Release cadence analysis — chains tag analysis, commit frequency, and trend analysis to evaluate release health | `repo_path`, `since?` |
+| `prepare-knowledge-transfer` | Knowledge transfer planning — chains offboarding simulation, knowledge map, loss risk, author timeline, and contributor network for departing developer preparation | `repo_path`, `departing_author`, `timeline?` |
 
 ## Resources
 
@@ -741,17 +767,17 @@ Add to your Windsurf MCP configuration:
 
 ### Timeout
 
-All 51 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
+All 54 tools accept an optional `timeout_ms` parameter (default: 30000ms, max: 300000ms) for large repositories.
 
 ### Output Format
 
-All 51 tools accept an optional `output_format` parameter:
+All 54 tools accept an optional `output_format` parameter:
 - `"text"` (default) — human-readable formatted output
 - `"json"` — structured JSON for programmatic consumption
 
 ### Tool Annotations
 
-All 51 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
+All 54 tools declare MCP Tool Annotations (`readOnlyHint: true`, `openWorldHint: false`), enabling clients to understand that dig tools are read-only git analysis operations.
 
 ### Streamable HTTP Transport
 

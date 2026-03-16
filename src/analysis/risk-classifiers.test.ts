@@ -11,6 +11,8 @@ import {
   riskLabel,
   classifyIntegrationStyle,
   classifyExpertiseDecay,
+  classifyRevertRatio,
+  classifyChurnTrend,
 } from "./risk-classifiers.js";
 import type { RiskDimension } from "./risk-classifiers.js";
 
@@ -274,6 +276,70 @@ describe("classifyExpertiseDecay", () => {
 
   it("全員activeでLOWを返す", () => {
     expect(classifyExpertiseDecay(3, 3, 3)).toBe("LOW");
+  });
+});
+
+describe("classifyRevertRatio", () => {
+  it("totalCommits=0でLOWを返す", () => {
+    const result = classifyRevertRatio(5, 0);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toBe("no reverts");
+  });
+
+  it("revertCount=0でLOWを返す", () => {
+    const result = classifyRevertRatio(0, 100);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toBe("no reverts");
+  });
+
+  it("ratio>=5%でHIGHを返す", () => {
+    const result = classifyRevertRatio(5, 100);
+    expect(result.level).toBe("HIGH");
+    expect(result.detail).toContain("5%");
+  });
+
+  it("ratio>=2%かつ<5%でMEDIUMを返す", () => {
+    const result = classifyRevertRatio(3, 100);
+    expect(result.level).toBe("MEDIUM");
+    expect(result.detail).toContain("3%");
+  });
+
+  it("ratio<2%でLOWを返す", () => {
+    const result = classifyRevertRatio(1, 100);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toContain("1%");
+  });
+});
+
+describe("classifyChurnTrend", () => {
+  it("両方0でLOWを返す", () => {
+    const result = classifyChurnTrend(0, 0);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toBe("no churn data");
+  });
+
+  it("olderChurn=0でMEDIUMを返す", () => {
+    const result = classifyChurnTrend(100, 0);
+    expect(result.level).toBe("MEDIUM");
+    expect(result.detail).toContain("new file");
+  });
+
+  it("ratio>=2.0でHIGHを返す", () => {
+    const result = classifyChurnTrend(200, 100);
+    expect(result.level).toBe("HIGH");
+    expect(result.detail).toContain("2.0x");
+  });
+
+  it("ratio>=1.5かつ<2.0でMEDIUMを返す", () => {
+    const result = classifyChurnTrend(150, 100);
+    expect(result.level).toBe("MEDIUM");
+    expect(result.detail).toContain("1.5x");
+  });
+
+  it("ratio<1.5でLOWを返す", () => {
+    const result = classifyChurnTrend(100, 100);
+    expect(result.level).toBe("LOW");
+    expect(result.detail).toContain("1.0x");
   });
 });
 

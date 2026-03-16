@@ -58,10 +58,12 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 | 知識所有者の活動が衰退している領域は？ | git_expertise_decay |
 | コミット頻度の異常を検出したい | git_velocity_anomalies |
 | タグベースのリリースパターンを分析したい | git_tag_analysis |
+| 開発が停止しているファイルを検出したい | git_activity_drought |
+| ファイルの安定性をスコアで予測したい | git_stability_prediction |
 
 ## カテゴリ別一覧
 
-### データ取得ツール（37個）
+### データ取得ツール（38個）
 - **git_blame_context** — ファイルの各行の著者・日時をブロック単位で表示
 - **git_file_history** — ファイルのコミット履歴を時系列で表示
 - **git_commit_show** — 特定コミットの詳細（diff含む）を表示
@@ -99,8 +101,9 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_revert_analysis** — リバートパターン分析（リバート検出・オリジナルコミット紐付け・time-to-revert統計・リバートホットスポット）
 - **git_velocity_anomalies** — コミット頻度の統計的異常検出（スパイク/ドロップ検出・mean±Nσ閾値・期間別分析）
 - **git_tag_analysis** — タグベースのリリースパターン分析（semver分布・annotated/lightweight判別・リリース間隔統計・頻度トレンド・命名prefix分布）
+- **git_activity_drought** — 開発活動停止期間（drought）検出（連続ゼロコミット期間の特定・ファイル別休止期間ランキング）
 
-### 組み合わせ分析ツール（13個）
+### 組み合わせ分析ツール（14個）
 - **git_file_risk_profile** — ファイルのリスク評価（変更頻度、著者数、churn等を統合）
 - **git_repo_health** — リポジトリ全体の健全性レポート
 - **git_code_ownership_changes** — 日付境界でのコード所有権比較（所有者交代・バス係数変化検出）
@@ -114,6 +117,7 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 - **git_offboarding_simulation** — 特定著者の離脱シミュレーション（bus factor再計算・新規SPOF検出・ディレクトリ別before/after比較）
 - **git_coordination_bottleneck** — ディレクトリ別調整コスト分析（変更頻度×著者数×所有分散度でランキング・マージリスク評価）
 - **git_expertise_decay** — 知識所有者の活動鮮度分析（active/fading/inactive分類・ディレクトリ別リスク評価）
+- **git_stability_prediction** — ファイル安定性予測（revert率×churnトレンド×コード年齢×コンフリクト頻度の4シグナルスコアリング）
 
 ### ワークフロー統合ツール（2個）
 - **git_review_prep** — PRレビュー用の変更サマリーとリスク情報を一括取得
@@ -121,18 +125,18 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 
 ## 共通オプション
 
-### output_format（全52ツール対応）
+### output_format（全54ツール対応）
 - \`output_format: "text"\` — デフォルト。人間が読みやすいテキスト形式
 - \`output_format: "json"\` — 構造化JSON形式。プログラムからの利用に最適
 
-### timeout_ms（全52ツール対応）
+### timeout_ms（全54ツール対応）
 - 大規模リポジトリでタイムアウトする場合に、git操作のタイムアウトを延長できる
 - 最小: 1000ms、最大: 300000ms（5分）、デフォルト: 30000ms（30秒）
 - 例: \`timeout_ms: 120000\` で2分に延長
 
 ## Tool Annotations
 
-全52ツールにMCP Tool Annotationsが設定されています:
+全54ツールにMCP Tool Annotationsが設定されています:
 - \`readOnlyHint: true\` — 全ツールが読み取り専用（gitリポジトリを変更しない）
 - \`openWorldHint: false\` — 全ツールがローカルgitリポジトリのみを対象とする
 
@@ -270,6 +274,23 @@ const TOOL_GUIDE = `# mcp-server-dig ツール使い分けガイド
 2. git_commit_frequency → 月次コミット頻度のトレンド確認
 3. git_trend_analysis → メトリクスの時系列トレンド分析
 
+### 活動休止検出
+1. git_activity_drought → 長期間コミットがないファイルを検出
+2. git_stale_files → 放置ファイルの詳細確認
+3. git_code_age → コード年齢分布の確認
+
+### 安定性予測
+1. git_stability_prediction → 4シグナルでファイル安定性をスコアリング
+2. git_file_risk_profile → 不安定なファイルの詳細リスク分析
+3. git_revert_analysis → リバートパターンの詳細確認
+
+### ナレッジトランスファー準備（prepare-knowledge-transfer Prompt推奨）
+1. git_offboarding_simulation → 離脱の影響シミュレーション
+2. git_knowledge_map → 知識分布の確認
+3. git_knowledge_loss_risk → 知識喪失リスク評価
+4. git_author_timeline → 活動履歴の確認
+5. git_contributor_network → コラボレーション関係の分析
+
 ### AIエージェント安全チェック（ai-agent-safety Prompt推奨）
 1. git_file_risk_profile → 変更対象ファイルのリスク評価
 2. git_impact_analysis → 変更の影響範囲分析
@@ -287,7 +308,7 @@ export function registerToolGuide(server: McpServer): void {
     "dig://tool-guide",
     {
       description:
-        "52ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
+        "54ツールの使い分けガイド（質問パターン→ツール対応表、カテゴリ別一覧、連携パターン）",
       mimeType: "text/markdown",
     },
     () => ({

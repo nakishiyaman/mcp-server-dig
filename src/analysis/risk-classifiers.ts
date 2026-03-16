@@ -225,6 +225,66 @@ export function classifyExpertiseDecay(
   return "LOW";
 }
 
+export function classifyRevertRatio(
+  revertCount: number,
+  totalCommits: number,
+): RiskDimension {
+  if (totalCommits === 0 || revertCount === 0) {
+    return { level: "LOW", detail: "no reverts" };
+  }
+
+  const ratio = revertCount / totalCommits;
+  const percentage = Math.round(ratio * 100);
+
+  if (ratio >= 0.05) {
+    return {
+      level: "HIGH",
+      detail: `${revertCount} reverts (${percentage}% of commits)`,
+    };
+  }
+  if (ratio >= 0.02) {
+    return {
+      level: "MEDIUM",
+      detail: `${revertCount} reverts (${percentage}% of commits)`,
+    };
+  }
+  return {
+    level: "LOW",
+    detail: `${revertCount} reverts (${percentage}% of commits)`,
+  };
+}
+
+export function classifyChurnTrend(
+  recentChurn: number,
+  olderChurn: number,
+): RiskDimension {
+  if (olderChurn === 0 && recentChurn === 0) {
+    return { level: "LOW", detail: "no churn data" };
+  }
+  if (olderChurn === 0) {
+    return { level: "MEDIUM", detail: "new file (no historical churn)" };
+  }
+
+  const ratio = recentChurn / olderChurn;
+
+  if (ratio >= 2.0) {
+    return {
+      level: "HIGH",
+      detail: `churn increasing (${ratio.toFixed(1)}x recent vs older)`,
+    };
+  }
+  if (ratio >= 1.5) {
+    return {
+      level: "MEDIUM",
+      detail: `churn slightly increasing (${ratio.toFixed(1)}x)`,
+    };
+  }
+  return {
+    level: "LOW",
+    detail: `churn stable or decreasing (${ratio.toFixed(1)}x)`,
+  };
+}
+
 export function classifyIntegrationStyle(
   mergeRatio: number,
   mergesPerWeek: number,

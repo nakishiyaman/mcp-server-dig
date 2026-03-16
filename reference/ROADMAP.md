@@ -1,6 +1,33 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-16 (v0.40.0ブランチカバレッジ回復)
+最終更新: 2026-03-17 (v0.41.0 新ツール2本 + 新Prompt1本)
+
+## v0.41.0 — 新ツール2本 + 新Prompt1本
+
+### Phase 1: git_activity_drought（データツール）
+- [x] `src/tools/period-utils.ts` — `generatePeriodRange()` 追加
+- [x] `src/tools/period-utils.test.ts` — generatePeriodRange テスト6件追加
+- [x] `src/tools/git-activity-drought.ts` — ツール実装（NEW）
+- [x] `src/tools/__tests__/git-activity-drought.integration.test.ts` — テスト7件
+
+### Phase 2: git_stability_prediction（組み合わせ分析ツール）
+- [x] `src/analysis/risk-classifiers.ts` — `classifyRevertRatio`, `classifyChurnTrend` 追加
+- [x] `src/analysis/risk-classifiers.test.ts` — 境界値テスト10件追加
+- [x] `src/analysis/stability-prediction.ts` — 純粋スコアリング関数（NEW）
+- [x] `src/analysis/stability-prediction.test.ts` — 単体テスト6件
+- [x] `src/tools/git-stability-prediction.ts` — ツール実装（NEW）
+- [x] `src/tools/__tests__/git-stability-prediction.integration.test.ts` — テスト6件
+
+### Phase 3: prepare-knowledge-transfer Prompt
+- [x] `src/prompts/prepare-knowledge-transfer.ts` — Prompt実装（NEW）
+- [x] `src/prompts/prompts.test.ts` — テスト4件追加
+
+### Phase 4: ドキュメント・仕上げ
+- [x] `src/resources/tool-guide.ts` — 2ツール追加（52→54）
+- [x] `CLAUDE.md` — v0.41.0、54ツール、18 Prompts
+- [x] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [x] `reference/ROADMAP.md` — v0.41.0セクション追加
+- [x] `src/index.ts` — 登録（データ38 + 組み合わせ14 + Prompt18）
 
 ## v0.40.0 — ブランチカバレッジ86%回復
 

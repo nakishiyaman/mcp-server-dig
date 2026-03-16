@@ -16,6 +16,7 @@ import { buildPostIncidentReviewPrompt } from "./post-incident-review.js";
 import { buildPlanReleasePrompt } from "./plan-release.js";
 import { buildFindExpertsPrompt } from "./find-experts.js";
 import { buildAnalyzeReleaseCadencePrompt } from "./analyze-release-cadence.js";
+import { buildPrepareKnowledgeTransferPrompt } from "./prepare-knowledge-transfer.js";
 
 describe("investigate-code prompt", () => {
   it("必須引数がメッセージに埋め込まれる", () => {
@@ -651,5 +652,58 @@ describe("analyze-release-cadence prompt", () => {
     expect(text).toContain("リリースサマリー");
     expect(text).toContain("推奨事項");
     expect(text).toContain("HIGH / MEDIUM / LOW");
+  });
+});
+
+describe("prepare-knowledge-transfer prompt", () => {
+  it("必須引数がメッセージに埋め込まれる", () => {
+    const result = buildPrepareKnowledgeTransferPrompt({
+      repo_path: "/path/to/repo",
+      departing_author: "alice@example.com",
+    });
+
+    expect(result.messages).toHaveLength(1);
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("/path/to/repo");
+    expect(text).toContain("alice@example.com");
+    expect(text).toContain("git_offboarding_simulation");
+    expect(text).toContain("git_knowledge_map");
+    expect(text).toContain("git_knowledge_loss_risk");
+    expect(text).toContain("git_author_timeline");
+    expect(text).toContain("git_contributor_network");
+  });
+
+  it("timelineが指定された場合メッセージに含まれる", () => {
+    const result = buildPrepareKnowledgeTransferPrompt({
+      repo_path: "/path/to/repo",
+      departing_author: "alice@example.com",
+      timeline: "2週間後に離脱予定",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("2週間後に離脱予定");
+    expect(text).toContain("移行タイムライン:");
+  });
+
+  it("timelineが未指定の場合タイムラインの記述がない", () => {
+    const result = buildPrepareKnowledgeTransferPrompt({
+      repo_path: "/path/to/repo",
+      departing_author: "alice@example.com",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).not.toContain("移行タイムライン:");
+  });
+
+  it("報告形式にナレッジトランスファー計画が含まれる", () => {
+    const result = buildPrepareKnowledgeTransferPrompt({
+      repo_path: "/path/to/repo",
+      departing_author: "alice@example.com",
+    });
+
+    const text = (result.messages[0].content as { type: string; text: string }).text;
+    expect(text).toContain("ナレッジトランスファー計画");
+    expect(text).toContain("HIGH / MEDIUM / LOW");
+    expect(text).toContain("リスク軽減策");
   });
 });

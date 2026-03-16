@@ -1,6 +1,55 @@
 /**
  * Shared period key formatting for time-bucketed analysis tools.
  */
+
+/**
+ * Generate a complete range of period keys between two dates.
+ * Useful for detecting periods with zero activity (droughts).
+ */
+export function generatePeriodRange(
+  startDate: string,
+  endDate: string,
+  granularity: string,
+): string[] {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const periods: string[] = [];
+
+  if (start > end) return periods;
+
+  const current = new Date(start);
+
+  switch (granularity) {
+    case "monthly":
+      // Align to first of month
+      current.setDate(1);
+      while (current <= end) {
+        periods.push(formatPeriodKey(current.toISOString(), "monthly"));
+        current.setMonth(current.getMonth() + 1);
+      }
+      break;
+    case "weekly": {
+      // Align to Monday
+      const day = current.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      current.setDate(current.getDate() + diff);
+      while (current <= end) {
+        periods.push(formatPeriodKey(current.toISOString(), "weekly"));
+        current.setDate(current.getDate() + 7);
+      }
+      break;
+    }
+    default: // daily
+      while (current <= end) {
+        periods.push(formatPeriodKey(current.toISOString(), "daily"));
+        current.setDate(current.getDate() + 1);
+      }
+      break;
+  }
+
+  return periods;
+}
+
 export function formatPeriodKey(dateStr: string, granularity: string): string {
   const date = new Date(dateStr);
   const year = date.getFullYear();
