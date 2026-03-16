@@ -3,29 +3,27 @@
 日時: 2026-03-16
 
 ### 完了したタスク
-- TLA+記事（モデル検査・状態空間爆発）の分析・説明
-- mcp-server-digへの推奨プラクティス評価（第4回評価、8項目）
-  - 採用候補3件: 不変条件テスト、プロパティベーステスト（fast-check）、キャッシュ層プロパティテスト
-  - 採用済み2件: 小さなモデルで検証、状態空間の意識的縮小
-  - 見送り3件: TLA+仕様記述、TLC/Apalache導入
-- `docs/recommended-practices.md` に第4回評価セクション追加
-- `reference/ROADMAP.md` にv0.37.0セクション追加（プロパティベーステスト導入計画）
+- v0.37.0 プロパティベーステスト導入（全Phase完了）
+  - Phase 1: `@fast-check/vitest` devDependency追加 + パーサープロパティテスト（17テスト）
+  - Phase 2: 不変条件テスト — successResponse/errorResponse/formatResponse（6テスト）
+  - Phase 3: キャッシュ層プロパティテスト — TTL/LRU/buildCacheKey（6テスト）
+  - Phase 4: ドキュメント更新（CLAUDE.md、ROADMAP.md）
+- `AnalysisCache.evictLRU()` 空文字キーバグ修正（プロパティテストで発見）
+  - `if (oldestKey)` → `if (oldestKey !== undefined)` — 空文字キーがJavaScript falsyで削除されないバグ
 
 ### 現在の状態
-- ブランチ: `docs/handoff-v0.36.0`
-- v0.36.0はリリース済み
-- v0.37.0の計画策定完了（未実装）
+- ブランチ: `feat/v0.37.0-property-testing`
+- 未コミット変更: あり（コミット・push予定）
+- テスト: 853件全パス（うちプロパティテスト29件新規）
+- typecheck/lint/build: 全パス
 
 ### 次にやるべきこと
-- v0.37.0の実装開始（`feat/v0.37.0-property-testing` ブランチをmainから作成）
-  - Phase 1: `@fast-check/vitest` devDependency追加 + パーサープロパティテスト
-  - Phase 2: 不変条件テスト（truncation、execFile引数安全性等）
-  - Phase 3: キャッシュ層プロパティテスト（TTL/LRU不変条件）
-  - Phase 4: ドキュメント更新
+- コミット・pushしてPR作成 → mainにマージ
+- release-pleaseによるv0.37.0リリース
+- v0.38.0の計画策定
 
 ### ブロッカー/注意点
-- `docs/handoff-v0.36.0` ブランチの変更をmainにマージしてからv0.37.0ブランチを作成すること
-- fast-checkはvitest統合パッケージ `@fast-check/vitest` を使用する
-- RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
 - `.claude/settings.local.json` の変更はコミット対象外にすること
+- `@fast-check/vitest` のdeprecation warning: "Importing from vitest/suite is deprecated since Vitest 4.1" — fast-check側の対応待ち
+- RELEASE_PLEASE_TOKEN 年次更新（2027-03頃）
 - release-please-action が Node.js 20 で警告あり（2026-06-02以降 Node.js 24 強制）→ v4の更新を追跡

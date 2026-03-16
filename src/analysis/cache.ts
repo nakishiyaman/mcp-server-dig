@@ -93,7 +93,7 @@ export class AnalysisCache {
       }
     }
 
-    if (oldestKey) {
+    if (oldestKey !== undefined) {
       this.store.delete(oldestKey);
       this.evictions++;
     }
