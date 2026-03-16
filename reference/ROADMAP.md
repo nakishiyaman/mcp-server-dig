@@ -1,6 +1,25 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-16 (v0.39.0リリース済み)
+最終更新: 2026-03-16 (v0.40.0ブランチカバレッジ回復)
+
+## v0.40.0 — ブランチカバレッジ86%回復
+
+### Phase 1: ブランチカバレッジ回復（83.57% → 86.06%）
+- [x] `src/tools/__tests__/branch-coverage-v040.integration.test.ts` 新規作成（144テスト）
+  - git-tag-analysis純粋関数単体テスト（parseTags, analyzeSemver, computeIntervals, detectTrend, extractPrefixes）
+  - repo-summary直接関数テスト
+  - 低カバレッジツール（Tier 1/Tier 2）のエッジケース統合テスト
+  - 未テストツール初回カバレッジ（revert_analysis, survival_analysis, code_ownership_changes, commit_message_quality, branch_activity, complexity_hotspots）
+  - カスタムマルチ期間リポジトリ（バックデートコミットで contributor growth retention, revert time-to-revert, expertise decay inactive/fading, formatSize KB分岐をカバー）
+  - 空結果パスのsinceなしフィルタテスト（commit_frequency, author_timeline, commit_patterns）
+
+### カバレッジ結果
+| 指標 | v0.39.0 | v0.40.0 |
+|------|---------|---------|
+| Statements | 94% | 95.7% |
+| Branches | 83.57% | 86.06% |
+| Functions | 92% | 93.75% |
+| Lines | 95% | 96.8% |
 
 ## v0.39.0 — formatPeriodKey共通化 + git_tag_analysis + analyze-release-cadence
 
