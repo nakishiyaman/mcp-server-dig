@@ -10,6 +10,7 @@ import {
   overallRisk,
   riskLabel,
   classifyIntegrationStyle,
+  classifyExpertiseDecay,
 } from "./risk-classifiers.js";
 import type { RiskDimension } from "./risk-classifiers.js";
 
@@ -247,6 +248,32 @@ describe("classifyIntegrationStyle", () => {
 
   it("低頻度でbatch mergingを返す", () => {
     expect(classifyIntegrationStyle(0.1, 0.5)).toBe("batch merging");
+  });
+});
+
+describe("classifyExpertiseDecay", () => {
+  it("所有者0人でHIGHを返す", () => {
+    expect(classifyExpertiseDecay(1, 0, 0)).toBe("HIGH");
+  });
+
+  it("busFactor<=1かつactive=0でHIGHを返す", () => {
+    expect(classifyExpertiseDecay(1, 0, 2)).toBe("HIGH");
+  });
+
+  it("busFactor<=2かつ全員inactiveでHIGHを返す", () => {
+    expect(classifyExpertiseDecay(2, 0, 3)).toBe("HIGH");
+  });
+
+  it("inactive所有者ありだがactive所有者も残存でMEDIUMを返す", () => {
+    expect(classifyExpertiseDecay(2, 1, 3)).toBe("MEDIUM");
+  });
+
+  it("busFactor>2でもinactive所有者ありでMEDIUMを返す", () => {
+    expect(classifyExpertiseDecay(3, 2, 4)).toBe("MEDIUM");
+  });
+
+  it("全員activeでLOWを返す", () => {
+    expect(classifyExpertiseDecay(3, 3, 3)).toBe("LOW");
   });
 });
 
