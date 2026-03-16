@@ -3,7 +3,7 @@ import { z } from "zod";
 import { validateGitRepo } from "../git/executor.js";
 import { analyzeTrend } from "../analysis/trend-analysis.js";
 import { cachedAnalyzeTrend } from "../analysis/cached-analysis.js";
-import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
+import { errorResponse, formatResponse, outputFormatSchema } from "./response.js";
 import type { ToolContext } from "../index.js";
 
 export function registerGitTrendAnalysis(server: McpServer, context?: ToolContext): void {
