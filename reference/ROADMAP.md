@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-17 (v0.43.0/v0.42.0ロードマップ策定)
+最終更新: 2026-03-17 (v0.42.0 Phase 1 セキュリティ硬化完了)
 
 ## v0.43.0 — 新分析ツール + MCPプロトコル対応
 
@@ -53,19 +53,17 @@
 詳細な評価記録: `docs/recommended-practices.md` 第5回評価
 
 ### Phase 1: セキュリティ硬化（CVE-2025-68144対策）
-- [ ] `src/git/executor.ts` — 引数インジェクション防止
+- [x] `src/git/validators.ts` — 引数インジェクション防止（`gitRefSchema`）
   - `-`で始まるref/ブランチ引数を入力検証レイヤーで明示的に拒否
-  - CVE-2025-68144（Anthropic mcp-server-git）の直接的教訓
-- [ ] `src/git/executor.ts` — シンボリックリンクバイパス防止
+  - 9ツール14パラメータに適用
+- [x] `src/git/executor.ts` — シンボリックリンクバイパス防止
   - `validateFilePath()`に`fs.realpath()`チェック追加
-  - `path.resolve()` + `startsWith()`はsymlinkを追跡しない問題の修正
-- [ ] `src/git/executor.ts` — Git環境変数サニタイズ
-  - execFileの`env`オプションで`GIT_DIR`、`GIT_CONFIG*`等をunset
-  - 親プロセス経由のgit操作リダイレクト防止
-- [ ] 出力サニタイズ — 制御文字ストリッピング
-  - git出力から`\x00`-`\x1f`（`\n`/`\t`除く）を除去
-  - プロンプトインジェクション/ANSIエスケープ対策
-- [ ] セキュリティテスト追加
+- [x] `src/git/executor.ts` — Git環境変数サニタイズ
+  - execFileの`env`オプションで`sanitizedEnv()`適用（16変数除去）
+- [x] `src/tools/response.ts` — 出力サニタイズ（制御文字ストリッピング）
+  - MCPレスポンス層で`\x00`-`\x08`,`\x0b`,`\x0c`,`\x0e`-`\x1f`を除去
+  - ※`execGit()`ではなくレスポンス層に配置（内部パースの`%x00`セパレータ保護）
+- [x] セキュリティテスト追加（64件の統合テスト + 23件のユニット/プロパティテスト）
 
 ### Phase 2: 品質基盤
 - [ ] Strykerインクリメンタル変異テスト導入
