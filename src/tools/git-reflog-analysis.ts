@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import type { ReflogEntry } from "../git/types.js";
+import { gitRefSchema } from "../git/validators.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 function parseReflogOutput(output: string): ReflogEntry[] {
@@ -30,8 +31,7 @@ export function registerGitReflogAnalysis(server: McpServer): void {
         "Analyze git reflog entries to understand HEAD movement history. Shows branch switches, resets, rebases, and other ref updates. Useful for recovering lost commits and understanding local workflow patterns.",
       inputSchema: {
         repo_path: z.string().describe("Absolute path to the git repository"),
-        ref: z
-          .string()
+        ref: gitRefSchema
           .optional()
           .default("HEAD")
           .describe("The ref to show reflog for (default: HEAD)"),

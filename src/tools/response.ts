@@ -6,6 +6,7 @@
  */
 
 import { z } from "zod";
+import { stripControlChars } from "../git/validators.js";
 
 const MAX_OUTPUT_LENGTH = 50_000;
 
@@ -39,15 +40,18 @@ export function formatResponse(
     : successResponse(textFormatter());
 }
 
-/** Build a successful MCP response, truncating if necessary. */
+/** Build a successful MCP response, truncating if necessary.
+ *  Strips dangerous control characters to prevent prompt injection / ANSI escape attacks.
+ */
 export function successResponse(text: string): McpToolResponse {
-  if (text.length > MAX_OUTPUT_LENGTH) {
+  const sanitized = stripControlChars(text);
+  if (sanitized.length > MAX_OUTPUT_LENGTH) {
     const truncated =
-      text.slice(0, MAX_OUTPUT_LENGTH) +
+      sanitized.slice(0, MAX_OUTPUT_LENGTH) +
       `\n\n[Output truncated at ${MAX_OUTPUT_LENGTH} characters]`;
     return { content: [{ type: "text", text: truncated }] };
   }
-  return { content: [{ type: "text", text }] };
+  return { content: [{ type: "text", text: sanitized }] };
 }
 
 /** Build an error MCP response with isError: true. */
@@ -55,7 +59,7 @@ export function errorResponse(error: unknown): McpToolResponse {
   const message =
     error instanceof Error ? error.message : String(error);
   return {
-    content: [{ type: "text", text: `Error: ${message}` }],
+    content: [{ type: "text", text: stripControlChars(`Error: ${message}`) }],
     isError: true,
   };
 }

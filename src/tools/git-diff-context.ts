@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateFilePath, validateGitRepo } from "../git/executor.js";
+import { gitRefSchema } from "../git/validators.js";
 import { parseDiffStatOutput } from "../git/parsers.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
@@ -13,9 +14,8 @@ export function registerGitDiffContext(server: McpServer): void {
       description: "Show the diff between two commits, branches, or tags. Useful for understanding what changed between releases, branches, or any two points in history.",
       inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
-      commit: z.string().describe("Target commit, branch, or tag"),
-      compare_to: z
-        .string()
+      commit: gitRefSchema.describe("Target commit, branch, or tag"),
+      compare_to: gitRefSchema
         .optional()
         .describe("Base to compare against (default: parent commit)"),
       file_path: z

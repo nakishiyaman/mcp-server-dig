@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
+import { gitRefSchema } from "../git/validators.js";
 import { errorResponse, formatResponse, outputFormatSchema } from "./response.js";
 
 const MAX_DIFF_LENGTH = 50_000;
@@ -12,9 +13,9 @@ export function registerGitCommitShow(server: McpServer): void {
       description: "Show detailed information about a specific commit: full message, changed files, and optionally the diff. Useful for drilling into a commit found via git_search_commits.",
       inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
-      commit: z
-        .string()
-        .describe("Commit hash (short or full), branch name, or tag"),
+      commit: gitRefSchema.describe(
+        "Commit hash (short or full), branch name, or tag",
+      ),
       show_diff: z
         .boolean()
         .optional()

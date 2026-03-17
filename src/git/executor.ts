@@ -1,7 +1,8 @@
 import { execFile } from "node:child_process";
-import { access } from "node:fs/promises";
+import { access, realpath } from "node:fs/promises";
 import { resolve } from "node:path";
 import { logger } from "../logger.js";
+import { sanitizedEnv } from "./validators.js";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
@@ -32,7 +33,12 @@ export async function execGit(
     execFile(
       "git",
       args,
-      { cwd: resolvedCwd, timeout: timeoutMs, maxBuffer: 10 * 1024 * 1024 },
+      {
+        cwd: resolvedCwd,
+        timeout: timeoutMs,
+        maxBuffer: 10 * 1024 * 1024,
+        env: sanitizedEnv(),
+      },
       (error, stdout, stderr) => {
         const durationMs = Math.round(performance.now() - startTime);
         const cmd = `git ${args.join(" ")}`;
@@ -94,9 +100,28 @@ export async function validateFilePath(
 ): Promise<void> {
   const resolved = resolve(repoPath, filePath);
   const repoResolved = resolve(repoPath);
+
+  // Logical path check (path traversal via ../)
   if (!resolved.startsWith(repoResolved)) {
     throw new GitExecutorError(
       `File path escapes repository root: ${filePath}`,
     );
+  }
+
+  // Physical path check (symlink resolution)
+  try {
+    const realResolved = await realpath(resolved);
+    const realRepo = await realpath(repoResolved);
+    if (!realResolved.startsWith(realRepo)) {
+      throw new GitExecutorError(
+        `File path escapes repository root: ${filePath}`,
+      );
+    }
+  } catch (err) {
+    // ENOENT: file doesn't exist yet (e.g. new file in git diff)
+    // In that case, the logical check above is sufficient
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") {
+      throw err;
+    }
   }
 }

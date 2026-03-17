@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput, parseDiffStatOutput } from "../git/parsers.js";
+import { gitRefSchema } from "../git/validators.js";
 import { analyzeHotspotsAndChurn } from "../analysis/combined-log-analysis.js";
 import { analyzeContributors } from "../analysis/contributors.js";
 import { analyzeCoChanges } from "../analysis/co-changes.js";
@@ -18,11 +19,8 @@ export function registerGitReviewPrep(server: McpServer, context?: ToolContext):
       description: "Generate a PR review briefing by analyzing the diff between two refs. Combines diff stats, commit history, hotspot/churn analysis, contributor patterns, and co-change detection to surface risk flags, suggest reviewers, and warn about potentially missing files.",
       inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
-      base_ref: z
-        .string()
-        .describe('Base ref for comparison, e.g. "main"'),
-      head_ref: z
-        .string()
+      base_ref: gitRefSchema.describe('Base ref for comparison, e.g. "main"'),
+      head_ref: gitRefSchema
         .optional()
         .default("HEAD")
         .describe('Head ref for comparison (default: "HEAD")'),

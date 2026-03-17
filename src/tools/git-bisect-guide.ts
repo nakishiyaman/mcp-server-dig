@@ -6,6 +6,7 @@ import {
   validateFilePath,
 } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
+import { gitRefSchema } from "../git/validators.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitBisectGuide(server: McpServer): void {
@@ -15,13 +16,10 @@ export function registerGitBisectGuide(server: McpServer): void {
       description: "Provide pre-bisect analysis for identifying bug-introducing commits. Shows commit count, estimated bisect steps (log2), hotspots within range, and file-specific commits. Does NOT run git bisect itself.",
       inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
-      good_ref: z
-        .string()
-        .describe(
-          "Known good reference (commit hash, tag, or branch) where the bug did not exist",
-        ),
-      bad_ref: z
-        .string()
+      good_ref: gitRefSchema.describe(
+        "Known good reference (commit hash, tag, or branch) where the bug did not exist",
+      ),
+      bad_ref: gitRefSchema
         .optional()
         .default("HEAD")
         .describe(

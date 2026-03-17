@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import type { CherryPickEntry } from "../git/types.js";
+import { gitRefSchema } from "../git/validators.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 function parseCherryOutput(output: string): CherryPickEntry[] {
@@ -29,11 +30,10 @@ export function registerGitCherryPickDetect(server: McpServer): void {
         "Detect cherry-picked or equivalent commits between branches using git cherry. Shows which commits from HEAD (or a specified branch) have already been applied to upstream, and which are unique. Useful for identifying duplicate work across branches.",
       inputSchema: {
         repo_path: z.string().describe("Absolute path to the git repository"),
-        upstream: z
-          .string()
-          .describe("The upstream branch to compare against (e.g. 'main')"),
-        head: z
-          .string()
+        upstream: gitRefSchema.describe(
+          "The upstream branch to compare against (e.g. 'main')",
+        ),
+        head: gitRefSchema
           .optional()
           .describe("The branch to check (default: current HEAD)"),
         timeout_ms: z

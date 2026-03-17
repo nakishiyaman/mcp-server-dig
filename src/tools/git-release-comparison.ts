@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { validateGitRepo } from "../git/executor.js";
+import { gitRefSchema } from "../git/validators.js";
 import { analyzeAtRef } from "../analysis/ref-comparison.js";
 import { cachedAnalyzeAtRef } from "../analysis/cached-analysis.js";
 import { errorResponse, formatResponse, outputFormatSchema } from "./response.js";
@@ -21,12 +22,12 @@ export function registerGitReleaseComparison(server: McpServer, context?: ToolCo
       description: "Compare repository metrics between two git refs (tags, branches, or commits). Shows how hotspots, churn, contributor count, and bus factor changed between two points in history. Useful for assessing the impact of releases, sprints, or major changes.",
       inputSchema: {
         repo_path: z.string().describe("Absolute path to the git repository"),
-        base_ref: z
-          .string()
-          .describe("Base ref to compare from (e.g. v1.0.0, main~10, abc1234)"),
-        target_ref: z
-          .string()
-          .describe("Target ref to compare to (e.g. v2.0.0, HEAD, def5678)"),
+        base_ref: gitRefSchema.describe(
+          "Base ref to compare from (e.g. v1.0.0, main~10, abc1234)",
+        ),
+        target_ref: gitRefSchema.describe(
+          "Target ref to compare to (e.g. v2.0.0, HEAD, def5678)",
+        ),
         path_pattern: z
           .string()
           .optional()

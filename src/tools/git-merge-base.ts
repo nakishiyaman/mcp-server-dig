@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
 import { parseLogOutput } from "../git/parsers.js";
+import { gitRefSchema } from "../git/validators.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 export function registerGitMergeBase(server: McpServer): void {
@@ -11,8 +12,8 @@ export function registerGitMergeBase(server: McpServer): void {
       description: "Find the common ancestor (merge base) of two branches or refs and show the commits on each side since divergence. Useful for understanding branch relationships, reviewing what will be merged, and analyzing branching strategy.",
       inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
-      ref1: z.string().describe("First branch or ref (e.g. 'main')"),
-      ref2: z.string().describe("Second branch or ref (e.g. 'feature-branch')"),
+      ref1: gitRefSchema.describe("First branch or ref (e.g. 'main')"),
+      ref2: gitRefSchema.describe("Second branch or ref (e.g. 'feature-branch')"),
       max_commits: z
         .number()
         .int()

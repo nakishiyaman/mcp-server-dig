@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { execGit, validateGitRepo } from "../git/executor.js";
+import { gitRefSchema } from "../git/validators.js";
 import { errorResponse, formatResponse, outputFormatSchema, successResponse } from "./response.js";
 
 interface ConventionalCommit {
@@ -136,11 +137,10 @@ export function registerGitReleaseNotes(server: McpServer): void {
       description: "Generate release notes between two refs by aggregating and classifying commits using Conventional Commits format. Detects breaking changes, groups by type/scope, and lists contributors.",
       inputSchema: {
       repo_path: z.string().describe("Absolute path to the git repository"),
-      from_ref: z
-        .string()
-        .describe('Start ref (exclusive), e.g. "v1.0.0" or a commit hash'),
-      to_ref: z
-        .string()
+      from_ref: gitRefSchema.describe(
+        'Start ref (exclusive), e.g. "v1.0.0" or a commit hash',
+      ),
+      to_ref: gitRefSchema
         .optional()
         .default("HEAD")
         .describe('End ref (inclusive), default: "HEAD"'),
