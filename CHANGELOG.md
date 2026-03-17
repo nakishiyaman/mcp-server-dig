@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.40.0](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.39.1...v0.40.0) (2026-03-17)
+
+
+### Features
+
+* v0.41.0 新ツール2本 + 新Prompt1本 ([08047a5](https://github.com/nakishiyaman/mcp-server-dig/commit/08047a596858239da26f3ef3be6f5341c501fd76))
+* v0.41.0 新ツール2本(git_activity_drought, git_stability_prediction) + 新Prompt1本(prepare-knowledge-transfer) ([69a0889](https://github.com/nakishiyaman/mcp-server-dig/commit/69a08896b1653f6425c06744818fe2ee83727897))
+
 ## [0.39.1](https://github.com/nakishiyaman/mcp-server-dig/compare/v0.39.0...v0.39.1) (2026-03-16)
 
 
