@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-17 (v0.42.0 Phase 1 セキュリティ硬化完了)
+最終更新: 2026-03-18 (v0.42.0 Phase 2 品質基盤完了)
 
 ## v0.43.0 — 新分析ツール + MCPプロトコル対応
 
@@ -66,16 +66,18 @@
 - [x] セキュリティテスト追加（64件の統合テスト + 23件のユニット/プロパティテスト）
 
 ### Phase 2: 品質基盤
-- [ ] Strykerインクリメンタル変異テスト導入
+- [x] Strykerインクリメンタル変異テスト導入
   - `@stryker-mutator/core` + `@stryker-mutator/vitest-runner` + `@stryker-mutator/typescript-checker`
-  - 対象: `src/git/parsers.ts` + `src/analysis/` (クリティカルパス)
+  - 対象: `src/git/parsers.ts`（初回基準スコア88.63%）
   - `--incremental`モードでPR単位のCI実行
-- [ ] eslint-plugin-sonarjs導入
+- [x] eslint-plugin-sonarjs導入
   - Cognitive Complexityメトリクス（閾値15、`"warn"`から開始）
   - `complexity`ルール（閾値10、`"warn"`）
   - `max-depth`ルール（閾値4、`"warn"`）
-- [ ] Vitest `expect.schemaMatching()` 活用
-  - 既存Zodスキーマをテストアサーションに転用する箇所の特定・適用
+  - 初回lint: 0 errors, 70 warnings
+- [x] Zodスキーマによるプロパティテスト強化（`expect.schemaMatching()`代替）
+  - `src/git/output-schemas.ts`: types.ts全13型のZodランタイムスキーマ
+  - `parsers.property.test.ts`: `Array.isArray` → `Schema.parse()` で構造検証強化
 
 ### Phase 3: 配布改善
 - [ ] `server.json` バージョン同期自動化
