@@ -1,24 +1,30 @@
 ## セッション引き継ぎ
 
-日時: 2026-03-16
+日時: 2026-03-17
 
 ### 完了したタスク
-- ブランチカバレッジ 83.57% → 86.06% 回復（+49ブランチ、1649 → 1698/1973）
-- `src/tools/__tests__/branch-coverage-v040.integration.test.ts` 新規作成（144テスト）
-- `reference/ROADMAP.md` に v0.40.0 セクション追加
+- `git_activity_drought` データツール実装（開発活動停止期間検出）
+  - `generatePeriodRange()` を `period-utils.ts` に追加（テスト6件）
+  - 統合テスト7件
+- `git_stability_prediction` 組み合わせ分析ツール実装（4シグナルスコアリング）
+  - `classifyRevertRatio`, `classifyChurnTrend` を `risk-classifiers.ts` に追加（テスト10件）
+  - `predictStability` 純粋スコアリング関数（テスト6件）
+  - 統合テスト6件
+- `prepare-knowledge-transfer` Prompt実装（離脱者ナレッジトランスファー計画）
+  - Promptテスト4件
+- ドキュメント更新（CLAUDE.md, README.md, README.ja.md, tool-guide.ts, ROADMAP.md）
+- 54ツール（データ38 + 組み合わせ14 + ワークフロー2）、18 Prompts
 
 ### 現在の状態
-- ブランチ: `test/v0.40.0-branch-coverage-recovery`（mainから分岐）
-- 未コミット変更: コミット・push済み
-- ビルド: `npm run build && npm run test` 全パス（1068テスト、83ファイル）
-- カバレッジ: branches 86.06% ≥ 86% threshold
+- ブランチ: `feat/v0.41.0-new-tools`（mainから分岐）
+- 未コミット変更: なし（コミット・push待ち）
+- ビルド: `npm run typecheck && npm run lint && npm run build && npm test` 全パス（1107テスト、86ファイル）
 
 ### 次にやるべきこと
+- `git push -u origin feat/v0.41.0-new-tools` でリモートにpush
 - PR作成 → CIパス確認 → mainにマージ
-- CLAUDE.md のバージョン更新（v0.39.0 → v0.40.0）検討
-- release-please-action v5リリース追跡（Node.js 20 deprecation警告）
+- ブランチカバレッジ確認（≥ 86% 維持）
 
 ### ブロッカー/注意点
-- カバレッジの一部テストは実行時間が長め（カスタムリポジトリ作成含む）。CI全体は問題なし
-- 残り未カバーブランチ（275個）の大半は防御的コード（`??` null合体の右側、`.catch()` ハンドラ、dead code paths）でありテストでの到達は困難
+- `v030-branch-coverage.integration.test.ts` の `hotspotsトレンドが実データで方向を返す` テストが稀にタイムアウトする（pre-existing、今回の変更とは無関係）
 - RELEASE_PLEASE_TOKEN の年次更新（2027-03頃）
