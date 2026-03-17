@@ -1,6 +1,101 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-17 (v0.41.0 新ツール2本 + 新Prompt1本)
+最終更新: 2026-03-17 (v0.43.0/v0.42.0ロードマップ策定)
+
+## v0.43.0 — 新分析ツール + MCPプロトコル対応
+
+詳細な評価記録: `docs/recommended-practices.md` 第5回評価
+
+### Phase 1: `git_code_survival`（データツール）
+- [ ] コード生存率分析 — 特定期間に書かれたコードが現在何%残っているか
+  - git blame + 日付分析でcohort別生存率を算出
+  - `git_code_age`の拡張概念（スナップショット→時系列）
+  - Hercules/git-of-theseusの手法をgit CLIのみで実現
+
+### Phase 2: `git_rework_rate`（データツール）
+- [ ] 短期チャーン分析 — コードが追加後N日以内に書き直される率
+  - DORA 2025の第5指標「Deployment Rework Rate」に対応
+  - git log + diff解析で「追加後2週間以内の変更」を検出
+  - `git_revert_analysis` + `git_code_churn`の発展形
+
+### Phase 3: Bus Factor Risk Matrix（組み合わせ分析ツール）
+- [ ] 変更頻度×コントリビューター数の2軸分類
+  - Danger Zone（高頻度変更×少数コントリビューター）の検出
+  - 既存の`git_hotspots` + `git_knowledge_map`データを組み合わせ
+  - 新データ取得不要の純粋な組み合わせ分析
+
+### Phase 4: Sum of Coupling強化
+- [ ] `git_related_changes`にSum of Coupling指標を追加
+  - ファイルが他の全ファイルと共変更される回数の総和
+  - code-maat/CodeSceneの標準メトリクス
+
+### Phase 5: `extract-dora-metrics` Prompt
+- [ ] DORA 5指標抽出ワークフロー
+  - tag_analysis → Deployment Frequency
+  - commit_frequency → Lead Time近似
+  - revert_analysis → Change Failure Rate近似
+  - git_rework_rate → Rework Rate
+
+### Phase 6: outputSchema宣言
+- [ ] JSON出力対応ツールにoutputSchemaを追加
+  - June 2025 MCP Spec準拠
+  - `structuredContent` + `content`テキストの併用で既存出力と両立
+
+### Phase 7: ドキュメント・仕上げ
+- [ ] `src/index.ts` — 新ツール登録
+- [ ] `src/resources/tool-guide.ts` — 新ツール追加
+- [ ] `CLAUDE.md` — v0.43.0、ツール数更新
+- [ ] `README.md` / `README.ja.md` — 新ツール・Promptドキュメント
+- [ ] `reference/ROADMAP.md` — v0.43.0完了チェック
+
+## v0.42.0 — セキュリティ硬化 + 品質基盤 + 配布改善
+
+詳細な評価記録: `docs/recommended-practices.md` 第5回評価
+
+### Phase 1: セキュリティ硬化（CVE-2025-68144対策）
+- [ ] `src/git/executor.ts` — 引数インジェクション防止
+  - `-`で始まるref/ブランチ引数を入力検証レイヤーで明示的に拒否
+  - CVE-2025-68144（Anthropic mcp-server-git）の直接的教訓
+- [ ] `src/git/executor.ts` — シンボリックリンクバイパス防止
+  - `validateFilePath()`に`fs.realpath()`チェック追加
+  - `path.resolve()` + `startsWith()`はsymlinkを追跡しない問題の修正
+- [ ] `src/git/executor.ts` — Git環境変数サニタイズ
+  - execFileの`env`オプションで`GIT_DIR`、`GIT_CONFIG*`等をunset
+  - 親プロセス経由のgit操作リダイレクト防止
+- [ ] 出力サニタイズ — 制御文字ストリッピング
+  - git出力から`\x00`-`\x1f`（`\n`/`\t`除く）を除去
+  - プロンプトインジェクション/ANSIエスケープ対策
+- [ ] セキュリティテスト追加
+
+### Phase 2: 品質基盤
+- [ ] Strykerインクリメンタル変異テスト導入
+  - `@stryker-mutator/core` + `@stryker-mutator/vitest-runner` + `@stryker-mutator/typescript-checker`
+  - 対象: `src/git/parsers.ts` + `src/analysis/` (クリティカルパス)
+  - `--incremental`モードでPR単位のCI実行
+- [ ] eslint-plugin-sonarjs導入
+  - Cognitive Complexityメトリクス（閾値15、`"warn"`から開始）
+  - `complexity`ルール（閾値10、`"warn"`）
+  - `max-depth`ルール（閾値4、`"warn"`）
+- [ ] Vitest `expect.schemaMatching()` 活用
+  - 既存Zodスキーマをテストアサーションに転用する箇所の特定・適用
+
+### Phase 3: 配布改善
+- [ ] `server.json` バージョン同期自動化
+  - release-pleaseワークフローで`server.json`のversion更新
+  - `mcp-publisher` CLIによるMCP Registry自動公開（GitHub OIDC）
+- [ ] Smithery登録
+  - 使用分析 + Cursorワンクリックインストール
+- [ ] awesome-mcp-servers PR
+  - Developer ToolsまたはCode Analysisカテゴリ
+- [ ] README改善
+  - 「Why」セクション追加（「Without dig」vs「With dig」の対比）
+  - npm version/downloads/license/CIバッジ追加
+  - VS Code `.vscode/mcp.json` 設定スニペット追加
+
+### Phase 4: ドキュメント
+- [ ] `CLAUDE.md` — v0.42.0
+- [ ] `reference/ROADMAP.md` — v0.42.0完了チェック
+- [ ] `docs/recommended-practices.md` — 第5回評価記録（本セクション）
 
 ## v0.41.0 — 新ツール2本 + 新Prompt1本
 
