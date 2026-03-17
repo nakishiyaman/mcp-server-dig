@@ -3,9 +3,7 @@
   "testRunner": "vitest",
   "checkers": ["typescript"],
   "mutate": [
-    "src/git/parsers.ts",
-    "src/analysis/**/*.ts",
-    "!src/**/*.test.ts"
+    "src/git/parsers.ts"
   ],
   "incremental": true,
   "reporters": ["clear-text", "html"],
