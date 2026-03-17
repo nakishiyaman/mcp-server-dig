@@ -5,3 +5,5 @@ build/
 .smithery/
 .mcpregistry_*
 coverage/
+reports/
+.stryker-tmp/

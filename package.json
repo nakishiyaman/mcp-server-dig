@@ -15,7 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "lint": "eslint src/",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:mutation": "stryker run"
   },
   "files": [
     "build",
@@ -53,9 +54,13 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@fast-check/vitest": "^0.3.0",
+    "@stryker-mutator/core": "^9.6.0",
+    "@stryker-mutator/typescript-checker": "^9.6.0",
+    "@stryker-mutator/vitest-runner": "^9.6.0",
     "@types/node": "^22.0.0",
     "@vitest/coverage-v8": "^4.1.0",
     "eslint": "^10.0.3",
+    "eslint-plugin-sonarjs": "^4.0.2",
     "prettier": "^3.8.1",
     "typescript": "^5.9.0",
     "typescript-eslint": "^8.57.0",
