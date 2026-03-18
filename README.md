@@ -1,8 +1,19 @@
 # mcp-server-dig
 
+[![npm version](https://img.shields.io/npm/v/mcp-server-dig)](https://www.npmjs.com/package/mcp-server-dig)
+[![npm downloads](https://img.shields.io/npm/dm/mcp-server-dig)](https://www.npmjs.com/package/mcp-server-dig)
+[![license](https://img.shields.io/npm/l/mcp-server-dig)](./LICENSE)
+[![CI](https://github.com/nakishiyaman/mcp-server-dig/actions/workflows/ci.yml/badge.svg)](https://github.com/nakishiyaman/mcp-server-dig/actions/workflows/ci.yml)
+
 English | [日本語](./README.ja.md)
 
 MCP server for AI-powered code archaeology — explore git blame, file history, contributor patterns, and co-change analysis through the [Model Context Protocol](https://modelcontextprotocol.io/).
+
+## Why dig?
+
+**Without dig**, you manually run `git log`, `git blame`, `git diff`, then copy-paste results into your AI assistant. Each question requires a new round of commands, and cross-referencing multiple outputs is tedious.
+
+**With dig**, your AI assistant queries git history directly — combining blame, file history, contributor patterns, and co-change analysis in a single conversation. Ask "why does this code exist?" and get a narrative that weaves together commits, authors, and related files.
 
 ## Tools
 
@@ -713,6 +724,24 @@ Or if running from source:
     "dig": {
       "command": "node",
       "args": ["./build/index.js"]
+    }
+  }
+}
+```
+
+### VS Code (Copilot Chat)
+
+Add to your VS Code `settings.json`:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "dig": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "mcp-server-dig"]
+      }
     }
   }
 }

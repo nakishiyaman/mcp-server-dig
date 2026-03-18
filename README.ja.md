@@ -1,8 +1,19 @@
 # mcp-server-dig
 
+[![npm version](https://img.shields.io/npm/v/mcp-server-dig)](https://www.npmjs.com/package/mcp-server-dig)
+[![npm downloads](https://img.shields.io/npm/dm/mcp-server-dig)](https://www.npmjs.com/package/mcp-server-dig)
+[![license](https://img.shields.io/npm/l/mcp-server-dig)](./LICENSE)
+[![CI](https://github.com/nakishiyaman/mcp-server-dig/actions/workflows/ci.yml/badge.svg)](https://github.com/nakishiyaman/mcp-server-dig/actions/workflows/ci.yml)
+
 [English](./README.md) | 日本語
 
 AI によるコード考古学のための MCP サーバー — git blame、ファイル履歴、コントリビューターパターン、変更関連性分析を [Model Context Protocol](https://modelcontextprotocol.io/) を通じて提供します。
+
+## なぜ dig?
+
+**dig なしの場合**: `git log`、`git blame`、`git diff` を手動で実行し、結果をAIアシスタントにコピペ。質問のたびにコマンドを打ち直し、複数の出力を突き合わせるのは手間がかかります。
+
+**dig ありの場合**: AIアシスタントがgit履歴に直接クエリ — blame、ファイル履歴、コントリビューターパターン、共変更分析を1つの会話内で統合。「このコードはなぜ存在する？」と聞けば、コミット・著者・関連ファイルを織り交ぜたナラティブが返ります。
 
 ## ツール一覧
 
@@ -713,6 +724,24 @@ MCP クライアントの設定ファイル（例: Claude Desktop の `claude_de
     "dig": {
       "command": "node",
       "args": ["./build/index.js"]
+    }
+  }
+}
+```
+
+### VS Code (Copilot Chat)
+
+VS Code の `settings.json` に追加してください：
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "dig": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "mcp-server-dig"]
+      }
     }
   }
 }
