@@ -1,6 +1,6 @@
 # mcp-server-dig ロードマップ
 
-最終更新: 2026-03-18 (v0.42.0 Phase 2 品質基盤完了)
+最終更新: 2026-03-18 (v0.42.0 Phase 3 配布改善完了)
 
 ## v0.43.0 — 新分析ツール + MCPプロトコル対応
 
@@ -80,17 +80,17 @@
   - `parsers.property.test.ts`: `Array.isArray` → `Schema.parse()` で構造検証強化
 
 ### Phase 3: 配布改善
-- [ ] `server.json` バージョン同期自動化
-  - release-pleaseワークフローで`server.json`のversion更新
-  - `mcp-publisher` CLIによるMCP Registry自動公開（GitHub OIDC）
-- [ ] Smithery登録
+- [x] `server.json` バージョン同期自動化
+  - release-please extra-filesで`server.json`のversion自動更新（root + packages[0]）
+  - `mcp-publisher` CLIによるMCP Registry自動公開（continue-on-error）
+- [ ] Smithery登録（リリース後に手動実施）
   - 使用分析 + Cursorワンクリックインストール
-- [ ] awesome-mcp-servers PR
+- [ ] awesome-mcp-servers PR（リリース後に手動実施）
   - Developer ToolsまたはCode Analysisカテゴリ
-- [ ] README改善
-  - 「Why」セクション追加（「Without dig」vs「With dig」の対比）
+- [x] README改善
+  - 「Why dig?」セクション追加（「Without dig」vs「With dig」の対比）
   - npm version/downloads/license/CIバッジ追加
-  - VS Code `.vscode/mcp.json` 設定スニペット追加
+  - VS Code (Copilot Chat) 設定スニペット追加
 
 ### Phase 4: ドキュメント
 - [ ] `CLAUDE.md` — v0.42.0
